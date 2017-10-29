@@ -31,3 +31,37 @@ class IPCLI(CLI):
             finally:
                 lg.info(n, '|', l)
         lg.info('\n')
+
+    def default(self, line):
+        """Called on an input line when the command prefix is not recognized.
+        Overridden to run shell commands when a node is the first CLI argument.
+        Past the first CLI argument, node names are automatically replaced with
+        corresponding addresses if possible.
+        An IPv4 address will be chosen by default if any and if the network allows IPv4.
+        An IPv6 address will be chosen if any and if the network allows IPv6.
+        In all the other cases, the name is not replaced."""
+
+        first, args, line = self.parseline(line)
+
+        if first in self.mn:
+            if not args:
+                print("*** Enter a command for node: %s <cmd>" % first)
+                return
+            node = self.mn[first]
+            rest = args.split(' ')
+            # Substitute IP addresses for node names in command
+            # If updateIP() returns None, then use node name
+            if self.mn.use_v4:
+                rest = [self.mn[arg].defaultIntf().updateIP() or arg
+                        if arg in self.mn else arg
+                        for arg in rest]
+            if self.mn.use_v6:
+                rest = [self.mn[arg].defaultIntf().updateIP6() or arg
+                        if arg in self.mn else arg
+                        for arg in rest]
+            rest = ' '.join(rest)
+            # Run cmd on node:
+            node.sendCmd(rest)
+            self.waitForNode(node)
+        else:
+            lg.error('*** Unknown command: %s\n' % line)

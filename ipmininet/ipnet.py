@@ -350,6 +350,64 @@ class IPNet(Mininet):
             domains.append(bd)
         return domains
 
+    def ping6(self, hosts=None, timeout=None):
+        """Ping6 between all specified hosts having at least one IPv6 address
+
+           :param hosts: the list of hosts or None if all must be pinged
+           :param timeout: the time to wait for a response, as string
+           :param returns: the packet loss percentage"""
+        packets = 0
+        lost = 0
+        if not hosts:
+            hosts = self.hosts
+            log.output('*** Ping6: testing ping6 reachability\n')
+        for node in hosts:
+            log.output('%s -> ' % node.name)
+            for dest in hosts:
+                # We do not try if there is no IPv6 address
+                if node != dest and node.intf().ip6:
+                    opts = ''
+                    if timeout:
+                        opts = '-W %s' % timeout
+                    if dest.intfs and dest.intf().ip6:
+                        result = node.cmd('ping6 -c1 %s %s' %
+                                           (opts, dest.intf().ip6))
+                        sent, received = self._parsePing(result)
+                    else:
+                        sent, received = 0, 0
+                    packets += sent
+                    if received > sent:
+                        log.error('*** Error: received too many packets')
+                        log.error('%s' % result)
+                        node.cmdPrint('route')
+                        exit(1)
+                    lost += sent - received
+                    log.output(('%s ' % dest.name ) if received else 'X ')
+            log.output('\n')
+        if packets > 0:
+            ploss = 100.0 * lost / packets
+            received = packets - lost
+            log.output("*** Results: %i%% dropped (%d/%d received)\n" %
+                       (ploss, received, packets))
+        else:
+            ploss = 0
+            log.output("*** Warning: No packets sent\n")
+        return ploss
+
+    def ping(self, hosts=None, timeout=None):
+        """Ping between all specified hosts.
+           ping(1) is used if self.use_v4 is set
+           ping6(1) is used if self.use_v6 is set
+
+           :param hosts: list of hosts or None if all must be pinged
+           :param timeout: time to wait for a response, as string
+           :param returns: the packet loss percentage of IPv4 connectivity if self.use_v4 is set
+                           the loss percentage of IPv6 connectivity otherwise"""
+        ploss_v4 = super(IPNet, self).ping(hosts=hosts, timeout=timeout) if self.use_v4 else 0
+        ploss_v6 = self.ping6(hosts=hosts, timeout=timeout) if self.use_v6 else 0
+
+        return ploss_v4 if self.use_v4 else ploss_v6
+
 
 class BroadcastDomain(object):
     """An IP broadcast domain in the network. This class stores the set of

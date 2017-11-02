@@ -2,6 +2,8 @@
 from mininet.cli import CLI
 from mininet.log import lg
 
+from ipmininet.utils import realIntfList
+
 
 class IPCLI(CLI):
     def do_route(self, line=""):
@@ -37,9 +39,10 @@ class IPCLI(CLI):
         Overridden to run shell commands when a node is the first CLI argument.
         Past the first CLI argument, node names are automatically replaced with
         corresponding addresses if possible.
-        An IPv4 address will be chosen by default if any and if the network allows IPv4.
-        An IPv6 address will be chosen if any and if the network allows IPv6.
-        In all the other cases, the name is not replaced."""
+        We select only one IP version for these automatic replacements. The IP version
+        chosen is first restricted by the addresses available on the first node.
+        Then, we choose the IP version that enables as many replacements as possible.
+        We use IPv4 as a tie-break."""
 
         first, args, line = self.parseline(line)
 
@@ -49,18 +52,40 @@ class IPCLI(CLI):
                 return
             node = self.mn[first]
             rest = args.split(' ')
+
+            # Identify which IP protocols can be used by the node on which the command is issued
+            first_v4 = False
+            first_v6 = False
+            for itf in realIntfList(node):
+                if itf.updateIP() is not None:
+                    first_v4 = True
+                itf.updateIP6()
+                for _ in itf.ip6s(exclude_lls=True):
+                    first_v6 = True
+                    break
+
+            # Identify the possible substitutions
+            ipv4_map = {}
+            ipv6_map = {}
+            for r in rest:
+                if r in self.mn:
+                    other_node = self.mn[r]
+                    for itf in realIntfList(other_node):
+                        if first_v4 and itf.updateIP() is not None:
+                            ipv4_map[r] = itf.ip
+                        if first_v6:
+                            itf.updateIP6()
+                            for ip6 in itf.ip6s(exclude_lls=True):
+                                ipv6_map[r] = str(ip6.ip)
+                                break
+
+            ip_map = ipv4_map if len(ipv4_map) >= len(ipv6_map) else ipv6_map
+
             # Substitute IP addresses for node names in command
-            # If updateIP() returns None, then use node name
-            if self.mn.use_v4:
-                rest = [self.mn[arg].defaultIntf().updateIP() or arg
-                        if arg in self.mn else arg
-                        for arg in rest]
-            if self.mn.use_v6:
-                rest = [self.mn[arg].defaultIntf().updateIP6() or arg
-                        if arg in self.mn else arg
-                        for arg in rest]
+            rest = [ip_map[arg] if arg in ip_map else arg for arg in rest]
             rest = ' '.join(rest)
-            # Run cmd on node:
+
+            # Run cmd on node
             node.sendCmd(rest)
             self.waitForNode(node)
         else:

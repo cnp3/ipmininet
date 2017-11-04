@@ -36,6 +36,22 @@ def realIntfList(n):
     return [i for i in n.intfList() if i.name != 'lo']
 
 
+def address_pair(n, use_v4=True, use_v6=True):
+    """Returns a tuple (ip, ip6) with ip/ip6 being one of the IPv4/IPv6
+       addresses of the node n"""
+    v4 = v6 = None
+    for itf in realIntfList(n):
+        if use_v4 and v4 is None:
+            v4 = itf.updateIP()
+        if use_v6 and v6 is None:
+            itf.updateIP6()
+            v6 = next(itf.ip6s(exclude_lls=True), None)
+            v6 = v6.ip.compressed if v6 is not None else v6
+        if (not use_v4 or v4 is not None) and (not use_v6 or v6 is not None):
+            break
+    return v4, v6
+
+
 def is_container(x):
     """Return whether x is a container (=iterable but not a string)"""
     return (isinstance(x, collections.Sequence) and

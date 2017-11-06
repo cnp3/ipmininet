@@ -28,6 +28,9 @@ interface ${intf.name}
 
 router ospf6
   router-id ${node.ospf6d.routerid}
+  % for r in node.ospf6d.redistribute:
+  redistribute ${r.subtype}
+  % endfor
   % for itf in node.ospf6d.interfaces:
   interface ${itf.name} area ${itf.area}
   % endfor

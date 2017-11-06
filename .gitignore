@@ -9,3 +9,5 @@ dist
 __ipmininet_temp_key
 __ipmininet_temp_key.pub
 tags
+.eggs
+*.ropeproject

@@ -5,21 +5,29 @@ from mininet.log import lg as log
 from ipaddress import ip_address
 
 
+def has_cmd(cmd):
+    """Return whether the given executable is available on the system or not"""
+    # Check if cmd is a valid absolute path
+    if os.path.isfile(cmd) and os.access(cmd, os.X_OK):
+        return True
+    # Try to find the cmd in each directory in $PATH
+    for path in os.environ["PATH"].split(os.pathsep):
+        path = path.strip('"')
+        exe = os.path.join(path, cmd)
+        if os.path.isfile(exe) and os.access(exe, os.X_OK):
+            return True
+    return False
+
+
 def require_cmd(cmd, help_str=None):
     """
     Ensures that a command is available in $PATH
     :param cmd: the command to test
     :param help_str: an optional help string to display if cmd is not found
     """
-    # Check if cmd is a valid absolute path
-    if os.path.isfile(cmd):
+    if has_cmd(cmd):
         return
-    # Try to find the cmd in each directory in $PATH
-    for path in os.environ["PATH"].split(os.pathsep):
-        path = path.strip('"')
-        exe = os.path.join(path, cmd)
-        if os.path.isfile(exe):
-            return
+
     if help_str:
         log.error(help_str)
     raise RuntimeError('[%s] is not available in $PATH' % cmd)

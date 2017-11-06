@@ -7,7 +7,7 @@ from operator import attrgetter, methodcaller
 from ipaddress import ip_network, ip_interface
 
 from . import MIN_IGP_METRIC, OSPF_DEFAULT_AREA
-from .utils import otherIntf, realIntfList, L3Router, address_pair
+from .utils import otherIntf, realIntfList, L3Router, address_pair, has_cmd
 from .router import Router
 from .router.config import BasicRouterConfig
 from .link import IPIntf, IPLink, PhysicalInterface
@@ -16,6 +16,9 @@ from mininet.net import Mininet
 from mininet.node import Host
 from mininet.nodelib import LinuxBridge
 from mininet.log import lg as log
+
+
+PING6_CMD = 'ping6' if has_cmd('ping6') else 'ping -6'  # ping6 is not provided by default on newer systems
 
 
 class IPNet(Mininet):
@@ -368,7 +371,7 @@ class IPNet(Mininet):
 
         log.output("%s --%s--> " % (src.name, "IPv4" if v4 else "IPv6"))
         for dst, dst_ip in dst_dict.iteritems():
-            result = src.cmd('%s -c1 %s %s' % ("ping" if v4 else "ping6", opts, dst_ip))
+            result = src.cmd('%s -c1 %s %s' % ("ping" if v4 else PING6_CMD, opts, dst_ip))
             sent, received = self._parsePing(result)
             lost += sent - received
             packets += sent
@@ -379,9 +382,9 @@ class IPNet(Mininet):
 
     def ping(self, hosts=None, timeout=None, use_v4=True, use_v6=True):
         """Ping between all specified hosts.
-           If use_v4 is true, ping(1) is used between any pair of hosts having at least
+           If use_v4 is true, pings over IPv4 are used between any pair of hosts having at least
            one IPv4 address on one of their interfaces (loopback excluded).
-           If use_v6 is true,ping6(1) is used between any pair of hosts having at least
+           If use_v6 is true, pings over IPv6 are used between any pair of hosts having at least
            one non-link-local IPv6 address on one of their interfaces (loopback excluded).
 
            :param hosts: list of hosts or None if all must be pinged
@@ -395,13 +398,13 @@ class IPNet(Mininet):
             hosts = self.hosts
         incompatible_hosts = {}
         if not use_v4 and not use_v6:
-            log.output("*** Warning: cannot use either ping(1) or ping6(1)\n")
+            log.output("*** Warning: Parameters forbid both IPv4 and IPv6 for pings\n")
             return 0
 
-        log.output("*** Ping: testing reachability with %s%s%s\n"
-                   % ("ping(1)" if use_v4 else "",
+        log.output("*** Ping: testing reachability over %s%s%s\n"
+                   % ("IPv4" if use_v4 else "",
                       " and " if use_v4 and use_v6 else "",
-                      "ping6(1)" if use_v6 else ""))
+                      "IPv6" if use_v6 else ""))
         for src in hosts:
             ping_dict = {}
             ping6_dict = {}

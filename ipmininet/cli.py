@@ -34,6 +34,22 @@ class IPCLI(CLI):
                 lg.info(n, '|', l)
         lg.info('\n')
 
+    def do_ping4all(self, line):
+        """Ping (IPv4-only) between all hosts."""
+        self.mn.ping4All(line)
+
+    def do_ping4pair(self, _line):
+        """Ping (IPv4-only) between first two hosts, useful for testing."""
+        self.mn.ping4Pair()
+
+    def do_ping6all(self, line):
+        """Ping (IPv4-only) between all hosts."""
+        self.mn.ping6All(line)
+
+    def do_ping6pair(self, _line):
+        """Ping (IPv6-only) between first two hosts, useful for testing."""
+        self.mn.ping6Pair()
+
     def default(self, line):
         """Called on an input line when the command prefix is not recognized.
         Overridden to run shell commands when a node is the first CLI argument.

@@ -151,6 +151,14 @@ class IPNet(Mininet):
         return super(IPNet, self).addLink(node1=node1, node2=node2,
                                           *args, **params)
 
+    def addHost(self, name, **params):
+        """Prevent Mininet from forcing the allocation of IPv4 addresses
+           on hosts. We delegate it to the address auto-allocation of
+           IPNet."""
+        if 'ip' not in params:
+            params['ip'] = None
+        super(IPNet, self).addHost(name, **params)
+
     def node_for_ip(self, ip):
         """Return the node owning a given IP address
 

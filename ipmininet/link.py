@@ -138,7 +138,7 @@ class IPIntf(_m.Intf):
         setv4 = setv6 = False
         # Make sure we have an up-to-date view of our addresses
         self._refresh_addresses()
-        rval = []
+        cmds = []
         # We want to iterate over the new ip sets
         if not is_container(ip):
             ip = (ip,)
@@ -152,10 +152,10 @@ class IPIntf(_m.Intf):
                     # no prefixLen defaults to full /128 or /32
                     addr = ip_interface(addr)
 
-            # Assign IP
-            rval.append(self.cmd('ip', 'address', 'add', 'dev',
-                                 self.name, addr.with_prefixlen))
-            # Record assignement family
+            # Prepare assignment commands
+            cmds.append('ip address add dev %s %s'
+                        % (self.name, addr.with_prefixlen))
+            # Record assignment family
             if addr.version == 4:
                 setv4 = True
             elif addr.version == 6:
@@ -167,6 +167,8 @@ class IPIntf(_m.Intf):
         if setv6:
             cleanup.append(self.ip6s(exclude_lls=True))
         map(self._del_ip, chain.from_iterable(cleanup))
+        # Assign IP
+        rval = map(self.cmd, cmds)
         self._refresh_addresses()
         return rval.pop() if rval and len(rval) == 1 else rval
 

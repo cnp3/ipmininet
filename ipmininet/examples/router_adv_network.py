@@ -30,6 +30,8 @@ class RouterAdvNet(IPTopo):
                      params1={"ip": ("2001:89ab::1/64", "2001:cdef::1/64")},
                      params2={"ip": ("2001:89ab::d/64", "2001:cdef::d/64")})
 
+        super(RouterAdvNet, self).build(*args, **kwargs)
+
     def addRouter_v6(self, name, **kwargs):
         return self.addRouter(name, use_v4=False, use_v6=True, **kwargs)
 

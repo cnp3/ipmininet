@@ -20,16 +20,6 @@ router bgp ${node.bgpd.asn}
     % if n.ebgp_multihop:
     neighbor ${n.peer} ebgp-multihop
     % endif
-    % if n.peer_is_active_opener:
-    ! In order to avoid simultaneous openings of the BGP session,
-    ! one of the peers has to actively establish the session
-    ! and the other one has to wait.
-    ! The following line makes this router passive for this BGP peering
-    ! because the peer is active.
-    ! Note that BGP would work without this line
-    ! but additional traffic would be generated (see Section 6.8 RFC4271).
-    neighbor ${n.peer} passive
-    % endif
     <%block name="neighbor"/>
 % endfor
 % for af in node.bgpd.address_families:

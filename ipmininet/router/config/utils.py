@@ -16,7 +16,7 @@ class ConfigDict(dict):
 
     def __init__(self, **kwargs):
         super(ConfigDict, self).__init__()
-        for key, val in kwargs.iteritems():
+        for key, val in kwargs.items():
             self[key] = val
 
     def __getattr__(self, item):

@@ -144,7 +144,7 @@ class IPNet(Mininet):
                 p = params[pstr]
             except KeyError:
                 p = params[pstr] = {}
-            for k, v in props.iteritems():
+            for k, v in props.items():
                 # Only iff not already specified
                 if k not in p:
                     p[k] = v
@@ -222,7 +222,7 @@ class IPNet(Mininet):
         if self.allocate_IPs:
             self._allocate_IPs()
         # Physical interfaces are their own broadcast domain
-        for itf_name, n in self.physical_interface.iteritems():
+        for itf_name, n in self.physical_interface.items():
             try:
                 itf = PhysicalInterface(itf_name, node=self[n])
                 log.info('\n*** Adding Physical interface',
@@ -351,7 +351,7 @@ class IPNet(Mininet):
                       for n in self.values()
                       if BroadcastDomain.is_domain_boundary(n)
                       for intf in realIntfList(n)}
-        for intf, explored in interfaces.iteritems():
+        for intf, explored in interfaces.items():
             # the interface already belongs to a broadcast domain
             if explored:
                 continue
@@ -381,7 +381,7 @@ class IPNet(Mininet):
             opts = '-W %s' % timeout
 
         log.output("%s --%s--> " % (src.name, "IPv4" if v4 else "IPv6"))
-        for dst, dst_ip in dst_dict.iteritems():
+        for dst, dst_ip in dst_dict.items():
             result = src.cmd('%s -c1 %s %s' % ("ping" if v4 else PING6_CMD,
                                                opts, dst_ip))
             sent, received = self._parsePing(result)
@@ -448,7 +448,7 @@ class IPNet(Mininet):
             lost += result[0]
             packets += result[1]
 
-        for node1, incompatibilities in incompatible_hosts.iteritems():
+        for node1, incompatibilities in incompatible_hosts.items():
             for node2 in incompatibilities:
                 log.output("*** Warning: %s and %s have no global address "
                            "in the same IP version\n" % (node1, node2))

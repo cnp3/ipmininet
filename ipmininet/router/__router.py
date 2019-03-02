@@ -55,7 +55,7 @@ class ProcessHelper(object):
 
     def terminate(self):
         """Terminate all processes in this family"""
-        for p in self._processes.itervalues():
+        for p in self._processes.values():
             try:
                 p.terminate()
             except OSError:
@@ -131,7 +131,7 @@ class Router(Node, L3Router):
         self._processes.terminate()
         if not DEBUG_FLAG:
             self.config.cleanup()
-        for opt, val in self._old_sysctl.iteritems():
+        for opt, val in self._old_sysctl.items():
             self._set_sysctl(opt, val)
         super(Router, self).terminate()
 

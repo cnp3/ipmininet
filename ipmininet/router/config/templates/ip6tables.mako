@@ -1,4 +1,4 @@
-% for table, rules in node.ip6tables.rules.iteritems():
+% for table, rules in node.ip6tables.rules.items():
 *${table}
   % for rule in rules:
 ${rule}

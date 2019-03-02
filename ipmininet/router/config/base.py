@@ -59,17 +59,17 @@ class RouterConfig(object):
         # Set the router id
         self.routerid = self.compute_routerid()
         # Build their config
-        for name, d in self._daemons.iteritems():
+        for name, d in self._daemons.items():
             self._cfg[name] = d.build()
         # Write their config, using the global ConfigDict to handle
         # dependencies
-        for d in self._daemons.itervalues():
+        for d in self._daemons.values():
             cfg = d.render(self._cfg)
             d.write(cfg)
 
     def cleanup(self):
         """Cleanup all temporary files for the daemons"""
-        for d in self._daemons.itervalues():
+        for d in self._daemons.values():
             d.cleanup()
 
     def register_daemon(self, cls, **daemon_opts):
@@ -97,8 +97,8 @@ class RouterConfig(object):
 
     @property
     def sysctl(self):
-        """Return an iterator over all sysctl to set on this node"""
-        return self._sysctl.iteritems()
+        """Return an list of all sysctl to set on this node"""
+        return self._sysctl.items()
 
     @sysctl.setter
     def sysctl(self, *values):
@@ -116,7 +116,7 @@ class RouterConfig(object):
 
     @property
     def daemons(self):
-        return sorted(self._daemons.itervalues(), key=attrgetter('PRIO'))
+        return sorted(self._daemons.values(), key=attrgetter('PRIO'))
 
     def daemon(self, key):
         """Return the Daemon object in this config for the given key

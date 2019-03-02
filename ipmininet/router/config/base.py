@@ -10,7 +10,7 @@ from ipaddress import ip_address
 
 from .utils import ConfigDict, template_lookup, ip_statement
 from ipmininet.utils import require_cmd, realIntfList
-from ipmininet.link import address_comparator
+from ipmininet.link import OrderedAddress
 
 import mako
 
@@ -151,7 +151,7 @@ class RouterConfig(object):
         # with the current router id
         ip_list = sorted((ip for itf in realIntfList(n)
                           for ip in itf.ips()),
-                         cmp=address_comparator)
+                         key=OrderedAddress)
         if len(ip_list) != 0 \
                 and str(ip_list.pop().ip) == str(last_routerid):
             return True
@@ -171,7 +171,7 @@ class RouterConfig(object):
 
         ip_list = sorted((ip for itf in realIntfList(self._node)
                           for ip in itf.ips()),
-                         cmp=address_comparator)
+                         key=OrderedAddress)
         if len(ip_list) == 0:
 
             to_visit = realIntfList(self._node)

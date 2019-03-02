@@ -4,6 +4,7 @@ classes and a new TCIntf base."""
 from itertools import chain
 import subprocess
 from ipaddress import ip_interface, IPv4Interface, IPv6Interface
+import functools
 
 from . import OSPF_DEFAULT_AREA, MIN_IGP_METRIC
 from .utils import otherIntf, is_container
@@ -218,8 +219,8 @@ def _addresses_of(devname, node=None):
         return None, (), ()
     mac, v4, v6 = _parse_addresses(addrstr)
     return (mac,
-            sorted(v4, cmp=address_comparator, reverse=True),
-            sorted(v6, cmp=address_comparator, reverse=True))
+            sorted(v4, key=OrderedAddress, reverse=True),
+            sorted(v6, key=OrderedAddress, reverse=True))
 
 
 def _parse_addresses(out):
@@ -260,6 +261,18 @@ class IPLink(_m.Link):
 # Monkey patch mininit.link ...
 TCIntf = _m.TCIntf
 TCIntf.__bases__ = (IPIntf,)
+
+
+@functools.total_ordering
+class OrderedAddress(object):
+    def __init__(self, addr):
+        self.addr = addr
+
+    def __eq__(self, other):
+        return address_comparator(self.addr, other.addr) == 0
+
+    def __lt__(self, other):
+        return address_comparator(self.addr, other.addr) < 0
 
 
 def address_comparator(a, b):

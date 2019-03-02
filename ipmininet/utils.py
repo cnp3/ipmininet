@@ -13,7 +13,7 @@ def has_cmd(cmd):
     if os.path.isfile(cmd) and os.access(cmd, os.X_OK):
         return True
     # Try to find the cmd in each directory in $PATH
-    for path in os.environ["PATH"].split(os.pathsep):
+    for path in os.environ["PATH"].split(os.path.pathsep):
         path = path.strip('"')
         exe = os.path.join(path, cmd)
         if os.path.isfile(exe) and os.access(exe, os.X_OK):

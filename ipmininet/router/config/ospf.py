@@ -30,7 +30,7 @@ class OSPFArea(Overlay):
     def apply(self, topo):
         # Add all links for the routers
         for r in self.nodes:
-            self.add_link(*map(lambda x: (r, x), topo.g[r].keys()))
+            self.add_link(*[(r, x) for x in topo.g[r].keys()])
         super(OSPFArea, self).apply(topo)
 
     def __str__(self):

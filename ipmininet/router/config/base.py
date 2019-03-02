@@ -35,7 +35,8 @@ class RouterConfig(object):
                        interfaces."""
         self._node = node  # The node for which we will build the configuration
         self._daemons = {}  # Active daemons
-        map(self.register_daemon, daemons)
+        for d in daemons:
+            self.register_daemon(d)
         self._cfg = ConfigDict()  # Our root config object
         self._sysctl = {'net.ipv4.ip_forward': 1,
                         'net.ipv6.conf.all.forwarding': 1}
@@ -51,9 +52,10 @@ class RouterConfig(object):
         self._cfg.password = self._node.password
         self._cfg.name = self._node.name
         # Check that all daemons have their dependencies satisfied
-        map(self.register_daemon,
-            (c for cls in self._daemons.values()
-             for c in cls.DEPENDS if c.NAME not in self._daemons))
+        for cls in list(self._daemons.values()):
+            for c in cls.DEPENDS:
+                if c.NAME not in self._daemons:
+                    self.register_daemon(c)
         # Set the router id
         self.routerid = self.compute_routerid()
         # Build their config

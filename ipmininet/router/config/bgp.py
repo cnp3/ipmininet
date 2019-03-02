@@ -54,7 +54,9 @@ def bgp_fullmesh(topo, routers):
     :param routers: The set of routers peering within each other"""
     def _set_peering(x):
         bgp_peering(topo, x[0], x[1])
-    map(_set_peering, itertools.combinations(routers, 2))
+
+    for peering in itertools.combinations(routers, 2):
+        _set_peering(peering)
 
 
 def bgp_peering(topo, a, b):
@@ -118,7 +120,7 @@ class AddressFamily(object):
     def __init__(self, af_name, redistribute=(), networks=(),
                  *args, **kwargs):
         self.name = af_name
-        self.networks = map(ip_network, map(unicode, networks))
+        self.networks = [ip_network(unicode(n)) for n in networks]
         self.redistribute = redistribute
         self.neighbors = []
         super(AddressFamily, self).__init__()

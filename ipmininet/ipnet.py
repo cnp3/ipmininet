@@ -581,8 +581,8 @@ class BroadcastDomain(object):
 
     @property
     def routers(self):
-        """Yield all interfaces in this domain belonging to a L3 router"""
-        return filter(L3Router.is_l3router_intf, self.interfaces)
+        """List all interfaces in this domain belonging to a L3 router"""
+        return [i for i in self.interfaces if L3Router.is_l3router_intf(i)]
 
     def next_ipv4(self):
         """Allocate and return the next available IPv4 address in this

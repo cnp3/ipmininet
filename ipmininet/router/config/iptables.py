@@ -38,7 +38,7 @@ class IPTables(Daemon):
     def build(self):
         cfg = super(IPTables, self).build()
         table_name = attrgetter('table')
-        cfg.rules = {k: map(str, v)
+        cfg.rules = {k: [str(x) for x in v]
                      for k, v in groupby(sorted(self.options.rules,
                                                 key=table_name),
                                          table_name)}

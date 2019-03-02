@@ -166,9 +166,10 @@ class IPIntf(_m.Intf):
             cleanup.append(self.ips())
         if setv6:
             cleanup.append(self.ip6s(exclude_lls=True))
-        map(self._del_ip, chain.from_iterable(cleanup))
+        for ip in chain.from_iterable(cleanup):
+            self._del_ip(ip)
         # Assign IP
-        rval = map(self.cmd, cmds)
+        rval = [self.cmd(cmd) for cmd in cmds]
         self._refresh_addresses()
         return rval.pop() if rval and len(rval) == 1 else rval
 

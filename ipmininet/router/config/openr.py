@@ -74,8 +74,9 @@ class Openr(OpenrDaemon):
                            ) for i in interfaces]
 
     def _build_prefixes(self, interfaces):
-        ipv6_addresses = reduce(lambda x, y: x + y.addresses[6],
-                                interfaces, [])
+        ipv6_addresses = []
+        for itf in interfaces:
+            ipv6_addresses += itf.addresses[6]
         ipv6_addresses = filter(lambda x: not x.is_link_local, ipv6_addresses)
         return ",".join(map(lambda x: x.with_prefixlen, ipv6_addresses))
 

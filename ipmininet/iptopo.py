@@ -84,7 +84,7 @@ class IPTopo(Topo):
 
     def routers(self, sort=True):
         """Return a list of router node names"""
-        return filter(self.isRouter, self.nodes(sort))
+        return [n for n in self.nodes(sort) if self.isRouter(n)]
 
     def addOverlay(self, overlay):
         """Add a new overlay on this topology"""

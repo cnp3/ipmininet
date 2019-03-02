@@ -85,7 +85,7 @@ class IPCLI(CLI):
             ip_map = v4_map if len(v4_map) >= len(v6_map) else v6_map
 
             if len(ip_map) < len(hops):
-                missing = filter(lambda h: h not in ip_map, hops)
+                missing = [h for h in hops if h not in ip_map]
                 version = 'IPv4' if v4_support else 'IPv6'
                 lg.error('*** Nodes', missing, 'have no', version,
                          'address! Cannot execute the command.\n')

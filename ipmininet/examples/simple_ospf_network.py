@@ -1,6 +1,7 @@
 """This file contains a simple OSPF topology"""
 
 from ipmininet.iptopo import IPTopo
+from ipmininet.router.config import OSPFArea
 
 HOSTS_PER_ROUTER = 2
 
@@ -48,17 +49,17 @@ Managment Network (OOB)|       |              |        |          |             
                 self.addLink(r, self.addHost('h%s%s' % (i, r)),
                              params2={'v4_width': 5})
 
-        # Area 1.1.1.1
+        # Area 1.1.1.1 is delimited by an OSPFArea overlay
         r4, r5 = self.addRouter('r4'), self.addRouter('r5')
-        self.addLink(r2, r5, igp_area='1.1.1.1')
-        self.addLink(r2, r4, igp_area='1.1.1.1')
-        self.addLink(r4, r5, igp_area='1.1.1.1', igp_metric=10)
+        self.addLink(r2, r5)
+        self.addLink(r2, r4)
+        self.addLink(r4, r5, igp_metric=10)
         for r in (r4, r5):
             for i in xrange(HOSTS_PER_ROUTER):
-                self.addLink(r, self.addHost('h%s%s' % (i, r)),
-                             igp_area='1.1.1.1')
+                self.addLink(r, self.addHost('h%s%s' % (i, r)))
+        self.addOverlay(OSPFArea(routers=(r4, r5), area='1.1.1.1'))
 
-        # Area 2.2.2.2
+        # Area 2.2.2.2 is delimited by the igp_area parameter of addLink()
         r6, r7 = self.addRouter('r6'), self.addRouter('r7')
         self.addLink(r3, r6, igp_area='2.2.2.2')
         self.addLink(r3, r7, igp_area='2.2.2.2', igp_metric=5)

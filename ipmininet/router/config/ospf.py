@@ -21,16 +21,16 @@ class OSPFArea(Overlay):
 
     @property
     def area(self):
-        return self.link_properties['igp_area']
+        return self.links_properties['igp_area']
 
     @area.setter
     def area(self, x):
-        self.link_properties['igp_area'] = x
+        self.links_properties['igp_area'] = x
 
     def apply(self, topo):
         # Add all links for the routers
         for r in self.nodes:
-            self.add_link(*topo.g[r])
+            self.add_link(*map(lambda x: (r, x), topo.g[r].keys()))
         super(OSPFArea, self).apply(topo)
 
     def __str__(self):

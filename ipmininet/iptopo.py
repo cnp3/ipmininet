@@ -76,7 +76,7 @@ class IPTopo(Topo):
         """Attempt to retrieve the information for the given link/key
         combination. If not found, set to an instance of default and return
         it"""
-        return get_set(self.linkInfo(l), key, default)
+        return get_set(self.linkInfo(l[0], l[1]), key, default)
 
     def capture_physical_interface(self, intfname, node):
         """Adds a pre-existing physical interface to the given node."""
@@ -110,7 +110,7 @@ class Overlay(object):
         for n in self.nodes:
             topo.nodeInfo(n).update(self.node_property(n))
         for l in self.links:
-            topo.linkInfo(l).update(self.link_property(l))
+            topo.linkInfo(l[0], l[1]).update(self.link_property(l))
 
     def check_consistency(self, topo):
         """Check that this overlay is consistent"""

@@ -12,7 +12,7 @@ from .utils import ConfigDict, template_lookup, ip_statement
 from ipmininet.utils import require_cmd, realIntfList
 from ipmininet.link import OrderedAddress
 
-import mako
+import mako.exceptions
 
 from mininet.log import lg as log
 
@@ -330,8 +330,8 @@ class BasicRouterConfig(RouterConfig):
 
         :param additional_daemons: Other daemons that should be used"""
         # Importing here to avoid circular import
-        from ospf import OSPF
-        from ospf6 import OSPF6
+        from .ospf import OSPF
+        from .ospf6 import OSPF6
         # We don't want any zebra-specific settings, so we rely on the OSPF/OSPF6
         # DEPENDS list for that daemon to run it with default settings
         # We also don't want specific settings beside the defaults, so we don't

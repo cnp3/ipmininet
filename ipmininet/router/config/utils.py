@@ -1,4 +1,7 @@
 """This modules contains various utilies to streamline config generation"""
+from builtins import str
+from ipmininet import basestring
+
 import os
 
 from ipaddress import ip_interface
@@ -41,5 +44,5 @@ def ip_statement(ip):
     :type ip: ip_interface, ip_network, ip_address, int, str"""
     if not isinstance(ip, int):
         ip = (ip_interface(ip) if not isinstance(ip, basestring) else
-              ip_interface(unicode(ip))).version
+              ip_interface(str(ip))).version
     return 'ipv6' if ip == 6 else 'ip'

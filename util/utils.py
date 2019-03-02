@@ -24,11 +24,11 @@ def sh(*cmds, **kwargs):
             while p.poll() is None:
                 out = p.stdout.readline()
                 if out != '':
-                    sys.stdout.write(out)
+                    sys.stdout.write(out.decode("utf-8"))
 
             out = p.stdout.read()
             if out != '':
-                sys.stdout.write(out)
+                sys.stdout.write(out.decode("utf-8"))
 
             if p.poll() != 0:
                 if not may_fail:

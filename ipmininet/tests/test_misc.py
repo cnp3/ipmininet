@@ -23,11 +23,11 @@ def test_nested_ip_networks(address):
 
 
 @pytest.mark.parametrize("test_input,expected", [
-    ("255.255.0.0", 16),
-    ("f000::", 4),
-    ("ffff::", 16),
-    ("128.0.0.0", 1),
-    ("fe00::", 7)
+    (u"255.255.0.0", 16),
+    (u"f000::", 4),
+    (u"ffff::", 16),
+    (u"128.0.0.0", 1),
+    (u"fe00::", 7)
 ])
 def test_prefix_for_netmask(test_input, expected):
     assert utils.prefix_for_netmask(test_input) == expected
@@ -51,7 +51,7 @@ def test_ip_address_format():
     """
     # We force up status so we parse at least one IP of each family
     subprocess.call(['ip', 'link', 'set', 'dev', 'lo', 'up'])
-    out = subprocess.check_output(['ip', 'address', 'show', 'dev', 'lo'])
+    out = subprocess.check_output(['ip', 'address', 'show', 'dev', 'lo']).decode("utf-8")
     mac, v4, v6 = _parse_addresses(out)
     assert mac is not None
     assert len(mac.split(':')) == 6

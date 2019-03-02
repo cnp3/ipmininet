@@ -2,6 +2,8 @@
 that is able to provide configurations for a set of routing daemons.
 It also defines the base class for a routing daemon, as well as a minimalistic
 configuration for a router."""
+from ipmininet import basestring
+
 import os
 import abc
 from contextlib import closing

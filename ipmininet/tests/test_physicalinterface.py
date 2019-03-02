@@ -72,6 +72,6 @@ def ip(*args):
     cmd.extend(args)
     try:
         log.info('Calling: %s', cmd)
-        return check_output(cmd)
+        return check_output(cmd).decode("utf-8")
     except (OSError, CalledProcessError):
         log.error('Command failed!')

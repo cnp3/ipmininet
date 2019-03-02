@@ -1,3 +1,5 @@
+from builtins import str
+
 import re
 import time
 
@@ -13,9 +15,9 @@ def traceroute(net, src, dst_ip, timeout=300):
     while t != timeout / 5.:
         out = net[src].cmd(["traceroute", "-w", "0.05", "-q", "1", "-n", "-I",
                             "-m", len(net.routers) + len(net.hosts), dst_ip]).split("\n")[1:-1]
-        path_ips = [unicode(white_space.split(line)[2])
+        path_ips = [str(white_space.split(line)[2])
                     for line in out if "*" not in line and "!" not in line]
-        if len(path_ips) > 0 and path_ips[-1] == unicode(dst_ip) and old_path_ips == path_ips:
+        if len(path_ips) > 0 and path_ips[-1] == str(dst_ip) and old_path_ips == path_ips:
             same_path_count += 1
             if same_path_count > 2:
                 # Network has converged

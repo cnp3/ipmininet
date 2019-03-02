@@ -1,4 +1,6 @@
 """This modules defines a L3 router class, with a modulable config system."""
+from builtins import str
+
 import sys
 import time
 

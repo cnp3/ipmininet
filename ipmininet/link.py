@@ -1,6 +1,9 @@
 """Classes for interfaces and links that are IP-agnostic. This basically
 enhance the Intf class from Mininet, and then define sane defaults for the link
 classes and a new TCIntf base."""
+from builtins import str
+from ipmininet import basestring
+
 from itertools import chain
 import subprocess
 from ipaddress import ip_interface, IPv4Interface, IPv6Interface
@@ -151,7 +154,7 @@ class IPIntf(_m.Intf):
                     addr = ip_interface(u'%s/%s' % (addr, prefixLen))
                 else:
                     # no prefixLen defaults to full /128 or /32
-                    addr = ip_interface(unicode(addr))
+                    addr = ip_interface(str(addr))
 
             # Prepare assignment commands
             cmds.append('ip address add dev %s %s'
@@ -211,7 +214,7 @@ def _addresses_of(devname, node=None):
     try:
         addrstr = node.cmd(*cmdline)
     except AttributeError:
-        addrstr = subprocess.check_output(cmdline)
+        addrstr = subprocess.check_output(cmdline).decode("utf-8")
     except (OSError, subprocess.CalledProcessError):
         addrstr = None
     if not addrstr:
@@ -240,9 +243,9 @@ def _parse_addresses(out):
         try:
             t = parts[0]
             if t == 'inet':
-                v4.append(IPv4Interface(unicode(parts[1])))
+                v4.append(IPv4Interface(str(parts[1])))
             elif t == 'inet6':
-                v6.append(IPv6Interface(unicode(parts[1])))
+                v6.append(IPv6Interface(str(parts[1])))
             elif 'link/' in t:
                 mac = parts[1]
         except IndexError:
@@ -319,7 +322,7 @@ class PhysicalInterface(IPIntf):
         if node.inNamespace:
             # cfr man ip-link; some devices cannot change of net ns
             if 'netns-local: on' in subprocess.check_output(
-                    ('ethtool', '-k', name)):
+                    ('ethtool', '-k', name)).decode("utf-8"):
                 log.error('Cannot move interface', name, 'into another network'
                           ' namespace!')
         super(PhysicalInterface, self).__init__(name, *args, **kw)
@@ -355,9 +358,9 @@ class GRETunnel(object):
                               tunnel is not established, the kernel will drop
                               by defualt the encapsualted packets."""
         self.if1, self.if2 = if1, if2
-        self.ip1, self.gre1 = (ip_interface(unicode(if1address)),
+        self.ip1, self.gre1 = (ip_interface(str(if1address)),
                                self._gre_name(if1))
-        self.ip2, self.gre2 = (ip_interface(unicode(if2address)),
+        self.ip2, self.gre2 = (ip_interface(str(if2address)),
                                self._gre_name(if2))
         self.bidirectional = bidirectional
         self.setup_tunnel()

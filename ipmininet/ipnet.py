@@ -1,6 +1,8 @@
 """IPNet: The Mininet that plays nice with IP networks.
 This modules will auto-generate all needed configuration properties if
 unspecified by the user"""
+from builtins import str
+
 import math
 from operator import attrgetter, methodcaller
 

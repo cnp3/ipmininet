@@ -1,4 +1,7 @@
 """utils: utility functions to manipulate host, interfaces, ..."""
+from builtins import str
+from ipmininet import basestring
+
 import collections
 import os
 
@@ -71,7 +74,7 @@ def is_container(x):
 def prefix_for_netmask(mask):
     """Return the prefix length associated to a given netmask.
     Will return garbage if the netmask is unproperly formatted!"""
-    ip = ip_address(unicode(mask))
+    ip = ip_address(str(mask))
     v = ~int(ip) & ~(1 - (1 << ip.max_prefixlen))
     l = 0
     while v > 0:

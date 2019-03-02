@@ -1,4 +1,6 @@
 """Base classes to configure a BGP daemon"""
+from builtins import str
+
 import itertools
 
 from ipaddress import ip_network
@@ -120,7 +122,7 @@ class AddressFamily(object):
     def __init__(self, af_name, redistribute=(), networks=(),
                  *args, **kwargs):
         self.name = af_name
-        self.networks = [ip_network(unicode(n)) for n in networks]
+        self.networks = [ip_network(str(n)) for n in networks]
         self.redistribute = redistribute
         self.neighbors = []
         super(AddressFamily, self).__init__()

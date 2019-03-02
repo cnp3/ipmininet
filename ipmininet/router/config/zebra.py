@@ -1,3 +1,5 @@
+from builtins import str
+
 import os
 
 from ipaddress import ip_network, ip_interface
@@ -185,5 +187,5 @@ class StaticRoute(object):
         """:param prefix: The prefix for this static route
         :param nexthop: The nexthop for this prefix, one of: <IP address,
                         interface name, null0, blackhole, reject>"""
-        self.prefix = ip_network(unicode(prefix))
+        self.prefix = ip_network(str(prefix))
         self.nexthop = nexthop

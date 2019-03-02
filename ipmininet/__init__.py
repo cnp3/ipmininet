@@ -11,6 +11,11 @@ except ImportError as e:
                      'Visit www.mininet.org to learn how to do so.\n')
     sys.exit(1)
 
+# Define basestring for python 2 & 3 compatibility
+try:
+    basestring = basestring
+except NameError:
+    basestring = str
 
 # Define global constants
 MIN_IGP_METRIC = 1

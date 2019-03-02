@@ -254,7 +254,7 @@ class IPNet(Mininet):
         for domain in self.broadcast_domains:
             for intf in domain:
                 ips = tuple(domain.next_ipv4()
-                            for _ in xrange(intf.interface_width[0]))
+                            for _ in range(intf.interface_width[0]))
                 intf.setIP(ips)
                 for ip in ips:
                     self._ip_allocs[ip.with_prefixlen] = intf.node
@@ -270,7 +270,7 @@ class IPNet(Mininet):
         for domain in self.broadcast_domains:
             for intf in domain:
                 ips = tuple(domain.next_ipv6()
-                            for _ in xrange(intf.interface_width[1]))
+                            for _ in range(intf.interface_width[1]))
                 intf.setIP6(ips)
                 for ip in ips:
                     self._ip_allocs[ip.with_prefixlen] = intf.node

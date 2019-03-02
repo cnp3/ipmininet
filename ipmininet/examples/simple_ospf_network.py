@@ -45,7 +45,7 @@ Managment Network (OOB)|       |              |        |          |             
         self.addLink(r1, r3, igp_metric=5)
         self.addLink(r3, r2)
         for r in (r1, r2, r3):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)),
                              params2={'v4_width': 5})
 
@@ -55,7 +55,7 @@ Managment Network (OOB)|       |              |        |          |             
         self.addLink(r2, r4)
         self.addLink(r4, r5, igp_metric=10)
         for r in (r4, r5):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)))
         self.addOverlay(OSPFArea(routers=(r4, r5), area='1.1.1.1'))
 
@@ -65,7 +65,7 @@ Managment Network (OOB)|       |              |        |          |             
         self.addLink(r3, r7, igp_area='2.2.2.2', igp_metric=5)
         self.addLink(r6, r7, igp_area='2.2.2.2')
         for r in (r6, r7):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)),
                              igp_area='2.2.2.2')
 

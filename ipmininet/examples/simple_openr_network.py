@@ -25,7 +25,7 @@ class SimpleOpenrNet(IPTopo):
         self.addLink(r1, r2)
         self.addLink(r1, r3)
         for r in (r1, r2, r3):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)),
                              params2={'v4_width': 5})
 

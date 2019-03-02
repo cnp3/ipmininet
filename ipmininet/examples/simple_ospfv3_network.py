@@ -32,7 +32,7 @@ class SimpleOSPFv3Net(IPTopo):
         self.addLink(r1, r3, igp_metric=5)
         self.addLink(r3, r2)
         for r in (r1, r2, r3):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)))
 
         r4, r5 = self.addRouter_v6('r4'), self.addRouter_v6('r5')
@@ -40,7 +40,7 @@ class SimpleOSPFv3Net(IPTopo):
         self.addLink(r2, r4)
         self.addLink(r4, r5, igp_metric=10)
         for r in (r4, r5):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)))
 
         r6, r7 = self.addRouter_v6('r6'), self.addRouter_v6('r7')
@@ -48,7 +48,7 @@ class SimpleOSPFv3Net(IPTopo):
         self.addLink(r3, r7, igp_metric=5)
         self.addLink(r6, r7)
         for r in (r6, r7):
-            for i in xrange(HOSTS_PER_ROUTER):
+            for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)))
 
         super(SimpleOSPFv3Net, self).build(*args, **kwargs)

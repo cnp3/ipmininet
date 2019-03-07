@@ -4,9 +4,10 @@ from ipmininet.router.config import SSHd, RouterConfig
 
 
 class SSHTopo(IPTopo):
-    """This is a simple 2-hosts topology with custom IPTable rules."""
     def build(self, *args, **kw):
-        config = (RouterConfig, {'daemons': [SSHd]})
-        self.addLink(self.addRouter('r1', config=config),
-                     self.addRouter('r2', config=config))
+        r1 = self.addRouter('r1', config=RouterConfig)
+        r2 = self.addRouter('r2', config=RouterConfig)
+        self.addLink(r1, r2)
+        r1.addDaemon(SSHd)
+        r2.addDaemon(SSHd)
         super(SSHTopo, self).build(*args, **kw)

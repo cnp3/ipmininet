@@ -4,17 +4,6 @@ from ipmininet.router.config import RouterConfig, BGP, iBGPFullMesh, AS,\
 import ipmininet.router.config.bgp as _bgp
 
 
-class BGPConfig(RouterConfig):
-    """A simple config with only a BGP daemon"""
-    def __init__(self, node, *args, **kwargs):
-        defaults = {'address_families': (
-            _bgp.AF_INET(redistribute=('connected',)),
-            _bgp.AF_INET6(redistribute=('connected',)))}
-        super(BGPConfig, self).__init__(node,
-                                        daemons=((BGP, defaults),),
-                                        *args, **kwargs)
-
-
 class SimpleBGPTopo(IPTopo):
     """This topology builds a 3-AS network exchanging BGP reachability
     information"""
@@ -54,4 +43,8 @@ class SimpleBGPTopo(IPTopo):
         super(SimpleBGPTopo, self).build(*args, **kwargs)
 
     def bgp(self, name):
-        return self.addRouter(name, config=BGPConfig)
+        r = self.addRouter(name, config=RouterConfig)
+        r.addDaemon(BGP, address_families=(
+            _bgp.AF_INET(redistribute=('connected',)),
+            _bgp.AF_INET6(redistribute=('connected',))))
+        return r

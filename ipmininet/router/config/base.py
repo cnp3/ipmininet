@@ -323,7 +323,7 @@ class Daemon(object):
 class BasicRouterConfig(RouterConfig):
     """A basic router that will run an OSPF daemon"""
 
-    def __init__(self, node, additional_daemons=(), *args, **kwargs):
+    def __init__(self, node, daemons=(), additional_daemons=(), *args, **kwargs):
         """A simple router made of at least an OSPF daemon
 
         :param additional_daemons: Other daemons that should be used"""
@@ -334,7 +334,7 @@ class BasicRouterConfig(RouterConfig):
         # DEPENDS list for that daemon to run it with default settings
         # We also don't want specific settings beside the defaults, so we don't
         # provide an instance but the class instead
-        d = []
+        d = list(daemons)
         if node.use_v4:
             d.append(OSPF)
         if node.use_v6:

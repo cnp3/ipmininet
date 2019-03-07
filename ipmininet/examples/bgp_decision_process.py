@@ -41,22 +41,32 @@ class BGPDecisionProcess(IPTopo):
          +------------+                                   +--------+
         """
         # Add all routers
-        as1r1 = self.addRouter('as1r1', config=(RouterConfig, {
-            'daemons': [(BGP, {'address_families': (
-                               _bgp.AF_INET(networks=('1.2.3.0/24',)),)})]}))
-        as2r1 = self.addRouter('as2r1', config=(RouterConfig, {
-            'daemons': [(BGP, {'routerid': '1.1.1.1'}), OSPF]}))
-        as2r2 = self.addRouter('as2r2', config=(RouterConfig, {
-            'daemons': [(BGP, {'routerid': '1.1.1.2'}), OSPF]}))
-        as2r3 = self.addRouter('as2r3', config=(RouterConfig, {
-            'daemons': [OSPF, BGP]}))
-        x = self.addRouter('x', config=(RouterConfig, {
-            'daemons': [OSPF]}))
-        y = self.addRouter('y', config=(RouterConfig, {
-            'daemons': [OSPF]}))
-        as3r1 = self.addRouter('as3r1', config=(RouterConfig, {
-            'daemons': [(BGP, {'address_families': (
-                               _bgp.AF_INET(networks=('1.2.3.0/24',)),)})]}))
+        as1r1 = self.addRouter('as1r1')
+        as1r1.addDaemon(BGP, address_families=(
+            _bgp.AF_INET(networks=('1.2.3.0/24',)),))
+
+        as2r1 = self.addRouter('as2r1')
+        as2r1.addDaemon(BGP, routerid='1.1.1.1')
+        as2r1.addDaemon(OSPF)
+
+        as2r2 = self.addRouter('as2r2')
+        as2r2.addDaemon(BGP, routerid='1.1.1.2')
+        as2r2.addDaemon(OSPF)
+
+        as2r3 = self.addRouter('as2r3')
+        as2r3.addDaemon(BGP)
+        as2r3.addDaemon(OSPF)
+
+        x = self.addRouter('x')
+        x.addDaemon(OSPF)
+
+        y = self.addRouter('y')
+        y.addDaemon(OSPF)
+
+        as3r1 = self.addRouter('as3r1')
+        as3r1.addDaemon(BGP, address_families=(
+            _bgp.AF_INET(networks=('1.2.3.0/24',)),))
+
         self.addLink(as1r1, as2r1)
         self.addLink(as2r1, x, igp_metric=1)
         self.addLink(x, as2r3, igp_metric=10)
@@ -72,3 +82,6 @@ class BGPDecisionProcess(IPTopo):
         ebgp_session(self, as1r1, as2r1)
         ebgp_session(self, as3r1, as2r2)
         super(BGPDecisionProcess, self).build(*args, **kwargs)
+
+    def addRouter(self, name, **kwargs):
+        return super(BGPDecisionProcess, self).addRouter(name, config=RouterConfig, **kwargs)

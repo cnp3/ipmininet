@@ -19,7 +19,8 @@ class RouterAdvNet(IPTopo):
         server.  Note that the DNS service is not actually started and thus the
         host won't get a DNS reply.
         """
-        r = self.addRouter_v6('r', config=(RouterConfig, {'daemons': [RADVD]}))
+        r = self.addRouter_v6('r')
+        r.addDaemon(RADVD)
         h = self.addHost('h')
         dns = self.addHost('dns')
         self.addLink(r, h, params1={
@@ -33,5 +34,5 @@ class RouterAdvNet(IPTopo):
         super(RouterAdvNet, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name, **kwargs):
-        return self.addRouter(name, use_v4=False, use_v6=True, **kwargs)
+        return self.addRouter(name, config=RouterConfig, use_v4=False, use_v6=True, **kwargs)
 

@@ -4,6 +4,7 @@ from mininet.topo import Topo
 from mininet.log import lg
 
 from ipmininet.utils import get_set
+from ipmininet.router.config import BasicRouterConfig
 
 
 class IPTopo(Topo):
@@ -43,7 +44,32 @@ class IPTopo(Topo):
         """Add a router to the topology
 
         :param name: the name of the node"""
-        return self.addNode(name, isRouter=True, **kwargs)
+        return RouterDescription(self.addNode(name, isRouter=True, **kwargs), self)
+
+    def addDaemon(self, router, daemon, default_cfg_class=BasicRouterConfig,
+                  cfg_daemon_list="daemons", **daemon_params):
+        """Add the daemon to the list of daemons to start on the router.
+
+        :param router: router name
+        :param daemon: daemon class
+        :param default_cfg_class: config class to use
+        if there is no configuration class defined for the router yet.
+        :param cfg_daemon_list: name of the parameter containing
+        the list of daemons in your config class constructor.
+        For instance, RouterConfig uses 'daemons'
+        but BasicRouterConfig uses 'additional_daemons'.
+        :param daemon_params: all the parameters to give
+        when instantiating the daemon class."""
+
+        config = self.nodeInfo(router).setdefault("config", default_cfg_class)
+        try:
+            config_params = config[1]
+        except (IndexError, TypeError):
+            config_params = {cfg_daemon_list: []}
+            self.nodeInfo(router)["config"] = (config, config_params)
+
+        daemon_list = config_params.setdefault(cfg_daemon_list, [])
+        daemon_list.append((daemon, daemon_params))
 
     def isRouter(self, n):
         """Check whether the given node is a router
@@ -81,6 +107,33 @@ class IPTopo(Topo):
     def capture_physical_interface(self, intfname, node):
         """Adds a pre-existing physical interface to the given node."""
         self.phys_interface_capture[intfname] = node
+
+
+class RouterDescription(str):
+
+    def __new__(cls, value, *args, **kwargs):
+        return super(RouterDescription, cls).__new__(cls, value)
+
+    def __init__(self, o, topo):
+        self.topo = topo
+        super(RouterDescription, self).__init__(o)
+
+    def addDaemon(self, daemon, default_cfg_class=BasicRouterConfig,
+                  cfg_daemon_list="daemons", **daemon_params):
+        """Add the daemon to the list of daemons to start on the router.
+
+        :param daemon: daemon class
+        :param default_cfg_class: config class to use
+        if there is no configuration class defined for the router yet.
+        :param cfg_daemon_list: name of the parameter containing
+        the list of daemons in your config class constructor.
+        For instance, RouterConfig uses 'daemons'
+        but BasicRouterConfig uses 'additional_daemons'.
+        :param daemon_params: all the parameters to give
+        when instantiating the daemon class."""
+
+        self.topo.addDaemon(self, daemon, default_cfg_class=default_cfg_class,
+                            cfg_daemon_list=cfg_daemon_list, **daemon_params)
 
 
 class Overlay(object):

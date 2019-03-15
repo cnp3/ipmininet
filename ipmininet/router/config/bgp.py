@@ -3,7 +3,7 @@ import itertools
 
 from ipaddress import ip_network
 
-from ipmininet.iptopo import Overlay
+from ipmininet.overlay import Overlay
 from ipmininet.utils import realIntfList
 from .zebra import QuaggaDaemon, Zebra
 

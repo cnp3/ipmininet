@@ -1,6 +1,7 @@
 import re
 import time
 
+import signal
 from ipaddress import ip_address
 
 
@@ -78,3 +79,28 @@ def assert_connectivity(net, v6=False, timeout=90):
         t += 1
         time.sleep(5)
     assert host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
+
+
+def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=30):
+    server_ip = server.defaultIntf().ip6 if v6 else server.defaultIntf().ip
+    server_cmd = "nc %s -l %d" % ("-6" if v6 else "-4", server_port)
+    server_p = server.popen(server_cmd.split(" "))
+
+    t = 0
+    client_cmd = "nc -z -w 1 -v %s %d" % (server_ip, server_port)
+
+    client_p = client.popen(client_cmd.split(" "))
+    while t != timeout * 2 and client_p.wait() != 0:
+        t += 1
+        if server_p.poll() is not None:
+            out, err = server_p.communicate()
+            assert False, \
+                "The netcat server used to check TCP connectivity failed with the output:" \
+                "\n[stdout]\n%s\n[stderr]\n%s" % (out, err)
+        time.sleep(.5)
+        client_p = client.popen(client_cmd.split(" "))
+    out, err = client_p.communicate()
+    code = client_p.poll()
+    server_p.send_signal(signal.SIGINT)
+    server_p.wait()
+    return code, out, err

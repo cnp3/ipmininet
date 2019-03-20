@@ -6,7 +6,7 @@ log file ${node.ospfd.logfile}
 % endif
 
 % for section in node.ospfd.debug:
-debug ospf section
+debug ospf ${section}
 % endfor
 
 % for intf in node.ospfd.interfaces:

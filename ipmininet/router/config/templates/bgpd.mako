@@ -6,7 +6,7 @@ log file ${node.bgpd.logfile}
 % endif
 
 % for section in node.bgpd.debug:
-debug bgp section
+debug bgp ${section}
 % endfor
 
 router bgp ${node.bgpd.asn}

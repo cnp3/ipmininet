@@ -118,7 +118,7 @@ class RouterDescription(str):
 
     def __init__(self, o, topo):
         self.topo = topo
-        super(RouterDescription, self).__init__(o)
+        super(RouterDescription, self).__init__()
 
     def addDaemon(self, daemon, default_cfg_class=BasicRouterConfig,
                   cfg_daemon_list="daemons", **daemon_params):

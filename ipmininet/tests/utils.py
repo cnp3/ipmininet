@@ -64,6 +64,8 @@ def host_connected(net, v6=False, timeout=0.5):
     for src in net.hosts:
         for dst in net.hosts:
             if src != dst:
+                dst.defaultIntf().updateIP()
+                dst.defaultIntf().updateIP6()
                 dst_ip = dst.defaultIntf().ip6 if v6 else dst.defaultIntf().ip
                 cmd = "nmap%s -sn -n --max-retries 0 --max-rtt-timeout %dms %s"\
                       % (" -6" if v6 else "", int(timeout * 1000), dst_ip)

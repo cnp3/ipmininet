@@ -24,7 +24,11 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: System :: Networking",
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
         ],
     keywords='networking OSPF IP BGP quagga mininet',
     license='GPLv2',

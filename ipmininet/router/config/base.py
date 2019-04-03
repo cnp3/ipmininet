@@ -2,6 +2,7 @@
 that is able to provide configurations for a set of routing daemons.
 It also defines the base class for a routing daemon, as well as a minimalistic
 configuration for a router."""
+from future.utils import with_metaclass
 from ipmininet import basestring
 
 import os
@@ -197,9 +198,8 @@ class RouterConfig(object):
             return id
 
 
-class Daemon(object):
+class Daemon(with_metaclass(abc.ABCMeta, object)):
     """This class serves as base for routing daemons"""
-    __metaclass__ = abc.ABCMeta
     # The name of this routing daemon
     NAME = None
     # The priority of this daemon, relative to others

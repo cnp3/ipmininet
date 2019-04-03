@@ -1,4 +1,3 @@
-import abc
 import os
 import shlex
 import subprocess
@@ -38,8 +37,6 @@ def sh(*cmds, **kwargs):
 
 
 class Distribution(object):
-    __metaclass__ = abc.ABCMeta
-
     NAME = None
     INSTALL_CMD = None
     UPDATE_CMD = None

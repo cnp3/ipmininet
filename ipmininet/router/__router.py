@@ -9,6 +9,7 @@ from .config import BasicRouterConfig
 import mininet.clean
 from mininet.node import Node
 from mininet.log import lg
+import shlex
 
 
 class ProcessHelper(object):
@@ -104,7 +105,7 @@ class Router(Node, L3Router):
         # Check them
         err_code = False
         for d in self.config.daemons:
-            out, err, code = self._processes.pexec(*d.dry_run.split(' '))
+            out, err, code = self._processes.pexec(shlex.split(d.dry_run))
             err_code = err_code or code
             if code:
                 lg.error(d.NAME, 'configuration check failed ['
@@ -120,7 +121,7 @@ class Router(Node, L3Router):
             self._old_sysctl[opt] = self._set_sysctl(opt, val)
         # Fire up all daemons
         for d in self.config.daemons:
-            self._processes.popen(*d.startup_line.split(' '))
+            self._processes.popen(shlex.split(d.startup_line))
             # Busy-wait if the daemon needs some time before being started
             while not d.has_started():
                 time.sleep(.001)

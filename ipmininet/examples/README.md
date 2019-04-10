@@ -142,3 +142,18 @@ This network spawn a small topology with two hosts and a router.
 One of these hosts uses Router Advertisements to get its IPv6 addresses
 The other one's IP addresses are announced in the Router Advertisements
 as the DNS server's addresses.
+
+
+## SimpleOpenRNetwork
+
+_topo name_ : simple_openr_network
+_args_ : n/a
+
+This network represents a small OpenR network connecting three routers in a Bus
+topology. Each router has hosts attached. The `/tmp` folders are private to
+isolate the unix sockets used by OpenR. The private `/var/log` directories
+isolate logs.
+
+Use
+[breeze](https://github.com/facebook/openr/blob/master/openr/docs/Breeze.md) to
+investigate the routing state of OpenR.

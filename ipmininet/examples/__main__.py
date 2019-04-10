@@ -13,6 +13,7 @@ from .iptables import IPTablesTopo
 from .gre import GRETopo
 from .sshd import SSHTopo
 from .router_adv_network import RouterAdvNet
+from .simple_openr_network import SimpleOpenrNet
 
 
 from mininet.log import lg, LEVELS
@@ -24,7 +25,8 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'iptables': IPTablesTopo,
          'gre': GRETopo,
          'ssh': SSHTopo,
-         'router_adv_network': RouterAdvNet}
+         'router_adv_network': RouterAdvNet,
+         'simple_openr_network': SimpleOpenrNet}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,

@@ -5,7 +5,7 @@ import signal
 from ipaddress import ip_address
 
 
-def traceroute(net, src, dst_ip, timeout=90):
+def traceroute(net, src, dst_ip, timeout=300):
     t = 0
     old_path_ips = []
     same_path_count = 0
@@ -30,7 +30,7 @@ def traceroute(net, src, dst_ip, timeout=90):
     assert False, "The network did not converged"
 
 
-def assert_path(net, expected_path, v6=False, timeout=90):
+def assert_path(net, expected_path, v6=False, timeout=300):
     src = expected_path[0]
     dst = expected_path[-1]
     dst_ip = net[dst].defaultIntf().ip6 if v6 else net[dst].defaultIntf().ip
@@ -75,7 +75,7 @@ def host_connected(net, v6=False, timeout=0.5):
     return True
 
 
-def assert_connectivity(net, v6=False, timeout=90):
+def assert_connectivity(net, v6=False, timeout=300):
     t = 0
     while t != timeout / 5. and not host_connected(net, v6=v6):
         t += 1
@@ -83,7 +83,7 @@ def assert_connectivity(net, v6=False, timeout=90):
     assert host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
 
-def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=30):
+def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=300):
     server_ip = server.defaultIntf().ip6 if v6 else server.defaultIntf().ip
     server_cmd = "nc %s -l %d" % ("-6" if v6 else "-4", server_port)
     server_p = server.popen(server_cmd.split(" "))

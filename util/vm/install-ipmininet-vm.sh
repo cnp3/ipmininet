@@ -41,8 +41,11 @@ sudo python setup.py install
 popd
 
 # Install quagga
-sudo apt install -yq quagga
+sudo apt install -yq quagga 
 sudo ln -s /usr/lib/quagga/* /usr/bin/
 
 # Install radvd
 sudo apt install -yq radvd
+
+# Install bridge-utils
+sudo apt install bridge-utils

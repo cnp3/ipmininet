@@ -23,10 +23,12 @@ def test_sshd_example():
         assert os.path.isfile(ssh_key), "Cannot find key file at %s" % ssh_key
 
         ip = net["r2"].intf("r2-eth0").ip
-        cmd = "ssh -oStrictHostKeyChecking=no -oConnectTimeout=1 -i %s %s ls" % (ssh_key, ip)
+        cmd = "ssh -oStrictHostKeyChecking=no -oConnectTimeout=1 -oPasswordAuthentication=no" \
+              " -i %s %s ls" % (ssh_key, ip)
         t = 0
         while t < 60 and net["r1"].popen(cmd.split(" ")).wait() != 0:
             time.sleep(0.5)
+            t += 1
         p = net["r1"].popen(cmd.split(" "))
         assert p.wait() == 0, "Cannot connect with SSH to the router"
 

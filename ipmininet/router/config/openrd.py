@@ -20,12 +20,15 @@ class OpenrDaemon(Daemon):
                         extra=self.STARTUP_LINE_EXTRA)
 
     def build(self):
-        cfg = super(OpenrDaemon, self).build()
-        cfg.debug = self.options.debug
+        cfg = ConfigDict()
         return cfg
 
-    def set_defaults(self, defaults):
+    def _defaults(self, **kwargs):
         """
+        Default parameters of the OpenR daemon. The template file openr.mako
+        sets the default parameters listed here. See:
+        https://github.com/facebook/openr/blob/master/openr/docs/Runbook.md.
+
         :param alloc_prefix_len: Block size of allocated prefix in terms of
             it's prefix length. In this case '/80' prefix will be elected for a
             node. e.g. 'face:b00c:0:0:1234::/80'. Default: 128.
@@ -216,6 +219,14 @@ class OpenrDaemon(Daemon):
             value of this flag. Use higher value for more verbose logging.
             Default: 1.
         """
+        defaults = ConfigDict()
+        # Apply daemon-specific defaults
+        self.set_defaults(defaults)
+        # Use user-supplied defaults if present
+        defaults.update(**kwargs)
+        return defaults
+
+    def set_defaults(self, defaults):
         super(OpenrDaemon, self).set_defaults(defaults)
 
     def _cfg_options(self):

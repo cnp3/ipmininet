@@ -48,15 +48,13 @@ class Openr(OpenrDaemon):
 
     def build(self):
         cfg = super(Openr, self).build()
-        for key in self._default_config().keys():
-            cfg[key] = self.options[key]
+        cfg.update(self.options)
         cfg.node_name = self._node.name
         interfaces = [itf
                       for itf in realIntfList(self._node)]
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         cfg.prefixes = self._build_prefixes(interfaces)
-        cfg.update(cfg_overwrite)
         return cfg
 
     def _build_networks(self, interfaces):
@@ -82,15 +80,13 @@ class Openr(OpenrDaemon):
         return ",".join(map(lambda x: x.with_prefixlen, ipv6_addresses))
 
     def set_defaults(self, defaults):
-        for k, v in self._default_config().iteritems():
-            defaults[k] = v
+        """Updates some options of the OpenR daemon to run a network of
+        routers in mininet. For a full list of parameters see
+        OpenrDaemon:_defaults in openrd.py"""
+        defaults.ifname_prefix="r"
+        defaults.iface_regex_include="r.*"
+        defaults.log_dir="/var/log"
         super(Openr, self).set_defaults(defaults)
-
-    def _config_overwrite(self):
-        return ConfigDict(
-                          ifname_prefix="r",
-                          iface_regex_include="r.*",
-                          log_dir="/var/log")
 
     def is_active_interface(self, itf):
         """Return whether an interface is active or not for the OpenR daemon"""

@@ -22,7 +22,6 @@ ${getConfig("enable_legacy_flooding", True)} \
 ${getConfig("enable_lfa", False)} \
 ${getConfig("enable_netlink_fib_handler", True)} \
 ${getConfig("enable_netlink_system_handler", True)} \
-${getConfig("enable_old_decision_module", False)} \
 ${getConfig("enable_perf_measurement", True)} \
 ${getConfig("enable_prefix_alloc", False)} \
 ${getConfig("enable_rtt_metric", True)} \

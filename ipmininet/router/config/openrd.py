@@ -82,7 +82,6 @@ class OpenrDaemon(Daemon):
             implementation of 'SystemService' and 'PlatformPublisher' that
             comes along with OpenR for Linux platform. If you want to run your
             own SystemService then disable this option. Default: True.
-        :param enable_old_decision_module Default: False.
         :param enable_perf_measurement: Experimental feature to measure
             convergence performance. Performance information can be viewed via
             breeze API 'breeze perf fib'. Default: True.

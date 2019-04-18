@@ -1,12 +1,16 @@
 import argparse
 import os
 import sys
+import stat
+import re
 
 from utils import supported_distributions, identify_distribution, sh
 
 MininetVersion = "master"
 QuaggaVersion = "1.2.4"
+OpenrRelease = "rc-20190419-11514"
 
+os.environ["PATH"] = "%s:/sbin:/usr/sbin/:/usr/local/sbin" % os.environ["PATH"]
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Install IPMininet with its dependencies")
@@ -21,6 +25,11 @@ def parse_args():
     parser.add_argument("-r", "--install-radvd", help="Install the RADVD daemon",
                         action="store_true")
     parser.add_argument("-s", "--install-sshd", help="Install the OpenSSH server", action="store_true")
+    parser.add_argument("-6", "--enable-ipv6", help="Enable IPv6", action="store_true")
+    parser.add_argument("-f", "--install-openr",
+                        help="Install OpenR. OpenR is not installed with '-a' option since the build takes quite long.\
+                        We also experienced that the build requires a substantial amount of memory (~4GB).",
+                        action="store_true")
     return parser.parse_args()
 
 
@@ -83,6 +92,63 @@ def install_quagga():
         break
 
 
+def install_openr(openr_release=OpenrRelease,
+                  openr_remote="https://github.com/facebook/openr.git"):
+    dist.install("git")
+    openr_install = os.path.join(args.output_dir, "openr")
+    openr_build = os.path.join(openr_install, "build")
+    openr_buildscript = os.path.join(openr_build, "build_openr_debian.sh")
+    debian_system_builder = "debian_system_builder/debian_system_builder.py"
+    sh("git clone %s" % openr_remote,
+       cwd=args.output_dir)
+    sh("git checkout %s" % openr_release,
+       cwd=openr_install)
+    # Generate build script
+    with open(openr_buildscript, "w+") as f:
+        sh("python %s" % debian_system_builder,
+           stdout=f,
+           cwd=openr_build).wait()
+    # Make build script executable
+    os.chmod(openr_buildscript, stat.S_IRWXU)
+    # Execute build script
+    sh(openr_buildscript,
+       cwd=openr_build,
+       shell=True,
+       executable="/bin/bash")
+
+
+def update_grub():
+    if dist.NAME == "Fedora":
+        cmd = "grub2-mkconfig --output=/boot/grub2/grub.cfg"
+    elif dist.NAME == "Ubuntu" or dist.NAME == "Debian":
+        cmd = "update-grub"
+    sh(cmd)
+
+
+def enable_ipv6():
+    if dist.NAME == "Debian":
+        dist.install("grub-common")
+
+    grub_cfg = "/etc/default/grub"
+    with open(grub_cfg, "r+") as f:
+        data = f.read()
+        f.seek(0)
+        f.write(data.replace("ipv6.disable=1 ", ""))
+        f.truncate()
+    update_grub()
+
+    sysctl_cfg = "/etc/sysctl.conf"
+    with open(sysctl_cfg, "r+") as f:
+        data = f.read()
+        f.seek(0)
+        # Comment out lines
+        f.write(re.sub(r'^.*disable_ipv6.*$', r'#\g<0>',
+                       "foo_disable_ipv6_bar = 1",
+                       data))
+        f.truncate()
+    sh("sysctl -p")
+
+
 args = parse_args()
 args.output_dir = os.path.normpath(os.path.abspath(args.output_dir))
 
@@ -120,6 +186,10 @@ if args.install_ipmininet:
     ipmininet_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sh("pip2 -q install %s/" % ipmininet_folder)
 
+# Enable IPv6 (disabled by mininet installation)
+
+if args.all or args.enable_ipv6:
+    enable_ipv6()
 
 # Install test dependencies
 
@@ -130,3 +200,12 @@ else:
     dist.install("netcat-openbsd")
 
 sh("pip2 -q install pytest")
+
+# Install OpenR
+
+if args.install_openr:
+    if dist.NAME == "Ubuntu":
+        install_openr()
+    else:
+        print("OpenR build currently only available on Ubuntu. Skipping installing OpenR.")
+        pass

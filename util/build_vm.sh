@@ -12,7 +12,7 @@ MN_INSTALL_SCRIPT_REMOTE="https://raw.githubusercontent.com/mininet/mininet/${MN
 DEPS="python \
       python-pip \
       python3 \
-      python3-pip
+      python3-pip \
       git"
 
 # Upgrade system and install dependencies

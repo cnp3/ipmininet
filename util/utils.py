@@ -6,28 +6,35 @@ import sys
 
 
 def sh(*cmds, **kwargs):
+    if not 'stdout' in kwargs:
+        kwargs['stdout'] = subprocess.PIPE
+    if not 'stderr' in kwargs:
+        kwargs['stderr'] = subprocess.STDOUT
     may_fail = kwargs.pop("may_fail", False)
     env = kwargs.pop("env", os.environ)
     env["LC_ALL"] = "C"
 
     for cmd in cmds:
         print("\n*** " + cmd)
-        p = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, **kwargs)
+        p = subprocess.Popen(shlex.split(cmd),
+                             env=env,
+                             **kwargs)
 
-        while p.poll() is None:
-            out = p.stdout.readline()
+        if kwargs.get('stdout') == subprocess.PIPE:
+            while p.poll() is None:
+                out = p.stdout.readline()
+                if out != '':
+                    sys.stdout.write(out)
+
+            out = p.stdout.read()
             if out != '':
                 sys.stdout.write(out)
 
-        out = p.stdout.read()
-        if out != '':
-            sys.stdout.write(out)
-
-        if p.poll() != 0:
-            if not may_fail:
-                sys.exit(1)
-            return False
-    return True
+            if p.poll() != 0:
+                if not may_fail:
+                    sys.exit(1)
+                return p
+    return p
 
 
 class Distribution(object):

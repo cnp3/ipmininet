@@ -35,9 +35,9 @@ def install_mininet():
     else:
         mininet_opts = "-a"
 
-    sh("git clone https://github.com/mininet/mininet.git",
-       "git checkout %s" % MininetVersion,
-       "mininet/util/install.sh %s -s ." % mininet_opts,
+    sh("git clone https://github.com/mininet/mininet.git", cwd=args.output_dir)
+    sh("git checkout %s" % MininetVersion, cwd=os.path.join(args.output_dir, "mininet"))
+    sh("mininet/util/install.sh %s -s ." % mininet_opts,
        "pip2 -q install mininet/",
        cwd=args.output_dir)
 

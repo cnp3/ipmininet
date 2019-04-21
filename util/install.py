@@ -48,6 +48,7 @@ def install_mininet():
     sh("git checkout %s" % MininetVersion, cwd=os.path.join(args.output_dir, "mininet"))
     sh("mininet/util/install.sh %s -s ." % mininet_opts,
        "pip2 -q install mininet/",
+       "pip3 -q install mininet/",
        cwd=args.output_dir)
 
 
@@ -164,7 +165,7 @@ dist.update()
 
 # Install dependencies
 
-dist.install("python-pip")
+dist.install("python-pip", "python3-pip")
 
 if args.install_mininet:
     install_mininet()
@@ -183,6 +184,7 @@ if args.all or args.install_sshd:
 if args.install_ipmininet:
     ipmininet_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sh("pip2 -q install %s/" % ipmininet_folder)
+    sh("pip3 -q install %s/" % ipmininet_folder)
 
 # Enable IPv6 (disabled by mininet installation)
 
@@ -198,6 +200,7 @@ else:
     dist.install("netcat-openbsd")
 
 sh("pip2 -q install pytest")
+sh("pip3 -q install pytest")
 
 # Install OpenR
 

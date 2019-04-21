@@ -26,11 +26,12 @@ sudo sed -i -e 's/^\(127\.0\.1\.1\).*/\1\tmininet-vm/' /etc/hosts
 pushd $HOME
 source <(curl -sL ${MN_INSTALL_SCRIPT_REMOTE})
 sudo pip2 install mininet/
+sudo pip3 install mininet/
 
 # Install ipmininet
 git clone https://github.com/cnp3/ipmininet.git
 pushd ipmininet
-sudo python util/install.py -iaf
+sudo python3 util/install.py -iaf
 popd
 popd
 
@@ -38,3 +39,7 @@ popd
 sudo pip2 install --upgrade pip
 sudo apt-get remove -y python-pip
 sudo pip2 install --upgrade setuptools
+
+sudo pip3 install --upgrade pip
+sudo apt-get remove -y python3-pip
+sudo pip3 install --upgrade setuptools

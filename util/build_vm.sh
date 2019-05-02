@@ -30,7 +30,7 @@ sudo pip2 install mininet/
 # Install ipmininet
 git clone https://github.com/cnp3/ipmininet.git
 pushd ipmininet
-sudo python util/install.py -ia
+sudo python util/install.py -iaf
 popd
 popd
 

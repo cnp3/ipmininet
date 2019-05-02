@@ -142,9 +142,7 @@ def enable_ipv6():
         data = f.read()
         f.seek(0)
         # Comment out lines
-        f.write(re.sub(r'^.*disable_ipv6.*$', r'#\g<0>',
-                       "foo_disable_ipv6_bar = 1",
-                       data))
+        f.write(re.sub(r'\n(.*disable_ipv6.*)', r'\n#\g<1>', data))
         f.truncate()
     sh("sysctl -p")
 

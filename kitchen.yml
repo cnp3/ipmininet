@@ -1,0 +1,19 @@
+---
+driver:
+  name: vagrant
+  synced_folders:
+    - [".", "/opt/ipmininet"]
+
+provisioner:
+  name: shell
+  command: sudo python /opt/ipmininet/util/install.py -a
+
+platforms:
+  - name: ubuntu-16.04
+  - name: debian-9
+  - name: fedora-28
+
+suites:
+  - name: default
+    run_list:
+    attributes:

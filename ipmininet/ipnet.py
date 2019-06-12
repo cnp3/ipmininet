@@ -157,7 +157,7 @@ class IPNet(Mininet):
            IPNet."""
         if 'ip' not in params:
             params['ip'] = None
-        super(IPNet, self).addHost(name, **params)
+        return super(IPNet, self).addHost(name, **params)
 
     def node_for_ip(self, ip):
         """Return the node owning a given IP address

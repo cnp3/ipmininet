@@ -34,6 +34,7 @@ setup(
         'ipaddress',
         'mininet'
     ],
+    scripts=['util/install.py', 'util/utils.py', 'util/build_vm.sh'],
     tests_require=['pytest'],
     setup_requires=['pytest-runner'],
     url='https://github.com/oliviertilmans/ipmininet'

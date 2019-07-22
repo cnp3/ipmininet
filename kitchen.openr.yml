@@ -1,0 +1,19 @@
+---
+driver:
+  name: vagrant
+  synced_folders:
+    - [".", "/opt/ipmininet"]
+  customize:
+    memory: 4096
+
+provisioner:
+  name: shell
+  command: /opt/ipmininet/util/build_vm.sh
+
+platforms:
+  - name: ubuntu-16.04
+
+suites:
+  - name: default
+    run_list:
+    attributes:

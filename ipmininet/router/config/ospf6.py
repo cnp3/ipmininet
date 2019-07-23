@@ -29,7 +29,7 @@ class OSPF6(OSPF):
             cost=i.igp_metric,
             # Is the interface forcefully disabled?
             passive=i.get('igp_passive', False),
-            instance_id=i.get('instance_id', 0),
+            instance_id=i.get('instance_id', self.options.instance_id),
             area=i.igp_area) for i in interfaces]
         # 'minimal hello-multiplier x' is not implemented in ospf6d
         for dic in conf:
@@ -40,9 +40,9 @@ class OSPF6(OSPF):
         return conf
 
     def set_defaults(self, defaults):
-        """:param dead_int: Dead interval timer
+        """:param debug: the set of debug events that should be logged
+        :param dead_int: Dead interval timer
         :param hello_int: Hello interval timer
-        :param cost: metric for interface
         :param priority: priority for the interface, used for DR election
         :param redistribute: set of OSPFRedistributedRoute sources
         :param instance_id: the number of the attached OSPF instance"""

@@ -27,6 +27,7 @@ def has_cmd(cmd):
 def require_cmd(cmd, help_str=None):
     """
     Ensures that a command is available in $PATH
+
     :param cmd: the command to test
     :param help_str: an optional help string to display if cmd is not found
     """

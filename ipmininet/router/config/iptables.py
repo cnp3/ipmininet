@@ -29,9 +29,10 @@ class IPTables(Daemon):
                                                    fname=self.cfg_filename)
 
     def set_defaults(self, defaults):
-        """:param rules: The (ordered) list of iptables rules that should be
-                         executed. If a rule is an iterable of strings,
-                         these will be joined using a space."""
+        """
+        :param rules: The (ordered) list of iptables rules that should be
+                      executed. If a rule is an iterable of strings,
+                      these will be joined using a space."""
         defaults.rules = []
         super(IPTables, self).set_defaults(defaults)
 
@@ -55,7 +56,7 @@ class IP6Tables(IPTables):
 class Rule(object):
     """A wrapper to represent an IPTable rule"""
     def __init__(self, *args, **kw):
-        """:param args: the rule members, which will joined bt a whitespace
+        """:param args: the rule members, which will joined by a whitespace
         :param table: Specify the table in which the rule should be installed.
                       Defaults to filter."""
         self.args = list(args)

@@ -84,9 +84,9 @@ class OSPF(QuaggaDaemon):
                 for i in interfaces]
 
     def set_defaults(self, defaults):
-        """:param dead_int: Dead interval timer
+        """:param debug: the set of debug events that should be logged
+        :param dead_int: Dead interval timer
         :param hello_int: Hello interval timer
-        :param cost: metric for interface
         :param priority: priority for the interface, used for DR election
         :param redistribute: set of OSPFRedistributedRoute sources"""
         defaults.dead_int = 'minimal hello-multiplier 5'

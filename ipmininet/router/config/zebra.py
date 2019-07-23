@@ -73,7 +73,8 @@ class Zebra(QuaggaDaemon):
         return cfg
 
     def set_defaults(self, defaults):
-        """:param access_lists: The set of AccessList to create, independently
+        """:param debug: the set of debug events that should be logged
+        :param access_lists: The set of AccessList to create, independently
                              from the ones already included by route_maps
         :param route_maps: The set of RouteMap to create
         :param static_routes: The set of StaticRoute to create"""

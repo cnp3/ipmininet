@@ -56,10 +56,11 @@ class RADVD(Daemon):
         return cfg
 
     def set_defaults(self, defaults):
-        """:param debuglevel: Turn on debugging information. Takes an integer
-                              between 0 and 5, where 0 completely turns off
-                              debugging, and 5 is extremely verbose.
-                              (see radvd(8) for more details)"""
+        """
+        :param debuglevel: Turn on debugging information. Takes an integer
+                           between 0 and 5, where 0 completely turns off
+                           debugging, and 5 is extremely verbose.
+                           (see radvd(8) for more details)"""
         defaults.debuglevel = 0
         super(RADVD, self).set_defaults(defaults)
 

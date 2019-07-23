@@ -25,7 +25,8 @@ class PIMD(QuaggaDaemon):
         return cfg
 
     def set_defaults(self, defaults):
-        """:param multicast_ssm: Enable pim ssm mode by default or not
+        """:param debug: the set of debug events that should be logged
+        :param multicast_ssm: Enable pim ssm mode by default or not
         :param multicast_igmp: Enable igmp by default or not"""
         defaults.multicast_ssm = True
         defaults.multicast_igmp = True

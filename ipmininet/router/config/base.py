@@ -106,6 +106,7 @@ class RouterConfig(object):
     @sysctl.setter
     def sysctl(self, *values):
         """Sets sysctl to particular value.
+
         :param values: sysctl strings, as `key=val`
         Example:  RouterConfig().sysctl = 'net.ipv4.ip_forward=1',
                                           'net.ipv6.conf.all.forwarding=1'"""
@@ -123,8 +124,9 @@ class RouterConfig(object):
 
     def daemon(self, key):
         """Return the Daemon object in this config for the given key
+
         :param key: the daemon name or a daemon class or instance
-        :return the Daemon object
+        :return: the Daemon object
         :raise KeyError: if not found"""
         if not isinstance(key, basestring):
             key = key.NAME

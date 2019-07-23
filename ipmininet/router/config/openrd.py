@@ -32,8 +32,8 @@ class OpenrDaemon(Daemon):
         :param alloc_prefix_len: Block size of allocated prefix in terms of
             it's prefix length. In this case '/80' prefix will be elected for a
             node. e.g. 'face:b00c:0:0:1234::/80'. Default: 128.
-        :param assume_drained Default: False.
-        :param config_store_filepath Default:
+        :param assume_drained: Default: False.
+        :param config_store_filepath: Default:
             /tmp/aq_persistent_config_store.bin
         :param decision_debounce_max_ms: Knobs to control how often to run
             Decision. On receipt of first even debounce is created with MIN
@@ -47,7 +47,7 @@ class OpenrDaemon(Daemon):
             debounce is executed.  This helps us to react to single network
             failures quickly enough (with min duration) while avoid high CPU
             utilization under heavy network churn.  Default: 10.
-        :param decision_rep_port Default: 60004.
+        :param decision_rep_port: Default: 60004.
         :param domain: Name of domain this node is part of. OpenR will 'only'
             form adjacencies to OpenR instances within it's own domain.  This
             option becomes very useful if you want to run OpenR on two nodes
@@ -61,14 +61,14 @@ class OpenrDaemon(Daemon):
             avoid mis-cabling of v4 addresses on different subnets on each end
             of the link. Need to enable v4 and this flag at the same time to
             turn on validation. Default: True.
-        :param enable_fib_sync Default: False.
+        :param enable_fib_sync: Default: False.
         :param enable_health_checker: OpenR can measure network health
             internally by pinging other nodes in the network and exports this
             information as counters or via breeze APIs. By default health
             checker is disabled. The expectation is that each node must have at
             least one v6 loopback addressed announced into the network for the
             reachability check. Default: False.
-        :param enable_legacy_flooding Default: True.
+        :param enable_legacy_flooding: Default: True.
         :param enable_lfa: With this option, additional Loop-Free Alternate
             (LFA) routes can be computed, per RFC 5286, for fast failure
             recovery.  Under the failure of all primary nexthops for a prefix,
@@ -103,24 +103,24 @@ class OpenrDaemon(Daemon):
             segment routing feature. As of now it only elects node/adjacency
             labels. In future we will extend it to compute and program FIB
             routes. Default: False.
-        :param enable_spark Default: True.
+        :param enable_spark: Default: True.
         :param enable_v4: OpenR supports v4 as well but it needs to be turned
             on explicitly. It is expected that each interface will have v4
             address configured for link local transport and v4/v6 topologies
             are congruent. Default: False.
-        :param enable_watchdog Default: True.
+        :param enable_watchdog: Default: True.
         :param fib_handler_port: TCP port on which 'FibService' will be
             listening. Default: 60100.
-        :param fib_rep_port Default: 60009.
+        :param fib_rep_port: Default: 60009.
         :param health_checker_ping_interval_s: Configure ping interval of the
             health checker. The below option configures it to ping all other
             nodes every 3 seconds. Default: 3.
-        :param health_checker_rep_port Default: 60012.
+        :param health_checker_rep_port: Default: 60012.
         :param ifname_prefix: Interface prefixes to perform neighbor discovery
             on. All interfaces whose names start with these are used for
             neighbor discovery. Default: ""
-        :param iface_regex_exclude Default:"".
-        :param iface_regex_include Default: "".
+        :param iface_regex_exclude: Default:"".
+        :param iface_regex_include: Default: "".
         :param ip_tos: Set type of service (TOS) value with which every control
             plane packet from Open/R will be marked with. This marking can be
             used to prioritize control plane traffic (as compared to data
@@ -130,19 +130,19 @@ class OpenrDaemon(Daemon):
             the key prefixes when key prefix filter is enabled (See
             SET_LEAF_NODE).  It is also set when requesting KEY_DUMP from peer
             to request keys that match one of these prefixes. Default: "".
-        :param kvstore_flood_msg_per_sec Default: 0.
-        :param kvstore_flood_msg_burst_size Default: 0.
-        :param kvstore_flood_msg_per_sec Default: 0.
-        :param kvstore_ttl_decrement_ms Default: 1.
+        :param kvstore_flood_msg_per_sec: Default: 0.
+        :param kvstore_flood_msg_burst_size: Default: 0.
+        :param kvstore_flood_msg_per_sec: Default: 0.
+        :param kvstore_ttl_decrement_ms: Default: 1.
         :param kvstore_zmq_hwm: Set buffering size for KvStore socket
             communication. Updates to neighbor node during flooding can be
             buffered upto this number. For larger networks where burst of
             updates can be high having high value makes sense. For smaller
             networks where burst of updates are low, having low value makes
             more sense. Default: 65536.
-        :param link_flap_initial_backoff_ms Default: 1000.
-        :param link_flap_max_backoff_ms Default: 60000.
-        :param link_monitor_cmd_port Default: 60006.
+        :param link_flap_initial_backoff_ms: Default: 1000.
+        :param link_flap_max_backoff_ms: Default: 60000.
+        :param link_monitor_cmd_port: Default: 60006.
         :param loopback_iface: Indicates loopback address to which auto elected
             prefix will be assigned if enabled. Default: "lo".
         :param memory_limit_mb: Enforce upper limit on amount of memory in
@@ -161,7 +161,7 @@ class OpenrDaemon(Daemon):
             node, before assigning it to interface all previously allocated
             prefixes or other global prefixes will be overridden with the new
             one. Use it with care! Default: False.
-        :param prefix_manager_cmd_port Default: 60011.
+        :param prefix_manager_cmd_port: Default: 60011.
         :param prefixes: Static list of comma separate prefixes to announce
             from the current node. Can't be changed while running. Default: "".
         :param redistribute_ifaces: Comma separated list of interface names
@@ -192,7 +192,7 @@ class OpenrDaemon(Daemon):
             Default: 30.
         :param spark_keepalive_time_s: How often to send spark hello messages
             to neighbors. Default: 3.
-        :param static_prefix_alloc Default: False.
+        :param static_prefix_alloc: Default: False.
         :param tls_acceptable_peers: A comma separated list of strings. Strings
             are x509 common names to accept SSL connections from. Default: ""
         :param tls_ecc_curve_name: If we are running an SSL thrift server, this
@@ -210,10 +210,10 @@ class OpenrDaemon(Daemon):
         :param x509_key_path: If we are running an SSL thrift server, this
             option specifies the key path for the associated
             wangle::SSLContextConfig. Default: "".
-        :param logbufsecs Default: 0
+        :param logbufsecs: Default: 0
         :param log_dir: Directory to store log files at. The folder must exist.
             Default: /var/log.
-        :param max_log_size Default: 1.
+        :param max_log_size: Default: 1.
         :param v: Show all verbose 'VLOG(m)' messages for m less or equal the
             value of this flag. Use higher value for more verbose logging.
             Default: 1.

@@ -55,13 +55,13 @@ class IPTopo(Topo):
         :param router: router name
         :param daemon: daemon class
         :param default_cfg_class: config class to use
-        if there is no configuration class defined for the router yet.
+            if there is no configuration class defined for the router yet.
         :param cfg_daemon_list: name of the parameter containing
-        the list of daemons in your config class constructor.
-        For instance, RouterConfig uses 'daemons'
-        but BasicRouterConfig uses 'additional_daemons'.
+            the list of daemons in your config class constructor.
+            For instance, RouterConfig uses 'daemons'
+            but BasicRouterConfig uses 'additional_daemons'.
         :param daemon_params: all the parameters to give
-        when instantiating the daemon class."""
+            when instantiating the daemon class."""
 
         config = self.nodeInfo(router).setdefault("config", default_cfg_class)
         try:
@@ -126,13 +126,13 @@ class RouterDescription(str):
 
         :param daemon: daemon class
         :param default_cfg_class: config class to use
-        if there is no configuration class defined for the router yet.
+            if there is no configuration class defined for the router yet.
         :param cfg_daemon_list: name of the parameter containing
-        the list of daemons in your config class constructor.
-        For instance, RouterConfig uses 'daemons'
-        but BasicRouterConfig uses 'additional_daemons'.
+            the list of daemons in your config class constructor.
+            For instance, RouterConfig uses 'daemons'
+            but BasicRouterConfig uses 'additional_daemons'.
         :param daemon_params: all the parameters to give
-        when instantiating the daemon class."""
+            when instantiating the daemon class."""
 
         self.topo.addDaemon(self, daemon, default_cfg_class=default_cfg_class,
                             cfg_daemon_list=cfg_daemon_list, **daemon_params)

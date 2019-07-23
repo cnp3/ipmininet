@@ -82,7 +82,7 @@ class BGP(QuaggaDaemon):
 
     @property
     def STARTUP_LINE_EXTRA(self):
-        # We add the port to the standard startup line
+        """We add the port to the standard startup line"""
         return '-p %s' % self.port
 
     def __init__(self, node, port=BGP_DEFAULT_PORT,
@@ -99,7 +99,8 @@ class BGP(QuaggaDaemon):
         return cfg
 
     def set_defaults(self, defaults):
-        """:param address_families: The set of AddressFamily to use"""
+        """:param debug: the set of debug events that should be logged
+        :param address_families: The set of AddressFamily to use"""
         defaults.address_families = []
         super(BGP, self).set_defaults(defaults)
 

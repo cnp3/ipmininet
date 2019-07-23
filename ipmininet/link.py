@@ -339,8 +339,8 @@ class GRETunnel(object):
     Currently, these tunnels only define stretched IP subnets.
 
     The instantiation of these tunnels should happen
-      *after* the network has been built
-      *before* the network has been started.
+    *after* the network has been built
+    and *before* the network has been started.
     You can leverage the IPTopo.post_build method to do it."""
     # TODO add the created tunnel interfaces to the list of interfaces
     # known by the nodes (e.g. so they could be auto-detected-advertized in

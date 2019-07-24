@@ -3,7 +3,7 @@ from builtins import str
 
 import itertools
 
-from ipaddress import ip_network
+from ipaddress import ip_network, ip_address
 
 from ipmininet.overlay import Overlay
 from ipmininet.utils import realIntfList
@@ -106,7 +106,13 @@ class BGP(QuaggaDaemon):
     def _build_neighbors(self):
         """Compute the set of BGP peers for this BGP router
         :return: set of neighbors"""
-        return [Peer(self._node, x) for x in self._node.get('bgp_peers', [])]
+        neighbors = []
+        for x in self._node.get('bgp_peers', []):
+            for v6 in [True, False]:
+                peer = Peer(self._node, x, v6=v6)
+                if peer.peer:
+                    neighbors.append(peer)
+        return neighbors
 
     def _address_families(self, af, nei):
         """Complete the address families: add extra networks, or activate
@@ -140,24 +146,27 @@ def AF_INET6(*args, **kwargs):
 
 class Peer(object):
     """A BGP peer"""
-    def __init__(self, base, node):
+    def __init__(self, base, node, v6=False):
         """:param base: The base router that has this peer
         :param node: The actual peer"""
-        self.peer, other = self._find_peer_address(base, node)
+        self.peer, other = self._find_peer_address(base, node, v6=v6)
+        if not self.peer:
+            return
         self.asn = other.asn
+        self.family = 'ipv4' if not v6 else 'ipv6'
         try:
             self.port = other.config.daemon(BGP).port
         except KeyError:  # No configured daemon - yet - use default
             self.port = BGP_DEFAULT_PORT
         # We default to nexthop self for all peering type
-        self.nh_self = 'next-hop-self all'
+        self.nh_self = 'next-hop-self force'
         # We enable eBGP multihop if eBGP is in use
         ebgp = self.asn != base.asn
         self.ebgp_multihop = ebgp
         self.description = '%s (%sBGP)' % (node, 'e' if ebgp else 'i')
 
     @staticmethod
-    def _find_peer_address(base, peer):
+    def _find_peer_address(base, peer, v6=False):
         """Return the IP address that base should try to contact to establish
         a peering"""
         visited = set()
@@ -171,9 +180,12 @@ class Peer(object):
             visited.add(i)
             for n in i.broadcast_domain.routers:
                 if n.node.name == peer:
-                    ip = n.ip
-                    return (ip, n.node) if ip else (
-                        n.ip6, n.node)
+                    if not v6:
+                        return n.ip, n.node
+                    elif n.ip6 and not ip_address(n.ip6).is_link_local:
+                        return n.ip6, n.node
+                    else:
+                        return None, None
                 elif n.node.asn == base.asn or not n.node.asn:
                     to_visit.extend(realIntfList(n.node))
         return None, None

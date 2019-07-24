@@ -47,12 +47,12 @@ class BGPTopo(IPTopo):
         as3r1.addDaemon(BGP, address_families=[AF_INET(redistribute=["connected"]),
                                                AF_INET6(redistribute=["connected"])])
 
-        self.addLink(as1r1, as2r1, params1={"ip": ["10.1.1.1/24", "fd00:1:1::1/64"]},
-                     params2={"ip": ["10.1.1.2/24", "fd00:1:1::2/64"]})
-        self.addLink(as2r1, as2r2, params1={"ip": ["10.2.1.1/24", "fd00:2:1::1/64"]},
-                     params2={"ip": ["10.2.1.2/24", "fd00:2:1::2/64"]})
-        self.addLink(as3r1, as2r2, params1={"ip": ["10.3.1.1/24", "fd00:3:1::1/64"]},
-                     params2={"ip": ["10.3.1.2/24", "fd00:3:1::2/64"]})
+        self.addLink(as1r1, as2r1, params1={"ip": ("10.1.1.1/24", "fd00:1:1::1/64")},
+                     params2={"ip": ("10.1.1.2/24", "fd00:1:1::2/64")})
+        self.addLink(as2r1, as2r2, params1={"ip": ("10.2.1.1/24", "fd00:2:1::1/64")},
+                     params2={"ip": ("10.2.1.2/24", "fd00:2:1::2/64")})
+        self.addLink(as3r1, as2r2, params1={"ip": ("10.3.1.1/24", "fd00:3:1::1/64")},
+                     params2={"ip": ("10.3.1.2/24", "fd00:3:1::2/64")})
 
         # Set AS-ownerships
         self.addOverlay(AS(1, (as1r1,)))
@@ -63,10 +63,10 @@ class BGPTopo(IPTopo):
         bgp_peering(self, as3r1, as2r2)
 
         # Add test hosts
-        self.addLink(as1r1, self.addHost('h%s' % as1r1), params1={"ip": ["10.1.0.1/24", "fd00:1::1/64"]},
-                     params2={"ip": ["10.1.0.2/24", "fd00:1::2/64"]})
-        self.addLink(as3r1, self.addHost('h%s' % as3r1), params1={"ip": ["10.3.0.1/24", "fd00:3::1/64"]},
-                     params2={"ip": ["10.3.0.2/24", "fd00:3::2/64"]})
+        self.addLink(as1r1, self.addHost('h%s' % as1r1), params1={"ip": ("10.1.0.1/24", "fd00:1::1/64")},
+                     params2={"ip": ("10.1.0.2/24", "fd00:1::2/64")})
+        self.addLink(as3r1, self.addHost('h%s' % as3r1), params1={"ip": ("10.3.0.1/24", "fd00:3::1/64")},
+                     params2={"ip": ("10.3.0.2/24", "fd00:3::2/64")})
         super(BGPTopo, self).build(*args, **kwargs)
 
 
@@ -111,6 +111,7 @@ def test_bgp_daemon_params(bgp_params, expected_cfg):
 
         # Check reachability
         assert_connectivity(net, v6=False)
+        assert_connectivity(net, v6=True)
         net.stop()
     finally:
         cleanup()

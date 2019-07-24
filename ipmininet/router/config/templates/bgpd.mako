@@ -12,6 +12,7 @@ debug bgp ${section}
 router bgp ${node.bgpd.asn}
     bgp router-id ${node.bgpd.routerid}
     bgp bestpath compare-routerid
+    no bgp default ipv4-unicast
 % for n in node.bgpd.neighbors:
     no auto-summary
     neighbor ${n.peer} remote-as ${n.asn}
@@ -23,9 +24,7 @@ router bgp ${node.bgpd.asn}
     <%block name="neighbor"/>
 % endfor
 % for af in node.bgpd.address_families:
-    % if af.name != 'ipv4':
     address-family ${af.name}
-    % endif
     % for net in af.networks:
     network ${net.with_prefixlen}
     % endfor
@@ -33,15 +32,14 @@ router bgp ${node.bgpd.asn}
     redistribute ${r}
     % endfor
     % for n in af.neighbors:
+        % if n.family == af.name:
     neighbor ${n.peer} activate
-        % if n.nh_self:
+            % if n.nh_self:
     neighbor ${n.peer} ${n.nh_self}
+            % endif
         % endif
     % endfor
-    % if af.name != 'ipv4':
-    exit-address-family
-    % endif
-    !
+
 % endfor
 <%block name="router"/>
 !

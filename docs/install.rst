@@ -46,6 +46,34 @@ following command in the same directory as the two previous one:
 .. _Vagrant: https://www.vagrantup.com/downloads.html
 .. _Virtualbox: https://www.virtualbox.org/wiki/Downloads
 
+Manual installation from PyPI
+-----------------------------
+
+You can download and install IPMininet.
+If you have pip above **18.1**, execute:
+
+.. code-block:: bash
+
+    $ sudo pip install ipmininet
+
+If you have an older version of pip, use:
+
+.. code-block:: bash
+
+    $ sudo pip install --process-dependency-links ipmininet
+
+Then, you can install all the daemons:
+
+.. code-block:: bash
+
+    $ sudo python -m ipmininet.install -af
+
+You can choose to install only a subset of the daemons
+by changing the options on the installation script.
+For the option documentations, use the ``-h`` option.
+
+.. _documentation: http://mininet.org/download/
+
 Manual installation from sources
 --------------------------------
 
@@ -57,35 +85,25 @@ To manually install IPMininet from source, first get the source code:
     $ cd ipmininet
     $ git checkout <version>
 
-Then, install IPMininet, Mininet and all the daemons:
+Then, install IPMininet.
+If you have pip above **18.1**, execute:
 
 .. code-block:: bash
 
-    $ sudo python util/install.py -iamf
+    $ sudo pip install .
 
-You can choose to install only a subset of the daemons
-by changing the options on the installation script.
-For the option documentations, use the ``-h`` option.
-
-Manual installation from PyPI
------------------------------
-
-Install Mininet by following its `documentation`_.
-
-Then, you can download and install IPMininet.
+If you have an older version of pip, use:
 
 .. code-block:: bash
 
-    $ sudo pip install ipmininet
+    $ sudo pip install --process-dependency-links .
 
 Finally, you can install all the daemons:
 
 .. code-block:: bash
 
-    $ sudo python util/install.py -af
+    $ sudo python -m ipmininet.install -af
 
 You can choose to install only a subset of the daemons
 by changing the options on the installation script.
 For the option documentations, use the ``-h`` option.
-
-.. _documentation: http://mininet.org/download/

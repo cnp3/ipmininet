@@ -3,6 +3,8 @@ import shlex
 import subprocess
 import sys
 
+from ipmininet.utils import require_cmd
+
 
 def sh(*cmds, **kwargs):
     if not 'stdout' in kwargs:
@@ -10,6 +12,7 @@ def sh(*cmds, **kwargs):
     if not 'stderr' in kwargs:
         kwargs['stderr'] = subprocess.STDOUT
     may_fail = kwargs.pop("may_fail", False)
+    output_stdout = kwargs.pop("output_stdout", True)
     env = kwargs.pop("env", os.environ)
     env["LC_ALL"] = "C"
 
@@ -19,7 +22,7 @@ def sh(*cmds, **kwargs):
                              env=env,
                              **kwargs)
 
-        if kwargs.get('stdout') == subprocess.PIPE:
+        if output_stdout:
             while p.poll() is None:
                 out = p.stdout.readline()
                 if out != '':
@@ -40,6 +43,32 @@ class Distribution(object):
     NAME = None
     INSTALL_CMD = None
     UPDATE_CMD = None
+    PIP3_CMD = None
+    PIP2_CMD = None
+    SpinPipVersion = "18.1"
+
+    def __init__(self):
+        self.pip2_args = self.check_pip_version(self.PIP2_CMD)
+        self.pip3_args = self.check_pip_version(self.PIP3_CMD)
+
+    def check_pip_version(self, pip):
+        from pkg_resources import parse_version
+
+        p = sh("%s -V" % pip, output_stdout=False)
+        if p.wait() != 0:
+            print("Print cannot get the version of %s" % pip)
+            sys.exit(1)
+        content, _ = p.communicate()
+        try:
+            v = content.decode("utf-8").split(u" ")[1]
+
+            if parse_version(v) >= parse_version(self.SpinPipVersion):
+                return ""
+            else:
+                return "--process-dependency-links"
+        except (ValueError, IndexError):
+            print("Cannot retrieve version number of %s" % pip)
+            sys.exit(1)
 
     def install(self, *packages):
         sh(self.INSTALL_CMD + " " + " ".join(packages))
@@ -47,23 +76,44 @@ class Distribution(object):
     def update(self):
         sh(self.UPDATE_CMD)
 
+    def pip_install(self, version, *packages, **kwargs):
+        if version == 2:
+            pip = self.PIP2_CMD
+            args = self.pip2_args
+        else:
+            pip = self.PIP3_CMD
+            args = self.pip3_args
+        sh(pip + " -q install " + args + " ".join(packages), **kwargs)
+
+    def require_pip(self, version):
+        if version == 2:
+            require_cmd(self.PIP2_CMD)
+        else:
+            require_cmd(self.PIP3_CMD)
+
 
 class Ubuntu(Distribution):
     NAME = "Ubuntu"
     INSTALL_CMD = "apt-get -y -q install"
     UPDATE_CMD = "apt-get update"
+    PIP3_CMD = "pip3"
+    PIP2_CMD = "pip2"
 
 
 class Debian(Distribution):
     NAME = "Debian"
     INSTALL_CMD = "apt-get -y -q install"
     UPDATE_CMD = "apt-get update"
+    PIP3_CMD = "pip3"
+    PIP2_CMD = "pip2"
 
 
 class Fedora(Distribution):
     NAME = "Fedora"
     INSTALL_CMD = "yum -y install"
     UPDATE_CMD = "true"
+    PIP3_CMD = "pip"
+    PIP2_CMD = "pip2"
 
 
 def supported_distributions():

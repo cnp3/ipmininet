@@ -66,6 +66,7 @@ We can add daemons to the routers as well.
             super(MyTopology, self).build(*args, **kwargs)
 
 By default, OSPF and OSPF6 are launched on each router.
+This means that your network has basic routing working by default.
 To change that, we have to modify the router configuration class.
 
 .. testcode:: topo creation config param
@@ -109,7 +110,8 @@ Network run
 -----------
 
 We run the topology by using the following code.
-The IPCLI object creates a extended `Mininet CLI`_.
+The IPCLI object creates a extended Mininet CLI.
+More details can be found in :ref:`Command-Line interface`
 As for Mininet, IPMininet networks need root access to be executed.
 
 .. testcode:: network run
@@ -167,6 +169,14 @@ More of them can be found in this repository_.
 .. _examples: https://github.com/oliviertilmans/ipmininet/tree/master/ipmininet/examples
 .. _repository: https://github.com/obonaventure/RoutingExamples
 
+Mininet compatibility
+---------------------
+
+IPMininet is an upper layer above Mininet.
+Therefore, everything that works in Mininet, also works in IPMininet.
+Feel free to consult the `Mininet documentation`_ as well.
+
+.. _`Mininet documentation`: https://github.com/mininet/mininet/wiki/Introduction-to-Mininet
 
 .. doctest related functions
 

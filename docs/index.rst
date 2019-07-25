@@ -15,7 +15,9 @@ such as IP addresses or router configuration files, ...
 
     install
     getting_started
+    cli
     daemons
+    addressing
     api/modules
 
 

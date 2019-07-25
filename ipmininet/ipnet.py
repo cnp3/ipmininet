@@ -254,6 +254,8 @@ class IPNet(Mininet):
                                size_key='max_v4prefixlen',
                                max_prefixlen=self.max_v4_prefixlen)
         for domain in self.broadcast_domains:
+            if not domain.use_ip_version(4):
+                continue
             for intf in domain:
                 ips = tuple(domain.next_ipv4()
                             for _ in range(intf.interface_width[0]))
@@ -270,6 +272,8 @@ class IPNet(Mininet):
                                size_key='max_v6prefixlen',
                                max_prefixlen=self.max_v6_prefixlen)
         for domain in self.broadcast_domains:
+            if not domain.use_ip_version(6):
+                continue
             for intf in domain:
                 ips = tuple(domain.next_ipv6()
                             for _ in range(intf.interface_width[1]))
@@ -311,7 +315,10 @@ class IPNet(Mininet):
         domains.sort(key=_domainlen, reverse=True)
         _prefixlen = attrgetter('prefixlen')
         subnets.sort(key=_prefixlen, reverse=True)
+        ip_version = 4 if net_key == 'net' else 6
         for d in domains:
+            if not d.use_ip_version(ip_version):
+                continue
             if not subnets:
                 raise ValueError('No subnet left in the prefix space for all'
                                  'broadcast domains.')
@@ -613,3 +620,17 @@ class BroadcastDomain(object):
             raise ValueError('No more available IPv6 address')
         except TypeError:
             raise ValueError('No associated IPv6 subnet')
+
+    def use_ip_version(self, ip_version):
+        """ Checks whether it makes sense to allocate a subnet
+        of an IP version to this domain. If there is no other node
+        allowing it, there is no point in allocating an address
+        to a single host.
+
+        :param ip_version: either 4 or 6
+        :return: True iif there is more than one interface on the domain enabling this IP version
+        """
+        for i in self.routers:
+            if i.node.use_v4 and ip_version == 4 or i.node.use_v6 and ip_version == 6:
+                return True
+        return len(self.interfaces) - len(self.routers) > 1

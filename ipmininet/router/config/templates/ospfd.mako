@@ -24,7 +24,7 @@ interface ${intf.name}
 % endfor
 
 router ospf
-  router-id ${node.ospfd.routerid}
+  ospf router-id ${node.ospfd.routerid}
   % for r in node.ospfd.redistribute:
   redistribute ${r.subtype} metric-type ${r.metric_type} metric ${r.metric}
   % endfor

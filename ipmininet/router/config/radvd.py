@@ -78,8 +78,10 @@ class RADVD(Daemon):
     def cleanup(self):
         try:
             with open(self._file('pid'), 'r') as f:
-                pid = int(f.read())
-                self._node._processes.call('kill -9 %d ' % pid)
+                for line in f:
+                    if len(line) > 1:
+                        pid = int(line[:-1])
+                        self._node._processes.call('kill -9 %d ' % pid)
         except (IOError, OSError):
             pass
         super(RADVD, self).cleanup()

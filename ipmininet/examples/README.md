@@ -16,6 +16,9 @@ The following sections will detail the topologies.
    - [GRETopo](#gretopo)
    - [SSHd](#sshd)
    - [RouterAdvNetwork](#routeradvnetwork)
+   - [SimpleOpenRNetwork](#simpleopenrnetwork)
+   - [StaticAddressNetwork](#staticaddressnetwork)
+   - [PartialStaticAddressNet](#partialstaticaddressnetwork)
 
 
 ## SimpleOSPFNetwork
@@ -157,3 +160,19 @@ isolate logs.
 Use
 [breeze](https://github.com/facebook/openr/blob/master/openr/docs/Breeze.md) to
 investigate the routing state of OpenR.
+
+## StaticAddressNetwork
+
+_topo name_ : static_address_network
+_args_ : n/a
+
+This network has statically assigned addresses
+instead of using the IPMininet auto-allocator.
+
+## PartialStaticAddressNetwork
+
+_topo name_ : partial_static_address_network
+_args_ : n/a
+
+This network has some statically assigned addresses
+and the others are dynamically allocated.

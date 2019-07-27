@@ -237,6 +237,18 @@ class IPNet(Mininet):
         except AttributeError as e:
             log.error('*** Skipping post_build():', str(e), '\n')
 
+    def _allocated_ipv4_subnets(self):
+        subnets = []
+        for d in self.broadcast_domains:
+            subnets.extend(d.fixed_net4s)
+        return subnets
+
+    def _allocated_ipv6_subnets(self):
+        subnets = []
+        for d in self.broadcast_domains:
+            subnets.extend(d.fixed_net6s)
+        return subnets
+
     def _allocate_IPs(self):
         """Allocate IP addresses on every interface in every broadcast
         domain"""
@@ -252,16 +264,18 @@ class IPNet(Mininet):
                                domainlen='len_v4',
                                net_key='net',
                                size_key='max_v4prefixlen',
-                               max_prefixlen=self.max_v4_prefixlen)
+                               max_prefixlen=self.max_v4_prefixlen,
+                               allocated_subnets=self._allocated_ipv4_subnets())
         for domain in self.broadcast_domains:
             if not domain.use_ip_version(4):
                 continue
             for intf in domain:
-                ips = tuple(domain.next_ipv4()
-                            for _ in range(intf.interface_width[0]))
-                intf.setIP(ips)
-                for ip in ips:
-                    self._ip_allocs[ip.with_prefixlen] = intf.node
+                if len(list(intf.ips())) == 0:
+                    ips = tuple(domain.next_ipv4()
+                                for _ in range(intf.interface_width[0]))
+                    intf.setIP(ips)
+                    for ip in ips:
+                        self._ip_allocs[ip.with_prefixlen] = intf.node
 
     def _allocate_ipv6(self):
         log.info("*** Allocating IPv6 addresses\n")
@@ -270,25 +284,27 @@ class IPNet(Mininet):
                                domainlen='len_v6',
                                net_key='net6',
                                size_key='max_v6prefixlen',
-                               max_prefixlen=self.max_v6_prefixlen)
+                               max_prefixlen=self.max_v6_prefixlen,
+                               allocated_subnets=self._allocated_ipv6_subnets())
         for domain in self.broadcast_domains:
             if not domain.use_ip_version(6):
                 continue
             for intf in domain:
-                ips = tuple(domain.next_ipv6()
-                            for _ in range(intf.interface_width[1]))
-                intf.setIP6(ips)
-                for ip in ips:
-                    self._ip_allocs[ip.with_prefixlen] = intf.node
+                if len(list(intf.ip6s(exclude_lls=True))) == 0:
+                    ips = tuple(domain.next_ipv6()
+                                for _ in range(intf.interface_width[1]))
+                    intf.setIP6(ips)
+                    for ip in ips:
+                        self._ip_allocs[ip.with_prefixlen] = intf.node
 
     @staticmethod
     def _allocate_subnets(subnets, domains, domainlen='len_v4',
                           net_key='net', size_key='max_v4prefixlen',
-                          max_prefixlen=24):
+                          max_prefixlen=24, allocated_subnets=()):
         """Allocate subnets to broadcast domains.
 
         We keep the subnets sorted as x < y wrt the available number of
-        addressess in the subnet so that the bigger domains
+        addresses in the subnet so that the bigger domains
         take the smallest subnets before subdividing them.
         As the domains range from the biggest to the smallest, and the subnets
         from the smallest to the biggest, the biggest domains will take the
@@ -310,6 +326,8 @@ class IPNet(Mininet):
                          suitable for a broadcast domain
         :param max_prefixlen: The maximal prefixlen that can be allocated,
                                 e.g. to not allocate /126 for IPv6 P2P links
+        :param allocated_subnets: The subnets that are already allocated and
+                                  cannot be allocated to another domain
         :return: iterator of (domain, subnet)"""
         _domainlen = methodcaller(domainlen)
         domains.sort(key=_domainlen, reverse=True)
@@ -338,14 +356,18 @@ class IPNet(Mininet):
                     # Get list of subnets and append to list of previous
                     # expanded subnets as it is bigger wrt. prefixlen
                     net, next_net = tuple(net.subnets(prefixlen_diff=1))
-                    nets.append(next_net)
+                    # If not a subnet of an allocated subnet
+                    if len(list(filter(lambda y: next_net in y, allocated_subnets))) == 0:
+                        nets.append(next_net)
                 # Check if we have an appropriately-sized subnet
                 if plen == net.prefixlen:
-                    # Register the allocation
-                    setattr(d, net_key, net)
+                    # If the network overlaps with an allocated subnet, we pass it
+                    if len(list(filter(lambda y: net in y or y in net, allocated_subnets))) == 0:
+                        # Register the allocation
+                        setattr(d, net_key, net)
                     # Delete the expanded/used subnet
                     del subnets[i]
-                    # Insert the creadted subnets if any
+                    # Insert the created subnets if any
                     subnets.extend(nets)
                     # Sort the array again
                     subnets.sort(key=_prefixlen, reverse=True)
@@ -532,6 +554,19 @@ class BroadcastDomain(object):
                 interfaces = [interfaces]
             self.explore(interfaces)
 
+        # Retrieve pre-fixed subnets
+        self.fixed_net4s = []
+        self.fixed_net6s = []
+        for i in self.interfaces:
+            for ip in i.ips():
+                net = ip_interface(ip).network
+                if net not in self.fixed_net4s:
+                    self.fixed_net4s.append(net)
+            for ip6 in i.ip6s(exclude_lls=True):
+                net6 = ip_interface(ip6).network
+                if net6 not in self.fixed_net6s:
+                    self.fixed_net6s.append(net6)
+
     @staticmethod
     def is_domain_boundary(node):
         """Check whether the node is a L3 broadcast domain boundary
@@ -545,11 +580,13 @@ class BroadcastDomain(object):
 
     def len_v4(self):
         """The number of IPv4 addresses in this broadcast domain"""
-        return sum(map(lambda x: x.interface_width[0], self.interfaces))
+        return sum(map(lambda x: x.interface_width[0]
+                       if x.ip else 0, self.interfaces))
 
     def len_v6(self):
         """The number of IPv6 addresses in this broadcast domain"""
-        return sum(map(lambda x: x.interface_width[1], self.interfaces))
+        return sum(map(lambda x: x.interface_width[1]
+                       if len(list(x.ip6s(exclude_lls=True))) else 0, self.interfaces))
 
     def explore(self, itfs):
         """Explore a new list of interfaces and add them and their neightbors

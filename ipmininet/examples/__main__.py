@@ -14,6 +14,8 @@ from .gre import GRETopo
 from .sshd import SSHTopo
 from .router_adv_network import RouterAdvNet
 from .simple_openr_network import SimpleOpenrNet
+from .static_address_network import StaticAddressNet
+from .partial_static_address_network import PartialStaticAddressNet
 
 
 from mininet.log import lg, LEVELS
@@ -26,7 +28,9 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'gre': GRETopo,
          'ssh': SSHTopo,
          'router_adv_network': RouterAdvNet,
-         'simple_openr_network': SimpleOpenrNet}
+         'simple_openr_network': SimpleOpenrNet,
+         'static_address_network': StaticAddressNet,
+         'partial_static_address_network': PartialStaticAddressNet}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,

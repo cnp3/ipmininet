@@ -47,12 +47,12 @@ def test_radvd_example():
 @pytest.mark.parametrize("link_params,expected_cfg", [
     ({"params1": {"ra": [AdvPrefix("2001:1341::/64", valid_lifetime=2000, preferred_lifetime=1000)]}},
      ["        prefix 2001:1341::/64",
-      "             AdvValidLifetime 2000;",
-      "             AdvPreferredLifetime 1000;"]),
+      "            AdvValidLifetime 2000;",
+      "            AdvPreferredLifetime 1000;"]),
     ({"params1": {"ra": [AdvPrefix("2001:1341::/64")],
                   "rdnss": [AdvRDNSS("2001:89ab::d", max_lifetime=1000)]}},
-     ["             RDNSS 2001:89ab::d {",
-      "                 AdvRDNSSLifetime 1000; # in seconds (0 means invalid)"])
+     ["        RDNSS 2001:89ab::d {",
+      "            AdvRDNSSLifetime 1000; # in seconds (0 means invalid)"])
 ])
 def test_radvd_daemon_params(link_params, expected_cfg):
     try:

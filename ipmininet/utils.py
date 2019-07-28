@@ -109,3 +109,30 @@ def get_set(d, key, default):
     except KeyError:
         x = d[key] = default()
         return x
+
+
+def find_node(start, node_name):
+    """
+    :param start: The starting node of the search
+    :param node_name: The name of the node to find
+    :return: The interface of the node connected to start with node_name as name
+    """
+
+    if start.name == node_name:
+        return start
+
+    visited = set()
+    to_visit = realIntfList(start)
+    # Explore all interfaces recursively, until we find one
+    # connected to the node
+    while to_visit:
+        i = to_visit.pop()
+        if i in visited:
+            continue
+        visited.add(i)
+        for n in i.broadcast_domain.interfaces:
+            if n.node.name == node_name:
+                return n
+            elif L3Router.is_l3router_intf(n):
+                to_visit.extend(realIntfList(n.node))
+    return None

@@ -303,8 +303,38 @@ This daemon also uses the following interface parameters:
 
             self.addLink(r, h, params1={
                 "ip": ("2001:1341::1/64", "2001:2141::1/64"),  # Static IP address
-                "ra": [AdvPrefix("2001:1341::/64"), AdvPrefix("2001:2141::/64")],
-                "rdnss": [AdvRDNSS("2001:89ab::d"), AdvRDNSS("2001:cdef::d")]})
+                "ra": [AdvPrefix("2001:1341::/64", valid_lifetime=86400, preferred_lifetime=14400),
+                       AdvPrefix("2001:2141::/64")],
+                "rdnss": [AdvRDNSS("2001:89ab::d", max_lifetime=25),
+                          AdvRDNSS("2001:cdef::d", max_lifetime=25)]})
+            self.addLink(r, dns,
+                         params1={"ip": ("2001:89ab::1/64", "2001:cdef::1/64")},  # Static IP address
+                         params2={"ip": ("2001:89ab::d/64", "2001:cdef::d/64")})  # Static IP address
+
+            super(MyTopology, self).build(*args, **kwargs)
+
+Instead of giving all addresses explicitly, you can use AdvConnectedPrefix() to advertise all the prefixes
+of the interface. You can also give the name of the DNS server (instead of an IP address) in the AdvRDNSS constructor.
+
+.. testcode:: radvd2
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.router.config import RouterConfig, RADVD, AdvConnectedPrefix, AdvRDNSS
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+
+            r = self.addRouter('r')
+            r.addDaemon(RADVD, debug=0)
+
+            h = self.addHost('h')
+            dns = self.addHost('dns')
+
+            self.addLink(r, h, params1={
+                "ip": ("2001:1341::1/64", "2001:2141::1/64"),  # Static IP address
+                "ra": [AdvConnectedPrefix(valid_lifetime=86400, preferred_lifetime=14400)],
+                "rdnss": [AdvRDNSS(dns, max_lifetime=25)]})
             self.addLink(r, dns,
                          params1={"ip": ("2001:89ab::1/64", "2001:cdef::1/64")},  # Static IP address
                          params2={"ip": ("2001:89ab::d/64", "2001:cdef::d/64")})  # Static IP address

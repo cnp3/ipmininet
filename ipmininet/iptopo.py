@@ -1,6 +1,8 @@
 """This module defines topology class that supports adding L3 routers"""
 from builtins import str
 
+import functools
+
 from mininet.topo import Topo
 from mininet.log import lg
 
@@ -47,6 +49,30 @@ class IPTopo(Topo):
 
         :param name: the name of the node"""
         return RouterDescription(self.addNode(name, isRouter=True, **kwargs), self)
+
+    def addLink(self, node1, node2, port1=None, port2=None,
+                key=None, **opts):
+        """:param node1: first node to link
+           :param node2: second node to link
+           :param port1: port of the first node (optional)
+           :param port2: port of the second node (optional)
+           :param key: a key to identify the link (optional)
+           :param opts: link options (optional)
+           :return: link info key"""
+
+        # XXX When PR https://github.com/mininet/mininet/pull/895
+        # is accepted, we can replace this code by a call to the
+        # super() method
+        if not opts and self.lopts:
+            opts = self.lopts
+        port1, port2 = self.addPort(node1, node2, port1, port2)
+        opts = dict(opts)
+        opts.update(node1=node1, node2=node2, port1=port1, port2=port2)
+        key = self.g.add_edge(node1, node2, key, opts)
+
+        # Create an abstraction to allow additional calls
+        link_description = LinkDescription(node1, node2, key, self.linkInfo(node1, node2, key))
+        return link_description
 
     def addDaemon(self, router, daemon, default_cfg_class=BasicRouterConfig,
                   cfg_daemon_list="daemons", **daemon_params):
@@ -136,3 +162,56 @@ class RouterDescription(str):
 
         self.topo.addDaemon(self, daemon, default_cfg_class=default_cfg_class,
                             cfg_daemon_list=cfg_daemon_list, **daemon_params)
+
+
+@functools.total_ordering
+class LinkDescription(object):
+
+    def __init__(self, src, dst, key, link_attrs):
+        self.src = src
+        self.dst = dst
+        self.key = key
+        self.link_attrs = link_attrs
+        self.src_intf = IntfDescription(self, self.src,
+                                        self.link_attrs.setdefault("params1", {}))
+        self.dst_intf = IntfDescription(self, self.dst,
+                                        self.link_attrs.setdefault("params2", {}))
+        super(LinkDescription, self).__init__()
+
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            if item == 1:
+                return self.src_intf
+            elif item == 2:
+                return self.dst_intf
+            raise IndexError("Links have only two nodes")
+        else:
+            if item == self.src:
+                return self.src_intf
+            elif item == self.dst:
+                return self.dst_intf
+            raise IndexError("Node '%s' is not on this link" % item)
+
+    # The following methods allow this object to behave like an edge key
+    # for mininet.topo.MultiGraph
+
+    def __hash__(self):
+        return self.key.__hash__()
+
+    def __eq__(self, other):
+        return self.key.__eq__(other.key)
+
+    def __lt__(self, other):
+        return self.key.__lt__(other.key)
+
+
+class IntfDescription(object):
+
+    def __init__(self, link, node, intf_attrs):
+        self.link = link
+        self.node = node
+        self.intf_attrs = intf_attrs
+        super(IntfDescription, self).__init__()
+
+    def addParams(self, **kwargs):
+        self.intf_attrs.update(kwargs)

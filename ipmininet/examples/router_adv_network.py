@@ -23,13 +23,13 @@ class RouterAdvNet(IPTopo):
         r.addDaemon(RADVD)
         h = self.addHost('h')
         dns = self.addHost('dns')
-        self.addLink(r, h, params1={
-            "ip": ("2001:1341::1/64", "2001:2141::1/64"),
-            "ra": [AdvConnectedPrefix()],
-            "rdnss": [AdvRDNSS(dns)]})
-        self.addLink(r, dns,
-                     params1={"ip": ("2001:89ab::1/64", "2001:cdef::1/64")},
-                     params2={"ip": ("2001:89ab::d/64", "2001:cdef::d/64")})
+        lrh = self.addLink(r, h)
+        lrh[r].addParams(ip=("2001:1341::1/64", "2001:2141::1/64"),
+                         ra=[AdvConnectedPrefix()],
+                         rdnss=[AdvRDNSS(dns)])
+        lrdns = self.addLink(r, dns)
+        lrdns[r].addParams(ip=("2001:89ab::1/64", "2001:cdef::1/64"))
+        lrdns[dns].addParams(ip=("2001:89ab::d/64", "2001:cdef::d/64"))
 
         super(RouterAdvNet, self).build(*args, **kwargs)
 

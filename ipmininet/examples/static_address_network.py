@@ -40,8 +40,10 @@ class StaticAddressNet(IPTopo):
         self.addLink(s1, h4)
 
         # IP addresses can be set with interface parameters
-        self.addLink(r2, s2, params1={"ip": ("10.0.3.1/24", "2001:3c::1/64")})
-        self.addLink(s2, h3, params2={"ip": ("10.0.3.2/24", "2001:3c::2/64")})
+        lr2s2 = self.addLink(r2, s2)
+        lr2s2[r2].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
+        ls2h3 = self.addLink(s2, h3)
+        ls2h3[h3].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
 
         # We can also declare the subnets on each LAN
         # We can use nodes and/or links to specify the host and router interfaces

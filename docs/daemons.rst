@@ -182,10 +182,10 @@ We can pass parameters to links and interfaces when calling ``addLink()``:
             router2 = self.addRouter("router2")
 
             # Add link
-            self.addLink(router1, router2,
-                         igp_cost=5, igp_area="0.0.0.1",  # Link parameters
-                         params1={"ospf_dead_int": 1},    # Router1 interface parameters
-                         params2={"ospf_priority": 1})    # Router2 interface parameters
+            l = self.addLink(router1, router2,
+                             igp_cost=5, igp_area="0.0.0.1")  # Link parameters
+            l[router1].addParams(ospf_dead_int=1)             # Router1 interface parameters
+            l[router2].addParams(ospf_priority=1)             # Router2 interface parameters
 
             super(MyTopology, self).build(*args, **kwargs)
 
@@ -255,10 +255,10 @@ It uses the following interface parameters:
             router2 = self.addRouter("router2")
 
             # Add link
-            self.addLink(router1, router2,
-                         igp_cost=5,                       # Link parameters
-                         params1={"ospf6_dead_int": 1},    # Router1 interface parameters
-                         params2={"ospf6_priority": 1})    # Router2 interface parameters
+            l = self.addLink(router1, router2,
+                             igp_cost=5)            # Link parameters
+            l[router1].addParams(ospf6_dead_int=1)  # Router1 interface parameters
+            l[router2].addParams(ospf6_priority=1)  # Router2 interface parameters
 
             super(MyTopology, self).build(*args, **kwargs)
 
@@ -301,15 +301,15 @@ This daemon also uses the following interface parameters:
             h = self.addHost('h')
             dns = self.addHost('dns')
 
-            self.addLink(r, h, params1={
-                "ip": ("2001:1341::1/64", "2001:2141::1/64"),  # Static IP address
-                "ra": [AdvPrefix("2001:1341::/64", valid_lifetime=86400, preferred_lifetime=14400),
-                       AdvPrefix("2001:2141::/64")],
-                "rdnss": [AdvRDNSS("2001:89ab::d", max_lifetime=25),
-                          AdvRDNSS("2001:cdef::d", max_lifetime=25)]})
-            self.addLink(r, dns,
-                         params1={"ip": ("2001:89ab::1/64", "2001:cdef::1/64")},  # Static IP address
-                         params2={"ip": ("2001:89ab::d/64", "2001:cdef::d/64")})  # Static IP address
+            lrh = self.addLink(r, h)
+            lrh[r].addParams(ip=("2001:1341::1/64", "2001:2141::1/64"),
+                             ra=[AdvPrefix("2001:1341::/64", valid_lifetime=86400, preferred_lifetime=14400),
+                                 AdvPrefix("2001:2141::/64")],
+                             rdnss=[AdvRDNSS("2001:89ab::d", max_lifetime=25),
+                                    AdvRDNSS("2001:cdef::d", max_lifetime=25)])
+            lrdns = self.addLink(r, dns)
+            lrdns[r].addParams(ip=("2001:89ab::1/64", "2001:cdef::1/64"))    # Static IP addresses
+            lrdns[dns].addParams(ip=("2001:89ab::d/64", "2001:cdef::d/64"))  # Static IP addresses
 
             super(MyTopology, self).build(*args, **kwargs)
 
@@ -331,13 +331,13 @@ of the interface. You can also give the name of the DNS server (instead of an IP
             h = self.addHost('h')
             dns = self.addHost('dns')
 
-            self.addLink(r, h, params1={
-                "ip": ("2001:1341::1/64", "2001:2141::1/64"),  # Static IP address
-                "ra": [AdvConnectedPrefix(valid_lifetime=86400, preferred_lifetime=14400)],
-                "rdnss": [AdvRDNSS(dns, max_lifetime=25)]})
-            self.addLink(r, dns,
-                         params1={"ip": ("2001:89ab::1/64", "2001:cdef::1/64")},  # Static IP address
-                         params2={"ip": ("2001:89ab::d/64", "2001:cdef::d/64")})  # Static IP address
+            lrh = self.addLink(r, h)
+            lrh[r].addParams(ip=("2001:1341::1/64", "2001:2141::1/64"),
+                             ra=[AdvConnectedPrefix(valid_lifetime=86400, preferred_lifetime=14400)],
+                             rdnss=[AdvRDNSS(dns, max_lifetime=25)])
+            lrdns = self.addLink(r, dns)
+            lrdns[r].addParams(ip=("2001:89ab::1/64", "2001:cdef::1/64"))    # Static IP addresses
+            lrdns[dns].addParams(ip=("2001:89ab::d/64", "2001:cdef::d/64"))  # Static IP addresses
 
             super(MyTopology, self).build(*args, **kwargs)
 

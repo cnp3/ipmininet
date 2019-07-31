@@ -1,7 +1,7 @@
 """Base classes to configure an OpenR daemon"""
 from ipaddress import ip_interface
 
-from ipmininet.iptopo import Overlay
+from ipmininet.overlay import Overlay
 from ipmininet.utils import otherIntf, L3Router, realIntfList
 from .utils import ConfigDict
 from .openrd import OpenrDaemon

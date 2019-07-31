@@ -7,8 +7,7 @@ subnet directly connected to the router whose decision process we want to
 analyze, as this would result in a metric of 0 since the connected routes
 types as an administrative distance and a metric of 0.:"""
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import BGP, iBGPFullMesh, AS,\
-                                    ebgp_session, OSPF, RouterConfig
+from ipmininet.router.config import BGP, ebgp_session, OSPF, RouterConfig
 import ipmininet.router.config.bgp as _bgp
 
 
@@ -75,9 +74,9 @@ class BGPDecisionProcess(IPTopo):
         self.addLink(y, as2r2, igp_metric=self.other_cost)
         self.addLink(as3r1, as2r2)
         # Set AS-ownerships
-        self.addOverlay(AS(1, (as1r1,)))
-        self.addOverlay(iBGPFullMesh(2, (as2r1, as2r2, as2r3)))
-        self.addOverlay(AS(3, (as3r1,)))
+        self.addAS(1, (as1r1,))
+        self.addiBGPFullMesh(2, (as2r1, as2r2, as2r3))
+        self.addAS(3, (as3r1,))
         # Add eBGP peering
         ebgp_session(self, as1r1, as2r1)
         ebgp_session(self, as3r1, as2r2)

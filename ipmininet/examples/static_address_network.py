@@ -1,7 +1,6 @@
 """This file contains a topology with statically assigned addresses"""
 
 from ipmininet.iptopo import IPTopo
-from ipmininet.overlay import Subnet
 
 
 class StaticAddressNet(IPTopo):
@@ -48,11 +47,8 @@ class StaticAddressNet(IPTopo):
         # We can also declare the subnets on each LAN
         # We can use nodes and/or links to specify the host and router interfaces
         # requiring an address for each subnet
-        self.addOverlay(Subnet(nodes=[r1, h1],
-                               subnets=["10.0.0.0/24", "2001:1a::/64"]))
-        self.addOverlay(Subnet(links=[(r1, r2)],
-                               subnets=["10.1.0.0/24", "2001:12::/64"]))
-        self.addOverlay(Subnet(nodes=[r1, h2, h4],
-                               subnets=["10.2.0.0/24", "2001:12b::/64"]))
+        self.addSubnet(nodes=[r1, h1],     subnets=["10.0.0.0/24", "2001:1a::/64"])
+        self.addSubnet(links=[(r1, r2)],   subnets=["10.1.0.0/24", "2001:12::/64"])
+        self.addSubnet(nodes=[r1, h2, h4], subnets=["10.2.0.0/24", "2001:12b::/64"])
 
         super(StaticAddressNet, self).build(*args, **kwargs)

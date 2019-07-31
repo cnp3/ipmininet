@@ -1,7 +1,6 @@
 """This file contains a simple OSPF topology"""
 
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import OSPFArea
 
 HOSTS_PER_ROUTER = 2
 
@@ -57,7 +56,7 @@ Managment Network (OOB)|       |              |        |          |             
         for r in (r4, r5):
             for i in range(HOSTS_PER_ROUTER):
                 self.addLink(r, self.addHost('h%s%s' % (i, r)))
-        self.addOverlay(OSPFArea(routers=(r4, r5), area='1.1.1.1'))
+        self.addOSPFArea(routers=(r4, r5), area='1.1.1.1')
 
         # Area 2.2.2.2 is delimited by the igp_area parameter of addLink()
         r6, r7 = self.addRouter('r6'), self.addRouter('r7')

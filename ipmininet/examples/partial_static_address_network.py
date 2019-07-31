@@ -2,7 +2,6 @@
    The remaining addresses will be dynamically allocated."""
 
 from ipmininet.iptopo import IPTopo
-from ipmininet.overlay import Subnet
 
 
 class PartialStaticAddressNet(IPTopo):
@@ -45,7 +44,6 @@ class PartialStaticAddressNet(IPTopo):
         ls2h3 = self.addLink(s2, h3)
         ls2h3[h3].addParams(ip=("192.168.1.2/24", "fc00:1::2/64"))
 
-        self.addOverlay(Subnet(links=[(r1, r2)],
-                               subnets=["192.168.0.0/24", "fc00::/64"]))
+        self.addSubnet(links=[(r1, r2)], subnets=["192.168.0.0/24", "fc00::/64"])
 
         super(PartialStaticAddressNet, self).build(*args, **kwargs)

@@ -47,7 +47,7 @@ The following code shows how to use all these abstractions:
 .. testcode:: bgp
 
     from ipmininet.iptopo import IPTopo
-    from ipmininet.router.config import BGP, AS, iBGPFullMesh, bgp_fullmesh, bgp_peering, ebgp_session, RouterConfig
+    from ipmininet.router.config import BGP, bgp_fullmesh, bgp_peering, ebgp_session, RouterConfig
 
     class MyTopology(IPTopo):
 
@@ -94,14 +94,14 @@ The following code shows how to use all these abstractions:
             self.addLink(as2r3, as3r1)
 
             # AS1 is composed of 3 routers that have a full-mesh set of iBGP peering between them
-            self.addOverlay(iBGPFullMesh(1, routers=[as1r1, as1r2, as1r3]))
+            self.addiBGPFullMesh(1, routers=[as1r1, as1r2, as1r3])
 
             # AS2 only has one iBGP session between its routers
-            self.addOverlay(AS(2, routers=[as2r1, as2r2, as2r3]))
+            self.addAS(2, routers=[as2r1, as2r2, as2r3])
             bgp_peering(self, as2r1, as2r3)
 
             # AS3 is also composed of 3 routers that have a full-mesh set of iBGP peering between them
-            self.addOverlay(AS(3, routers=[as3r1, as3r2, as3r3]))
+            self.addAS(3, routers=[as3r1, as3r2, as3r3])
             bgp_fullmesh(self, [as3r1, as3r2, as3r3])
 
             # Establish eBGP sessions between ASes
@@ -197,7 +197,6 @@ while the link between r2 and r3 is in area '0.0.0.5':
 .. testcode:: ospf overlay
 
     from ipmininet.iptopo import IPTopo
-    from ipmininet.router.config import OSPFArea
 
     class MyTopology(IPTopo):
 
@@ -214,8 +213,8 @@ while the link between r2 and r3 is in area '0.0.0.5':
             self.addLink(r2, r3)
 
             # Define OSPF areas
-            self.addOverlay(OSPFArea('0.0.0.1', routers=[r1], links=[]))
-            self.addOverlay(OSPFArea('0.0.0.5', routers=[], links=[(r2, r3)]))
+            self.addOSPFArea('0.0.0.1', routers=[r1], links=[])
+            self.addOSPFArea('0.0.0.5', routers=[], links=[(r2, r3)])
 
             super(MyTopology, self).build(*args, **kwargs)
 

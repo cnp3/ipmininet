@@ -1,6 +1,5 @@
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import RouterConfig, BGP, iBGPFullMesh, AS,\
-                                    bgp_peering
+from ipmininet.router.config import RouterConfig, BGP, bgp_peering
 import ipmininet.router.config.bgp as _bgp
 
 
@@ -31,9 +30,9 @@ class SimpleBGPTopo(IPTopo):
         self.addLink(as2r1, as2r2)
         self.addLink(as3r1, as2r2)
         # Set AS-ownerships
-        self.addOverlay(AS(1, (as1r1,)))
-        self.addOverlay(iBGPFullMesh(2, (as2r1, as2r2)))
-        self.addOverlay(AS(3, (as3r1,)))
+        self.addAS(1, (as1r1,))
+        self.addiBGPFullMesh(2, (as2r1, as2r2))
+        self.addAS(3, (as3r1,))
         # Add eBGP peering
         bgp_peering(self, as1r1, as2r1)
         bgp_peering(self, as3r1, as2r2)

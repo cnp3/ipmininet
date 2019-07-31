@@ -6,13 +6,17 @@ import functools
 from mininet.topo import Topo
 from mininet.log import lg
 
-from ipmininet.overlay import Overlay
+from ipmininet.overlay import Overlay, Subnet
 from ipmininet.utils import get_set
-from ipmininet.router.config import BasicRouterConfig
+from ipmininet.router.config import BasicRouterConfig, OSPFArea, AS,\
+    iBGPFullMesh, OpenrDomain
 
 
 class IPTopo(Topo):
     """A topology that supports L3 routers"""
+
+    OVERLAYS = {cls.__name__: cls
+                for cls in (AS, iBGPFullMesh, OpenrDomain, OSPFArea, Subnet)}
 
     def __init__(self, *args, **kwargs):
         self.overlays = []
@@ -120,6 +124,15 @@ class IPTopo(Topo):
             overlay = overlay()
         self.overlays.append(overlay)
 
+    def __getattr__(self, item):
+        if item.startswith('add'):
+            try:
+                return OverlayWrapper(self, self.OVERLAYS[item[3:]])
+            except KeyError:
+                pass
+        raise AttributeError('%s is neither a method of IPTopo'
+                             ' nor refers to any known overlay' % item)
+
     def getNodeInfo(self, n, key, default):
         """Attempt to retrieve the information for the given node/key
         combination. If not found, set to an instance of default and return
@@ -135,6 +148,16 @@ class IPTopo(Topo):
     def capture_physical_interface(self, intfname, node):
         """Adds a pre-existing physical interface to the given node."""
         self.phys_interface_capture[intfname] = node
+
+
+class OverlayWrapper(object):
+
+    def __init__(self, topo, overlay):
+        self.topo = topo
+        self.overlay = overlay
+
+    def __call__(self, *args, **kwargs):
+        return self.topo.addOverlay(self.overlay(*args, **kwargs))
 
 
 class RouterDescription(str):

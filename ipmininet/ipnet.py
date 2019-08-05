@@ -195,12 +195,6 @@ class IPNet(Mininet):
                         h.cmd('ip route add default dev %s via %s' % (
                             h.defaultIntf(), r.ip6))
                         default = True
-                    if len(r.rdnss_list) > 0:
-                        # Launch a daemon able to interpret this RA option
-                        process = h.popen("dhcpcd -d %s" % (itf.name,))
-                        return_value = process.poll()
-                        if return_value is not None and return_value != 0:
-                            print("DHCP Client Failure %s" % (return_value,))
                     break
                 if default:
                     break

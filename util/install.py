@@ -213,6 +213,8 @@ if args.all or args.install_frrouting:
     install_frrouting()
 
 if args.all or args.install_radvd:
+    if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
+        dist.install("resolvconf")
     dist.install("radvd")
 
 if args.all or args.install_sshd:

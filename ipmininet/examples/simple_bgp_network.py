@@ -1,5 +1,5 @@
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import RouterConfig, BGP, bgp_peering
+from ipmininet.router.config import RouterConfig, BGP, ebgp_session
 import ipmininet.router.config.bgp as _bgp
 
 
@@ -34,8 +34,8 @@ class SimpleBGPTopo(IPTopo):
         self.addiBGPFullMesh(2, (as2r1, as2r2))
         self.addAS(3, (as3r1,))
         # Add eBGP peering
-        bgp_peering(self, as1r1, as2r1)
-        bgp_peering(self, as3r1, as2r2)
+        ebgp_session(self, as1r1, as2r1)
+        ebgp_session(self, as3r1, as2r2)
         # Add test hosts
         for r in self.routers():
             self.addLink(r, self.addHost('h%s' % r))

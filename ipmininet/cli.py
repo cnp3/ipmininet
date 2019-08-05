@@ -1,4 +1,8 @@
 """An enhanced CLI providing IP-related commands"""
+import sys
+from cmd import Cmd
+from select import poll
+
 from mininet.cli import CLI
 from mininet.log import lg
 
@@ -6,11 +10,38 @@ from ipmininet.utils import address_pair
 
 
 class IPCLI(CLI):
+
+    # XXX When PR https://github.com/mininet/mininet/pull/897
+    # is accepted, we can remove this constructor
+    def __init__(self, mininet, stdin=sys.stdin, script=None):
+        """Start and run interactive or batch mode CLI
+           mininet: Mininet network object
+           stdin: standard input for CLI
+           script: script to run in batch mode"""
+        self.mn = mininet
+        # Local variable bindings for py command
+        self.locals = {'net': mininet}
+        # Attempt to handle input
+        self.stdin = stdin
+        self.inPoller = poll()
+        self.inPoller.register(stdin)
+        self.inputFile = script
+        Cmd.__init__(self, stdin=self.stdin)
+        lg.info('*** Starting CLI:\n')
+
+        if self.inputFile:
+            self.do_source(self.inputFile)
+            return
+
+        self.initReadline()
+        self.run()
+
     def do_route(self, line=""):
         """route destination: Print all the routes towards that destination
         for every router in the network"""
         for r in self.mn.routers:
-            self.default('[%s] ip route get %s' % (r.name, line))
+            lg.output("[%s] " % r.name)
+            self.default('%s ip route get %s' % (r.name, line))
 
     def do_ip(self, line):
         """ip IP1 IP2 ...: return the node associated to the given IP"""
@@ -20,8 +51,7 @@ class IPCLI(CLI):
             except KeyError:
                 n = 'unknown IP'
             finally:
-                lg.info(ip, '|', n)
-        lg.info('\n')
+                lg.output(ip, '|', n, "\n")
 
     def do_ips(self, line):
         """ips n1 n2 ...: return the ips associated to the given node name"""
@@ -31,8 +61,7 @@ class IPCLI(CLI):
             except KeyError:
                 l = 'unknown node'
             finally:
-                lg.info(n, '|', l)
-        lg.info('\n')
+                lg.output(n, '|', l, "\n")
 
     def do_ping4all(self, line):
         """Ping (IPv4-only) between all hosts."""
@@ -65,7 +94,7 @@ class IPCLI(CLI):
 
         if first in self.mn:
             if not args:
-                print("*** Enter a command for node: %s <cmd>" % first)
+                lg.error("*** Enter a command for node: %s <cmd>" % first)
                 return
             node = self.mn[first]
             rest = args.split(' ')

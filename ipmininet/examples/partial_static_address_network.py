@@ -33,7 +33,7 @@ class PartialStaticAddressNet(IPTopo):
 
         self.addLink(h1, r1)
 
-        self.addLink(r1, r2)
+        lr1r2 = self.addLink(r1, r2)
 
         self.addLink(r1, s1)
         self.addLink(s1, h2)
@@ -44,6 +44,6 @@ class PartialStaticAddressNet(IPTopo):
         ls2h3 = self.addLink(s2, h3)
         ls2h3[h3].addParams(ip=("192.168.1.2/24", "fc00:1::2/64"))
 
-        self.addSubnet(links=[(r1, r2)], subnets=["192.168.0.0/24", "fc00::/64"])
+        self.addSubnet(links=[lr1r2], subnets=["192.168.0.0/24", "fc00::/64"])
 
         super(PartialStaticAddressNet, self).build(*args, **kwargs)

@@ -52,7 +52,7 @@ class IPTopo(Topo):
         """Add a router to the topology
 
         :param name: the name of the node"""
-        return RouterDescription(self.addNode(name, isRouter=True, **kwargs), self)
+        return RouterDescription(self.addNode(str(name), isRouter=True, **kwargs), self)
 
     def addLink(self, node1, node2, port1=None, port2=None,
                 key=None, **opts):
@@ -75,7 +75,7 @@ class IPTopo(Topo):
         key = self.g.add_edge(node1, node2, key, opts)
 
         # Create an abstraction to allow additional calls
-        link_description = LinkDescription(node1, node2, key, self.linkInfo(node1, node2, key))
+        link_description = LinkDescription(self, node1, node2, key, self.linkInfo(node1, node2, key))
         return link_description
 
     def addDaemon(self, router, daemon, default_cfg_class=BasicRouterConfig,
@@ -190,30 +190,32 @@ class RouterDescription(str):
 @functools.total_ordering
 class LinkDescription(object):
 
-    def __init__(self, src, dst, key, link_attrs):
+    def __init__(self, topo, src, dst, key, link_attrs):
         self.src = src
         self.dst = dst
         self.key = key
         self.link_attrs = link_attrs
-        self.src_intf = IntfDescription(self, self.src,
+        self.src_intf = IntfDescription(self.src, topo, self,
                                         self.link_attrs.setdefault("params1", {}))
-        self.dst_intf = IntfDescription(self, self.dst,
+        self.dst_intf = IntfDescription(self.dst, topo, self,
                                         self.link_attrs.setdefault("params2", {}))
         super(LinkDescription, self).__init__()
 
     def __getitem__(self, item):
         if isinstance(item, int):
-            if item == 1:
+            if item == 0:
                 return self.src_intf
-            elif item == 2:
+            elif item == 1:
                 return self.dst_intf
-            raise IndexError("Links have only two nodes")
+            elif item == 3:
+                return self.key
+            raise IndexError("Links have only two nodes and one key")
         else:
             if item == self.src:
                 return self.src_intf
             elif item == self.dst:
                 return self.dst_intf
-            raise IndexError("Node '%s' is not on this link" % item)
+            raise KeyError("Node '%s' is not on this link" % item)
 
     # The following methods allow this object to behave like an edge key
     # for mininet.topo.MultiGraph
@@ -222,19 +224,25 @@ class LinkDescription(object):
         return self.key.__hash__()
 
     def __eq__(self, other):
-        return self.key.__eq__(other.key)
+        return self.key == other
 
     def __lt__(self, other):
-        return self.key.__lt__(other.key)
+        return self.key.__lt__(other)
 
 
-class IntfDescription(object):
+class IntfDescription(RouterDescription):
 
-    def __init__(self, link, node, intf_attrs):
+    def __init__(self, o, topo, link, intf_attrs):
         self.link = link
-        self.node = node
+        self.node = o
         self.intf_attrs = intf_attrs
-        super(IntfDescription, self).__init__()
+        super(IntfDescription, self).__init__(o, topo)
 
     def addParams(self, **kwargs):
         self.intf_attrs.update(kwargs)
+
+    def __hash__(self):
+        return self.node.__hash__()
+
+    def __eq__(self, other):
+        return self.node.__eq__(other)

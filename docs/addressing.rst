@@ -212,15 +212,15 @@ You can also declare your subnets by declaring a Subnet overlay.
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
-            self.addLink(r1, r2)
+            lr1r2 = self.addLink(r1, r2)
             self.addLink(r1, h1)
             self.addLink(r2, h2)
 
             # The interfaces of the nodes and links on their common LAN
             # will get an address for each subnet.
-            self.addSubnet(nodes=[r1, r2],   subnets=["2042:12::/64", "10.12.0.0/24"])
-            self.addSubnet(nodes=[r1, h1],   subnets=["2042:1a::/64", "10.51.0.0/24"])
-            self.addSubnet(links=[(r2, h2)], subnets=["2042:2b::/64", "10.62.0.0/24"])
+            self.addSubnet(nodes=[r1, r2], subnets=["2042:12::/64", "10.12.0.0/24"])
+            self.addSubnet(nodes=[r1, h1], subnets=["2042:1a::/64", "10.51.0.0/24"])
+            self.addSubnet(links=[lr1r2],  subnets=["2042:2b::/64", "10.62.0.0/24"])
 
             super(MyTopology, self).build(*args, **kwargs)
 

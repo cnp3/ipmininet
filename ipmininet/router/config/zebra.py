@@ -1,12 +1,9 @@
-from builtins import str
-
 import os
+import socket
 
-from ipaddress import ip_network, ip_interface
-
+from ipmininet.utils import realIntfList
 from .base import Daemon
 from .utils import ConfigDict
-from ipmininet.utils import realIntfList
 
 # Zebra actions
 DENY = 'deny'
@@ -76,16 +73,24 @@ class Zebra(QuaggaDaemon):
         """:param debug: the set of debug events that should be logged
         :param access_lists: The set of AccessList to create, independently
                              from the ones already included by route_maps
-        :param route_maps: The set of RouteMap to create
-        :param static_routes: The set of StaticRoute to create"""
+        :param route_maps: The set of RouteMap to create"""
         defaults.access_lists = []
         defaults.route_maps = []
-        defaults.static_routes = []
         super(Zebra, self).set_defaults(defaults)
 
     def has_started(self):
         # We override this such that we wait until we have the API socket
-        return os.path.exists(self.zebra_socket)
+        # and until wa can connect to it
+        return os.path.exists(self.zebra_socket) and self.listening()
+
+    def listening(self):
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        try:
+            sock.connect(self.zebra_socket)
+            sock.close()
+            return True
+        except socket.error:
+            return False
 
 
 class AccessListEntry(object):
@@ -179,14 +184,3 @@ class RouteMap(object):
         """Return the zebra description of this route map and apply it to the
         relevant protocols"""
         return 'route-map'
-
-
-class StaticRoute(object):
-    """A class representing a static route"""
-
-    def __init__(self, prefix, nexthop, distance=10):
-        """:param prefix: The prefix for this static route
-        :param nexthop: The nexthop for this prefix, one of: <IP address,
-                        interface name, null0, blackhole, reject>"""
-        self.prefix = ip_network(str(prefix))
-        self.nexthop = nexthop

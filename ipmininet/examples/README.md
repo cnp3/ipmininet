@@ -19,6 +19,7 @@ The following sections will detail the topologies.
    - [SimpleOpenRNetwork](#simpleopenrnetwork)
    - [StaticAddressNetwork](#staticaddressnetwork)
    - [PartialStaticAddressNet](#partialstaticaddressnetwork)
+   - [StaticRoutingNet](#staticroutingnet)
 
 
 ## SimpleOSPFNetwork
@@ -176,3 +177,11 @@ _args_ : n/a
 
 This network has some statically assigned addresses
 and the others are dynamically allocated.
+
+## StaticRoutingNet
+
+_topo name_ : static_routing_network
+_args_ : n/a
+
+This network uses static routes with zebra and staticd
+daemons.

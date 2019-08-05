@@ -37,7 +37,3 @@ ${rm.describe} ${rm.name} ${entry.action} ${entry.prio}
 ip protocol ${proto} route-map ${rm.name}
     % endfor
 % endfor
-!
-% for route in node.zebra.static_routes:
-${ip_statement(route.prefix)} route ${route.prefix} ${route.nexthop}
-% endfor

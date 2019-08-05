@@ -243,8 +243,7 @@ You can change it when adding a new router to your topology.
 .. testcode:: static routing
 
     from ipmininet.iptopo import IPTopo
-    from ipmininet.router.config import RouterConfig, Zebra
-    from ipmininet.router.config.zebra import StaticRoute
+    from ipmininet.router.config import RouterConfig, STATIC, StaticRoute
     from ipmininet.ipnet import IPNet
     from ipmininet.cli import IPCLI
 
@@ -259,21 +258,23 @@ You can change it when adding a new router to your topology.
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
-            self.addLink(r1, r2,
-                         params1={"ip": ("2042:12::1/64", "10.12.0.1/24")},
-                         params2={"ip": ("2042:12::2/64", "10.12.0.2/24")})
-            self.addLink(r1, h1,
-                         params1={"ip": ("2042:1a::1/64", "10.51.0.1/24")},
-                         params2={"ip": ("2042:1a::a/64", "10.51.0.5/24")})
-            self.addLink(r2, h2,
-                         params1={"ip": ("2042:2b::2/64", "10.62.0.2/24")},
-                         params2={"ip": ("2042:2b::b/64", "10.62.0.6/24")})
+            lr1r2 = self.addLink(r1, r2)
+            lr1r2[r1].addParams(ip=("2042:12::1/64", "10.12.0.1/24"))
+            lr1r2[r2].addParams(ip=("2042:12::2/64", "10.12.0.2/24"))
+
+            lr1h1 = self.addLink(r1, h1)
+            lr1h1[r1].addParams(ip=("2042:1a::1/64", "10.51.0.1/24"))
+            lr1h1[h1].addParams(ip=("2042:1a::a/64", "10.51.0.5/24"))
+
+            lr2h2 = self.addLink(r2, h2)
+            lr2h2[r2].addParams(ip=("2042:2b::2/64", "10.62.0.2/24"))
+            lr2h2[r2].addParams(ip=("2042:2b::b/64", "10.62.0.6/24"))
 
             # Add static routes
-            r1.addDaemon(Zebra, static_routes=[StaticRoute("2042:2b::/64", "2042:12::2"),
-                                               StaticRoute("10.51.0.0/24", "10.12.0.2")])
-            r2.addDaemon(Zebra, static_routes=[StaticRoute("2042:1a::/64", "2042:12::1"),
-                                               StaticRoute("10.62.0.0/24", "10.12.0.1")])
+            r1.addDaemon(STATIC, static_routes=[StaticRoute("2042:2b::/64", "2042:12::2"),
+                                                StaticRoute("10.62.0.0/24", "10.12.0.2")])
+            r2.addDaemon(STATIC, static_routes=[StaticRoute("2042:1a::/64", "2042:12::1"),
+                                                StaticRoute("10.51.0.0/24", "10.12.0.1")])
 
             super(MyTopology, self).build(*args, **kwargs)
 
@@ -290,8 +291,7 @@ You can also add routes manually when the network has started since you can run 
     :hide:
 
     from ipmininet.iptopo import IPTopo
-    from ipmininet.router.config import RouterConfig, Zebra
-    from ipmininet.router.config.zebra import StaticRoute
+    from ipmininet.router.config import RouterConfig, STATIC, StaticRoute
     from ipmininet.ipnet import IPNet
     from ipmininet.cli import IPCLI
 
@@ -304,21 +304,23 @@ You can also add routes manually when the network has started since you can run 
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
-            self.addLink(r1, r2,
-                         params1={"ip": ("2042:12::1/64", "10.12.0.1/24")},
-                         params2={"ip": ("2042:12::2/64", "10.12.0.2/24")})
-            self.addLink(r1, h1,
-                         params1={"ip": ("2042:1a::1/64", "10.51.0.1/24")},
-                         params2={"ip": ("2042:1a::a/64", "10.51.0.5/24")})
-            self.addLink(r2, h2,
-                         params1={"ip": ("2042:2b::2/64", "10.62.0.2/24")},
-                         params2={"ip": ("2042:2b::b/64", "10.62.0.6/24")})
+            lr1r2 = self.addLink(r1, r2)
+            lr1r2[r1].addParams(ip=("2042:12::1/64", "10.12.0.1/24"))
+            lr1r2[r2].addParams(ip=("2042:12::2/64", "10.12.0.2/24"))
+
+            lr1h1 = self.addLink(r1, h1)
+            lr1h1[r1].addParams(ip=("2042:1a::1/64", "10.51.0.1/24"))
+            lr1h1[h1].addParams(ip=("2042:1a::a/64", "10.51.0.5/24"))
+
+            lr2h2 = self.addLink(r2, h2)
+            lr2h2[r2].addParams(ip=("2042:2b::2/64", "10.62.0.2/24"))
+            lr2h2[r2].addParams(ip=("2042:2b::b/64", "10.62.0.6/24"))
 
             # Add static routes
-            r1.addDaemon(Zebra, static_routes=[StaticRoute("2042:2b::/64", "2042:12::2"),
-                                               StaticRoute("10.51.0.0/24", "10.12.0.2")])
-            r2.addDaemon(Zebra, static_routes=[StaticRoute("2042:1a::/64", "2042:12::1"),
-                                               StaticRoute("10.62.0.0/24", "10.12.0.1")])
+            r1.addDaemon(STATIC, static_routes=[StaticRoute("2042:2b::/64", "2042:12::2"),
+                                                StaticRoute("10.62.0.0/24", "10.12.0.2")])
+            r2.addDaemon(STATIC, static_routes=[StaticRoute("2042:1a::/64", "2042:12::1"),
+                                                StaticRoute("10.51.0.0/24", "10.12.0.1")])
 
             super(MyTopology, self).build(*args, **kwargs)
 
@@ -330,9 +332,9 @@ You can also add routes manually when the network has started since you can run 
 
         # Static routes
         net["r1"].cmd("ip -6 route add 2042:2b::/64 via 2042:12::2")
-        net["r1"].cmd("ip -4 route add 10.51.0.0/24 via 10.12.0.2")
-        net["r1"].cmd("ip -6 route add 2042:1a::/64 via 2042:12::1")
-        net["r1"].cmd("ip -4 route add 10.62.0.0/24 via 10.12.0.1")
+        net["r1"].cmd("ip -4 route add 10.62.0.0/24 via 10.12.0.2")
+        net["r2"].cmd("ip -6 route add 2042:1a::/64 via 2042:12::1")
+        net["r2"].cmd("ip -4 route add 10.51.0.0/24 via 10.12.0.1")
 
         IPCLI(net)
     finally:

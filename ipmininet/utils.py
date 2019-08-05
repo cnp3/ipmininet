@@ -119,7 +119,7 @@ def find_node(start, node_name):
     """
 
     if start.name == node_name:
-        return start
+        return start.intf()
 
     visited = set()
     to_visit = realIntfList(start)

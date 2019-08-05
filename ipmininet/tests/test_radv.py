@@ -72,3 +72,19 @@ def test_radvd_daemon_params(link_params, expected_cfg):
         net.stop()
     finally:
         cleanup()
+
+
+@require_root
+def test_radvd_cleanup():
+    try:
+        net = IPNet(topo=RouterAdvNet(), use_v4=False, use_v6=True, allocate_IPs=False)
+        net.start()
+        net["r"].config.daemon(RADVD).cleanup()
+        try:
+            net["r"].config.daemon(RADVD).cleanup()
+        except Exception as e:
+            assert False, "An exception '%s' was raised" \
+                          " while cleaning twice RADVD daemon" % e
+        net.stop()
+    finally:
+        cleanup()

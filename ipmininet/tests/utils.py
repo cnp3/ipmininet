@@ -1,9 +1,16 @@
 from builtins import str
+try:
+    # Python 2
+    from cStringIO import StringIO
+except ImportError:
+    # Python 3
+    from io import StringIO
 
 import re
+import signal
 import time
 
-import signal
+import mininet.log
 from ipaddress import ip_address
 
 
@@ -108,3 +115,21 @@ def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=300
     server_p.send_signal(signal.SIGINT)
     server_p.wait()
     return code, out, err
+
+
+class CLICapture(object):
+
+    def __init__(self, loglevel):
+        self.loglevel = loglevel
+
+    def __enter__(self):
+        self.stream = StringIO()
+        self.handler = mininet.log.StreamHandlerNoNewline(self.stream)
+        mininet.log.lg.addHandler(self.handler)
+        return self
+
+    def __exit__(self, *args):
+        mininet.log.lg.removeHandler(self.handler)
+        self.handler.flush()
+        self.handler.close()
+        self.out = self.stream.getvalue().splitlines()

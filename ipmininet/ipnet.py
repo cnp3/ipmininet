@@ -274,8 +274,9 @@ class IPNet(Mininet):
                     ips = tuple(domain.next_ipv4()
                                 for _ in range(intf.interface_width[0]))
                     intf.setIP(ips)
-                    for ip in ips:
-                        self._ip_allocs[ip.with_prefixlen] = intf.node
+                for ip in intf.ips():
+                    self._ip_allocs[ip.with_prefixlen] = intf.node
+                    self._ip_allocs[ip.ip.compressed] = intf.node
 
     def _allocate_ipv6(self):
         log.info("*** Allocating IPv6 addresses\n")
@@ -294,8 +295,9 @@ class IPNet(Mininet):
                     ips = tuple(domain.next_ipv6()
                                 for _ in range(intf.interface_width[1]))
                     intf.setIP6(ips)
-                    for ip in ips:
-                        self._ip_allocs[ip.with_prefixlen] = intf.node
+                for ip in intf.ip6s(exclude_lls=True):
+                    self._ip_allocs[ip.with_prefixlen] = intf.node
+                    self._ip_allocs[ip.ip.compressed] = intf.node
 
     @staticmethod
     def _allocate_subnets(subnets, domains, domainlen='len_v4',

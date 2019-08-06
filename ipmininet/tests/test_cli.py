@@ -36,10 +36,10 @@ def net(request):
 
 
 @pytest.fixture(scope="function")
-def tmp():
+def tmp(request):
     name = tempfile.mktemp()
-    yield name
-    os.unlink(name)
+    request.addfinalizer(lambda: os.unlink(name))
+    return name
 
 
 def perm(*args):

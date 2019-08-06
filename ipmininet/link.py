@@ -297,10 +297,18 @@ def address_comparator(a, b):
         return 1
     if b.network.is_global and not a.network.is_global:
         return -1
-    # Otherwise simply rank the IP values
-    if a > b:
+    # Compare networks
+    if b.network.is_global and not a.network.is_global:
+        return -1
+    # Compare network values
+    if a.network < b.network:
+        return -1
+    if a.network > b.network:
         return 1
-    return -1 if b > a else 0
+    # Otherwise simply rank the IP values
+    if a.ip < b.ip:
+        return -1
+    return 1 if a.ip > b.ip else 0
 
 
 class PhysicalInterface(IPIntf):

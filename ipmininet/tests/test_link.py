@@ -21,6 +21,10 @@ from ipmininet.tests import require_root
      [u"100.64.0.1/32", u"10.0.0.1/8"]),  # Public before private
     ([u"100.64.0.1/32", u"10.0.0.1/8"],
      [u"100.64.0.1/32", u"10.0.0.1/8"]),  # Public before private
+    ([u"2001::1/16", u"2002::1/16"],
+     [u"2002::1/16", u"2001::1/16"]),  # Bigger network value first
+    ([u"2002::1/16", u"2001::1/16"],
+     [u"2002::1/16", u"2001::1/16"]),  # Bigger network value first
     ([u"2001::1/16", u"2001::2/16"],
      [u"2001::2/16", u"2001::1/16"]),  # Bigger IP value first
     ([u"2001::2/16", u"2001::1/16"],

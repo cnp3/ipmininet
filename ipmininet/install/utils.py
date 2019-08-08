@@ -3,7 +3,7 @@ import shlex
 import subprocess
 import sys
 
-from ipmininet.utils import require_cmd
+from distutils.spawn import find_executable
 
 
 def sh(*cmds, **kwargs):
@@ -86,10 +86,9 @@ class Distribution(object):
         sh(pip + " -q install " + args + " ".join(packages), **kwargs)
 
     def require_pip(self, version):
-        if version == 2:
-            require_cmd(self.PIP2_CMD)
-        else:
-            require_cmd(self.PIP3_CMD)
+        pip = self.PIP2_CMD if version == 2 else self.PIP3_CMD
+        if find_executable(pip) is None:
+            raise RuntimeError("Cannot find %s" % pip)
 
 
 class Ubuntu(Distribution):

@@ -4,7 +4,9 @@ import re
 import stat
 import sys
 
-from .utils import supported_distributions, identify_distribution, sh
+# For imports to work during setup and afterwards
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from utils import supported_distributions, identify_distribution, sh
 
 MininetVersion = "2.3.0d6"
 FRRoutingVersion = "7.1"

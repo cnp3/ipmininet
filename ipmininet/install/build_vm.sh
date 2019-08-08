@@ -6,6 +6,7 @@
 set -e
 
 export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
 
 MN_VERSION="2.3.0d6"
 MN_INSTALL_SCRIPT_REMOTE="https://raw.githubusercontent.com/mininet/mininet/${MN_VERSION}/util/vm/install-mininet-vm.sh"
@@ -36,6 +37,6 @@ git clone https://github.com/cnp3/ipmininet.git
 pushd ipmininet
 sudo pip2 install .
 sudo pip3 install .
-sudo python3 ipmininet/install/install.py -af
+sudo python3 -m ipmininet.install -af6
 popd
 popd

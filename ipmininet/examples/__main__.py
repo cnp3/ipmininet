@@ -17,7 +17,7 @@ from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
 from .partial_static_address_network import PartialStaticAddressNet
 from .static_routing import StaticRoutingNet
-
+from .spanning_tree import SpanningTreeNet
 
 from mininet.log import lg, LEVELS
 
@@ -32,7 +32,8 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'simple_openr_network': SimpleOpenrNet,
          'static_address_network': StaticAddressNet,
          'partial_static_address_network': PartialStaticAddressNet,
-         'static_routing_network': StaticRoutingNet}
+         'static_routing_network': StaticRoutingNet,
+         'spanning_tree_network': SpanningTreeNet}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,

@@ -589,11 +589,13 @@ class BroadcastDomain(object):
         to this broadcast domain
 
         :param itf: a list of Intf"""
+        visited = []
         while itfs:
             # Explore one element
             i = itfs.pop()
-            if i in self.interfaces:
+            if i in visited:
                 continue
+            visited.append(i)
             if self.is_domain_boundary(i.node):
                 self.interfaces.add(i)
             # check its corresponding interface

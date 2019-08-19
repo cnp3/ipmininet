@@ -103,11 +103,27 @@ class IPTopo(Topo):
         daemon_list = config_params.setdefault(cfg_daemon_list, [])
         daemon_list.append((daemon, daemon_params))
 
+    def addHub(self, name, **opts):
+        """Convenience method: Add hub to graph.
+           name: hub name
+           opts: hub options
+           returns: hub name"""
+        if not opts and self.sopts:
+            opts = self.sopts
+        result = self.addSwitch(name, stp=False, hub=True, **opts)
+        return result
+
     def isRouter(self, n):
         """Check whether the given node is a router
 
         :param n: node name"""
         return self.isNodeType(n, 'isRouter')
+
+    def isHub(self, n):
+        """Check whether the given node is a router
+
+        :param n: node name"""
+        return self.isNodeType(n, 'hub')
 
     def hosts(self, sort=True):
         # The list is already sorted, simply filter out the routers
@@ -117,6 +133,10 @@ class IPTopo(Topo):
     def routers(self, sort=True):
         """Return a list of router node names"""
         return [n for n in self.nodes(sort) if self.isRouter(n)]
+
+    def hubs(self, sort=True):
+        """Return a list of hub node names"""
+        return [n for n in self.nodes(sort) if self.isHub(n)]
 
     def addOverlay(self, overlay):
         """Add a new overlay on this topology"""

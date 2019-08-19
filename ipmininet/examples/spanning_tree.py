@@ -5,7 +5,7 @@ from ipmininet.iptopo import IPTopo
 
 class SpanningTreeNet(IPTopo):
     """This simple network has a LAN with redundant links.
-       It enables the spanning tree protocol to prevent loops."""
+       The IPSwitch class enables the spanning tree protocol by default to prevent loops."""
 
     def build(self, *args, **kwargs):
         """
@@ -20,10 +20,9 @@ class SpanningTreeNet(IPTopo):
         | hs2 +-----+ s2 +----------+ s3 +-----+ hs3 |
         +-----+     +----+          +----+     +-----+
         """
-        # 'stp' option enables the spanning tree protocol to resolve loops in LAN
-        s1 = self.addSwitch('s1', stp=True)
-        s2 = self.addSwitch('s2', stp=True)
-        s3 = self.addSwitch('s3', stp=True)
+        s1 = self.addSwitch('s1', prio='3')
+        s2 = self.addSwitch('s2', prio='2')
+        s3 = self.addSwitch('s3', prio='1')
         self.addLink(s1, s2)
         self.addLink(s1, s3)
         self.addLink(s3, s2)

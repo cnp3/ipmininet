@@ -20,6 +20,7 @@ The following sections will detail the topologies.
    - [StaticAddressNetwork](#staticaddressnetwork)
    - [PartialStaticAddressNet](#partialstaticaddressnetwork)
    - [StaticRoutingNet](#staticroutingnet)
+   - [SpanningTreeNet](#spanningtreenet)
 
 
 ## SimpleOSPFNetwork
@@ -185,3 +186,11 @@ _args_ : n/a
 
 This network uses static routes with zebra and staticd
 daemons.
+
+## SpanningTreeNet
+
+_topo name_ : spanning_tree_network
+_args_ : n/a
+
+This network contains a single LAN with a loop.
+It enables the spanning tree protocol to prevent packet looping in the LAN.

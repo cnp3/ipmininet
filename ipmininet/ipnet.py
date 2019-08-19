@@ -17,6 +17,7 @@ from .link import IPIntf, IPLink, PhysicalInterface
 from mininet.net import Mininet
 from mininet.node import Host
 from mininet.nodelib import LinuxBridge
+from ipmininet.switch_hub import SwitchHub
 from mininet.log import lg as log
 
 # ping6 is not provided by default on newer systems
@@ -39,7 +40,7 @@ class IPNet(Mininet):
                  igp_area=OSPF_DEFAULT_AREA,
                  link=IPLink,
                  intf=IPIntf,
-                 switch=LinuxBridge,
+                 switch=SwitchHub,
                  controller=None,
                  *args, **kwargs):
         """Extends Mininet by adding IP-related ivars/functions and

@@ -15,8 +15,12 @@ from .sshd import SSHTopo
 from .router_adv_network import RouterAdvNet
 from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
+from .static_routing_network_3 import StaticRoutingNet3
+from .static_routing_network_4 import StaticRoutingNet4
 from .partial_static_address_network import PartialStaticAddressNet
 from .static_routing import StaticRoutingNet
+from .static_routing_network_2 import StaticRoutingNet2
+from .static_routing_failure import StaticRoutingNetFailure
 from .spanning_tree import SpanningTreeNet
 from .spanning_tree_3 import SpanningTree3
 from .spanning_tree_4 import SpanningTree4
@@ -36,8 +40,12 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'router_adv_network': RouterAdvNet,
          'simple_openr_network': SimpleOpenrNet,
          'static_address_network': StaticAddressNet,
+         'static_routing_network_3': StaticRoutingNet3,
+         'static_routing_network_4': StaticRoutingNet4,
          'partial_static_address_network': PartialStaticAddressNet,
          'static_routing_network': StaticRoutingNet,
+         'static_routing_network_2': StaticRoutingNet2,
+         'static_routing_network_failure': StaticRoutingNetFailure,
          'spanning_tree_network': SpanningTreeNet,
          'spanning_tree_3': SpanningTree3,
          'spanning_tree_4': SpanningTree4,

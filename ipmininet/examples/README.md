@@ -184,8 +184,17 @@ and the others are dynamically allocated.
 _topo name_ : static_routing_network
 _args_ : n/a
 
-This network uses static routes with zebra and staticd
+This network uses static routes with zebra and static
 daemons.
+
+## StaticRoutingNetFailure
+
+_topo name_ : static_routing_network_failure
+_args_ : n/a
+
+This network uses static routes with zebra and static
+daemons. These static routes are wrong and lead to a 
+failing communication.
 
 ## SpanningTreeNet
 

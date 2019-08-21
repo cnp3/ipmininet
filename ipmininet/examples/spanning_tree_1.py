@@ -49,13 +49,13 @@ class SpanningTree1(IPTopo):
         #self.addLink(s6,s11,port1=3, port2=3)
         
         #links with hubs
-        self.addLink(s3,s99, cost=0.5)#hub s99
-        self.addLink(s17,s99, cost=0.5)
-        self.addLink(s6,s99, cost=0.5)
+        self.addLink(s3,s99)#hub s99
+        self.addLink(s17,s99)
+        self.addLink(s6,s99)
         
-        self.addLink(s6,s100, cost=0.5)#hub s100
-        self.addLink(s11,s100, cost=0.5)
-        self.addLink(s12,s100, cost=0.5)
+        self.addLink(s6,s100)#hub s100
+        self.addLink(s11,s100)
+        self.addLink(s12,s100)
         
         for s in (s3,s6,s10,s11,s12,s17):
             self.addLink(s, self.addHost('h%s' % s))

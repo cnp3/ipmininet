@@ -29,6 +29,10 @@ from .spanning_tree_bus import SpanningTreeBus
 from .spanning_tree_hub import SpanningTreeHub
 from .spanning_tree_cost import SpanningTreeCost
 from .spanning_tree_adjust import SpanningTreeAdjust
+from .bgp_full_config import BGPTopoFull
+from .bgp_local_pref import BGPTopoLocalPref
+from .bgp_med import BGPTopoMed
+from .bgp_rr import BGPTopoRR
 
 from mininet.log import lg, LEVELS
 
@@ -55,11 +59,23 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'spanning_tree_bus': SpanningTreeBus,
          'spanning_tree_hub': SpanningTreeHub,
          'spanning_tree_cost': SpanningTreeCost,
-         'spanning_tree_adjust': SpanningTreeAdjust}
+         'spanning_tree_adjust': SpanningTreeAdjust,
+         'bgp_full_config': BGPTopoFull,
+         'bgp_local_pref': BGPTopoLocalPref,
+         'bgp_med': BGPTopoMed,
+         'bgp_rr': BGPTopoRR}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,
-                                   'allocate_IPs': False}}
+                                   'allocate_IPs': False},
+            'bgp_full_config':    {'use_v4': False,
+                                   'use_v6': True},
+            'bgp_local_pref':     {'use_v4': False,
+                                   'use_v6': True},
+            'bgp_med':            {'use_v4': False,
+                                   'use_v6': True},
+            'bgp_rr':             {'use_v4': False,
+                                   'use_v6': True}}
 
 
 def parse_args():

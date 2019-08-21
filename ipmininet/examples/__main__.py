@@ -17,6 +17,7 @@ from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
 from .partial_static_address_network import PartialStaticAddressNet
 from .static_routing import StaticRoutingNet
+from .static_routing_failure import StaticRoutingNetFailure
 from .spanning_tree import SpanningTreeNet
 from .spanning_tree_3 import SpanningTree3
 from .spanning_tree_4 import SpanningTree4
@@ -37,6 +38,7 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'static_address_network': StaticAddressNet,
          'partial_static_address_network': PartialStaticAddressNet,
          'static_routing_network': StaticRoutingNet,
+         'static_routing_network_failure': StaticRoutingNetFailure,
          'spanning_tree_network': SpanningTreeNet,
          'spanning_tree_3': SpanningTree3,
          'spanning_tree_4': SpanningTree4,

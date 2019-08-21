@@ -9,7 +9,7 @@ Created on Wed Aug 21 09:50:11 2019
 from ipmininet.iptopo import IPTopo
 
 class SpanningTree1(IPTopo):
-    
+
     def build(self, *args, **kwargs):
         """
           +-----+s3.2   ||   s17.1+-----+s17.2  ||  s10.1+-----+
@@ -24,7 +24,7 @@ class SpanningTree1(IPTopo):
           =======       ||--------+ s6  +-------||-------+ s11 |
              |          ||        +--+--+       ||       +--+--+
              |                       |s6.1                  |s11.2
-             |                       |                      | 
+             |                       |                      |
              |                ===================================[hub s100]
              |s12.1             |
           +--+--+               |
@@ -41,23 +41,34 @@ class SpanningTree1(IPTopo):
         #hubs
         s99 =  self.addSwitch("s99", stp=False, hub=True) # Hub
         s100 =  self.addSwitch("s100", stp=False, hub=True) # Hub
-        
-        #1 to 1 links
-        self.addLink(s3,s12,port1=1,port2=1)
-        self.addLink(s17,s10,port1=2,port2=1)
-        self.addLink(s10,s11,port1=2,port2=1)
-        #self.addLink(s6,s11,port1=3, port2=3)
-        
+
+        #links
+        #self.addLink(s3,s12,1,1)
+        #self.addLink(s17,s10,2,1)
+        #self.addLink(s10,s11,2,1)
+        #self.addLink(s6,s11,3,3)
+        self.addLink(s3,s12)
+        self.addLink(s3,s99)
+        self.addLink(s12,s100)
+        self.addLink(s6,s100)
+        self.addLink(s17,s99)
+        self.addLink(s10,s17)
+        self.addLink(s11,s10)
+        self.addLink(s11,s100)
+        self.addLink(s6,s99)
+        self.addLink(s6,s11)
+
+
         #links with hubs
         self.addLink(s3,s99)#hub s99
         self.addLink(s17,s99)
         self.addLink(s6,s99)
-        
+
         self.addLink(s6,s100)#hub s100
         self.addLink(s11,s100)
         self.addLink(s12,s100)
-        
-        for s in (s3,s6,s10,s11,s12,s17):
-            self.addLink(s, self.addHost('h%s' % s))
-            
+
+        #for s in (s3,s6,s10,s11,s12,s17):
+        #    self.addLink(s, self.addHost('h%s' % s))
+
         super(SpanningTree1, self).build(*args, **kwargs)

@@ -29,7 +29,7 @@ class SpanningTreeBus(IPTopo):
         s1  =  self.addSwitch("s1", stp=True)
         s2  =  self.addSwitch("s2", stp=True)
         s3  =  self.addSwitch("s3", stp=True)
-        s99 =  self.addSwitch("s99", stp=False, hub=True) # Hub
+        s99 =  self.addHub("s99", stp=False) # Hub
         
         self.addLink(s1,s99)
         self.addLink(s2,s99)

@@ -110,7 +110,7 @@ class IPTopo(Topo):
            returns: hub name"""
         if not opts and self.sopts:
             opts = self.sopts
-        result = self.addNode( name, isHub=True, **opts )
+        result = self.addSwitch( name, hub=True, **opts )
         return result
 
     def isRouter(self, n):
@@ -118,12 +118,6 @@ class IPTopo(Topo):
 
         :param n: node name"""
         return self.isNodeType(n, 'isRouter')
-    
-    def isHub(self, n):
-        """Check wheter the given node is a router
-
-        :param n: node name"""
-        return self.isNodeType(n, 'isHub')
 
     def hosts(self, sort=True):
         # The list is already sorted, simply filter out the routers
@@ -133,10 +127,6 @@ class IPTopo(Topo):
     def routers(self, sort=True):
         """Return a list of router node names"""
         return [n for n in self.nodes(sort) if self.isRouter(n)]
-    
-    def hubs(self, sort=True):
-        """Return a list of hub node names"""
-        return [n for n in self.nodes(sort) if self.isHub(n)]
 
     def addOverlay(self, overlay):
         """Add a new overlay on this topology"""

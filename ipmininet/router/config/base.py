@@ -336,7 +336,6 @@ class BasicRouterConfig(RouterConfig):
         # Importing here to avoid circular import
         from .ospf import OSPF
         from .ospf6 import OSPF6
-        from .ripng import RIPng
         # We don't want any zebra-specific settings, so we rely on the OSPF/OSPF6
         # DEPENDS list for that daemon to run it with default settings
         # We also don't want specific settings beside the defaults, so we don't

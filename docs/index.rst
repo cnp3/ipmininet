@@ -19,6 +19,7 @@ such as IP addresses or router configuration files, ...
     cli
     daemons
     addressing
+    contribute
     api/modules
 
 

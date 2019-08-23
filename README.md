@@ -14,11 +14,3 @@ IP addresses or router configuration files, ...
 The latest user documentation is available on
 https://ipmininet.readthedocs.io/
 
-[ipmininet/examples/README](ipmininet/examples/README.md) 
-contains a description of the examples that come with this library.
-
-## Contributions
-
-If you want to contribute, feel free to open a Pull Request.
-[ipmininet/tests/README](ipmininet/tests/README.md)
-contains the instructions to run the test suite of the library.

@@ -50,7 +50,7 @@ autodoc_mock_imports = ["pytest"]
 # API doc parameters
 apidoc_module_dir = '../ipmininet'
 apidoc_output_dir = 'api'
-apidoc_excluded_paths = ['tests', 'examples']
+apidoc_excluded_paths = ['tests', 'examples', 'install']
 apidoc_separate_modules = True
 apidoc_module_first = True
 apidoc_extra_args = ['-H', 'IPMininet API', '-d', '6']

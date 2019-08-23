@@ -7,9 +7,9 @@ import ipmininet.router.config as daemons
 from .utils import is_container
 
 
-def cleanup():
+def cleanup(level='info'):
     """Cleanup all possible junk that we may have started."""
-    log.setLogLevel('info')
+    log.setLogLevel(level)
     # Standard mininet cleanup
     mnclean.cleanup()
     # Cleanup any leftover daemon

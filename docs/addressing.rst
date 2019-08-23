@@ -345,7 +345,7 @@ You can also add routes manually when the network has started since you can run 
 .. testsetup:: *
 
     from ipmininet.clean import cleanup
-    cleanup()
+    cleanup(level='warning')
 
 .. testoutput:: *
     :hide:

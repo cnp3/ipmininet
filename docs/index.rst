@@ -15,6 +15,7 @@ such as IP addresses or router configuration files, ...
 
     install
     getting_started
+    examples
     cli
     daemons
     addressing

@@ -160,14 +160,19 @@ As for Mininet, IPMininet networks need root access to be executed.
 
 .. _`Mininet CLI`: http://mininet.org/walkthrough/#part-3-mininet-command-line-interface-cli-commands
 
-Examples
---------
+.. _getting_started_cleaning:
 
-A few documented examples are in examples_ in the IPMininet repository.
-More of them can be found in this repository_.
+IPMininet network cleaning
+--------------------------
 
-.. _examples: https://github.com/oliviertilmans/ipmininet/tree/master/ipmininet/examples
-.. _repository: https://github.com/obonaventure/RoutingExamples
+If you forget to clean your network with ``net.stop()`` in your script,
+your machine can will have ghost daemon process and uncleaned network namespaces.
+This can also happen if IPMininet crashes.
+In both cases, you have to clean it up with the following command:
+
+.. code-block:: bash
+
+    sudo python -m ipmininet.clean
 
 Mininet compatibility
 ---------------------

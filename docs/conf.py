@@ -42,7 +42,8 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxcontrib.napoleon',
               'sphinxcontrib.apidoc',
               'sphinx.ext.autosectionlabel',
-              'sphinx.ext.doctest']
+              'sphinx.ext.doctest',
+              'm2r']
 
 # Mock calls to external libraries
 autodoc_mock_imports = ["pytest"]
@@ -62,8 +63,10 @@ templates_path = ['_templates']
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
+
+# m2r parameters
+m2r_parse_relative_links = True
 
 # The master toctree document.
 master_doc = 'index'

@@ -74,6 +74,8 @@ For the option documentations, use the ``-h`` option.
 
 .. _documentation: http://mininet.org/download/
 
+.. _install_manual:
+
 Manual installation from sources
 --------------------------------
 

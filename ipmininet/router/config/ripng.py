@@ -10,12 +10,13 @@ class RIPng(QuaggaDaemon):
     """This class provides a simple configuration for an RIP daemon.
     It advertizes one network per interface (the primary one),
     and set interfaces not facing another L3Router to passive"""
-    NAME = 'ripng'
+    NAME = 'ripngd'
     DEPENDS = (Zebra,)
     KILL_PATTERNS = (NAME,)
 
     def build(self):
         cfg = super(RIPng, self).build()
+        cfg.redistribute = self.options.redistribute
         interfaces = [itf
                       for itf in realIntfList(self._node)]
         cfg.interfaces = self._build_interfaces(interfaces)
@@ -35,17 +36,18 @@ class RIPng(QuaggaDaemon):
         return [ConfigDict(description=i.describe,
                            name=i.name,
                            # Is the interface between two routers?
-                           active=self.is_active_interface(i),
-                           priority=i.get('rip_priority',
-                                          self.options.priority),
-                           dead_int=i.get('rip_dead_int',
-                                          self.options.dead_int),
-                           hello_int=i.get('rip_hello_int',
-                                           self.options.hello_int),
-                           cost=i.igp_metric,
-                           # Is the interface forcefully disabled?
-                           passive=i.get('igp_passive', False))
+                           active=self.is_active_interface(i))
                 for i in interfaces]
+
+    def set_defaults(self, defaults):
+        """:param debug: the set of debug events that should be logged
+        :param dead_int: Dead interval timer
+        :param hello_int: Hello interval timer
+        :param priority: priority for the interface, used for DR election
+        :param redistribute: set of OSPFRedistributedRoute sources"""
+        defaults.redistribute = []
+        defaults.flush_time = 240  # Arbitrary
+        super(RIPng, self).set_defaults(defaults)
 
     def is_active_interface(self, itf):
         """Return whether an interface is active or not for the OSPF daemon"""
@@ -57,3 +59,12 @@ class RIPNetwork(object):
 
     def __init__(self, domain):
         self.domain = domain
+
+
+class RIPRedistributedRoute(object):
+    """A class representing a redistributed route type in RIP"""
+
+    def __init__(self, subtype, metric_type=1, metric=1000):
+        self.subtype = subtype
+        self.metric_type = metric_type
+        self.metric = metric

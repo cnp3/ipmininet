@@ -54,10 +54,12 @@ class Distribution(object):
     def check_pip_version(self, pip):
         from pkg_resources import parse_version
 
+        if find_executable(pip) is None:
+            return ""
         p = sh("%s -V" % pip, output_stdout=False)
         if p.wait() != 0:
             print("Print cannot get the version of %s" % pip)
-            sys.exit(1)
+            return ""
         content, _ = p.communicate()
         try:
             v = content.decode("utf-8").split(u" ")[1]
@@ -83,7 +85,8 @@ class Distribution(object):
         else:
             pip = self.PIP3_CMD
             args = self.pip3_args
-        sh(pip + " -q install " + args + " ".join(packages), **kwargs)
+        if find_executable(pip) is not None:
+            sh(pip + " -q install " + args + " ".join(packages), **kwargs)
 
     def require_pip(self, version):
         pip = self.PIP2_CMD if version == 2 else self.PIP3_CMD

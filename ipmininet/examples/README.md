@@ -106,7 +106,7 @@ inbound traffic (the INPUT chains in ip(6)tables):
   - Can only be (properly established) TCP over IPv6
 
 You can test this by trying to ping(6) both routers, use nc to (try to)
-exchange data over TCP, or [tracebox](www.tracebox.org) to send a crafted TCP
+exchange data over TCP, or [tracebox](http://www.tracebox.org) to send a crafted TCP
 packet not part of an already established session.
 
 

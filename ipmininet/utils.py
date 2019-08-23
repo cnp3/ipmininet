@@ -35,7 +35,9 @@ def require_cmd(cmd, help_str=None):
         return
 
     if help_str:
-        log.error(help_str)
+        #log.error(help_str)
+        print(help_str)
+        print('-------')
     raise RuntimeError('[%s] is not available in $PATH' % cmd)
 
 

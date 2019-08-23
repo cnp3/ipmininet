@@ -10,6 +10,7 @@ from .radvd import RADVD, AdvPrefix, AdvRDNSS, AdvConnectedPrefix
 from .iptables import IPTables, IP6Tables
 from .sshd import SSHd
 from .pimd import PIMD
+from .ripng import RIPng
 from .openrd import OpenrDaemon
 from .openr import Openr, OpenrDomain
 

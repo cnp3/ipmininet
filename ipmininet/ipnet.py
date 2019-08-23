@@ -109,8 +109,9 @@ class IPNet(Mininet):
             log.info(routerName + ' ')
         log.info('\n')
         self.physical_interface.update(topo.phys_interface_capture)
+        
         super(IPNet, self).buildFromTopo(topo)
-
+                
     def addLink(self, node1, node2,
                 igp_metric=None, igp_area=None, igp_passive=False,
                 v4_width=1, v6_width=1,
@@ -151,6 +152,7 @@ class IPNet(Mininet):
                 # Only iff not already specified
                 if k not in p:
                     p[k] = v
+        
         return super(IPNet, self).addLink(node1=node1, node2=node2,
                                           *args, **params)
 
@@ -203,6 +205,26 @@ class IPNet(Mininet):
                 log.info('skipping %s , ' % h.name)
         log.info('\n')
 
+        # Adjust the STP cost
+        for myLink in self.links:
+            if 'stp_cost1' in myLink.intf1.params:
+                portName = myLink.intf1
+                node = str(portName).split('-')[0]
+                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf1.params['stp_cost1']))
+            if 'stp_cost2' in myLink.intf1.params:
+                portName = myLink.intf2
+                node = str(portName).split('-')[0]
+                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf1.params['stp_cost2']))
+            if 'stp_cost1' in myLink.intf2.params: #redondant because of the two intf
+                portName = myLink.intf1
+                node = str(portName).split('-')[0]
+                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf2.params['stp_cost1']))
+            if 'stp_cost2' in myLink.intf2.params:
+                portName = myLink.intf2
+                node = str(portName).split('-')[0]
+                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf2.params['stp_cost2']))
+
+                
     def stop(self):
         log.info('*** Stopping', len(self.routers),  'routers\n')
         for router in self.routers:

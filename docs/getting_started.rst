@@ -184,7 +184,7 @@ Feel free to consult the `Mininet documentation`_ as well.
 .. testsetup:: *
 
     from ipmininet.clean import cleanup
-    cleanup()
+    cleanup(level='warning')
 
 .. testcode:: topo creation,topo creation addDaemon,topo creation config param,topo creation addDeamon params
     :hide:

@@ -399,7 +399,7 @@ if we want to change one of its parameters:
 .. testsetup:: *
 
     from ipmininet.clean import cleanup
-    cleanup()
+    cleanup(level='warning')
 
 .. testcode:: *
     :hide:

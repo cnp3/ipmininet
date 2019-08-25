@@ -85,10 +85,13 @@ class IPIntf(_m.Intf):
     def ip(self):
         return self._ip(4)
 
-    def ips(self):
-        """Return a generator over all IPv4 assigned to this interface"""
+    def ips(self, exclude_lbs=True):
+        """Return a generator over all IPv4 assigned to this interface
+
+        :param exclude_lbs: Whether Loopback addresses should be included or not"""
         for i in self.addresses[4]:
-            yield i
+            if not exclude_lbs or not i.is_loopback:
+                yield i
 
     @ip.setter
     def ip(self, ip):
@@ -107,12 +110,14 @@ class IPIntf(_m.Intf):
         """Return the default IPv6 for this interface"""
         return self._ip(6)
 
-    def ip6s(self, exclude_lls=False):
+    def ip6s(self, exclude_lls=False, exclude_lbs=True):
         """Return a generator over all IPv6 assigned to this interface
 
-        :param exclude_lls: Whether Link-locals should be included or not"""
+        :param exclude_lls: Whether Link-locals should be included or not
+        :param exclude_lbs: Whether Loopback addresses should be included or not"""
         for i in self.addresses[6]:
-            if not exclude_lls or not i.is_link_local:
+            if (not exclude_lls or not i.is_link_local) \
+                    and (not exclude_lbs or not i.is_loopback):
                 yield i
 
     @ip6.setter
@@ -140,6 +145,7 @@ class IPIntf(_m.Intf):
         if not ip:
             return
         setv4 = setv6 = False
+        lb_v4_update = lb_v6_update = False
         # Make sure we have an up-to-date view of our addresses
         self._refresh_addresses()
         cmds = []
@@ -162,14 +168,17 @@ class IPIntf(_m.Intf):
             # Record assignment family
             if addr.version == 4:
                 setv4 = True
+                lb_v4_update = addr.is_loopback or lb_v4_update
             elif addr.version == 6:
                 setv6 = True
+                lb_v6_update = addr.is_loopback or lb_v6_update
         # Clean-up old addresses
         cleanup = []
         if setv4:
-            cleanup.append(self.ips())
+            cleanup.append(self.ips(exclude_lbs=not lb_v4_update))
         if setv6:
-            cleanup.append(self.ip6s(exclude_lls=True))
+            cleanup.append(self.ip6s(exclude_lls=True,
+                                     exclude_lbs=not lb_v6_update))
         for ip in chain.from_iterable(cleanup):
             self._del_ip(ip)
         # Assign IP
@@ -287,6 +296,11 @@ def address_comparator(a, b):
         return 1
     if a.version < b.version:
         return -1
+    # We don't prefer loopback addresses
+    if a.network.is_loopback and not b.network.is_loopback:
+        return -1
+    if b.network.is_loopback and not a.network.is_loopback:
+        return 1
     # LLs have low visibility
     if a.is_link_local and not b.is_link_local:
         return -1

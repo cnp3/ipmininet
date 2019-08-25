@@ -13,6 +13,10 @@ from ipmininet.tests import require_root
      [u"2001::1/16", u"10.0.0.1/8"]),  # V4 before V6
     ([u"2001::1/16", u"10.0.0.1/8"],
      [u"2001::1/16", u"10.0.0.1/8"]),  # V4 before V6
+    ([u"fe80::/16", u"::1/128"],
+     [u"fe80::/16", u"::1/128"]),  # Link-local before loopback
+    ([u"::1/128", u"fe80::/16"],
+     [u"fe80::/16", u"::1/128"]),  # Link-local before loopback
     ([u"fe80::/16", u"2001::1/16"],
      [u"2001::1/16", u"fe80::/16"]),  # Global before link-local
     ([u"2001::1/16", u"fe80::/16"],

@@ -6,6 +6,7 @@ import time
 
 from ipmininet import DEBUG_FLAG
 from ipmininet.utils import L3Router
+from ipmininet.link import IPIntf
 from .config import BasicRouterConfig
 
 import mininet.clean
@@ -98,10 +99,13 @@ class Router(Node, L3Router):
             self.config = config(self)
         self._processes = process_manager(self)
 
+        # This interface already exists in the router,
+        # so no need to move it
+        IPIntf('lo', node=self, moveIntfFn=lambda x, y: None)
+
     def start(self):
         """Start the router: Configure the daemons, set the relevant sysctls,
         and fire up all needed processes"""
-        self.cmd('ip', 'link', 'set', 'dev', 'lo', 'up')
         # Build the config
         self.config.build()
         # Check them

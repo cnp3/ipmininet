@@ -378,6 +378,7 @@ class IPNet(Mininet):
                       for n in self.values()
                       if BroadcastDomain.is_domain_boundary(n)
                       for intf in realIntfList(n)}
+        interfaces.update({r.intf('lo'): False for r in self.routers})
         for intf, explored in interfaces.items():
             # the interface already belongs to a broadcast domain
             if explored:
@@ -577,7 +578,7 @@ class BroadcastDomain(object):
     def len_v4(self):
         """The number of IPv4 addresses in this broadcast domain"""
         return sum(map(lambda x: x.interface_width[0]
-                       if x.ip else 0, self.interfaces))
+                       if len(list(x.ips())) else 0, self.interfaces))
 
     def len_v6(self):
         """The number of IPv6 addresses in this broadcast domain"""

@@ -13,19 +13,20 @@ from .iptables import IPTablesTopo
 from .gre import GRETopo
 from .sshd import SSHTopo
 from .router_adv_network import RouterAdvNet
+from .ripng_network import RIPngNetwork
 from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
-from .static_routing_network_3 import StaticRoutingNet3
-from .static_routing_network_4 import StaticRoutingNet4
+from .static_routing_network_intermediate import StaticRoutingNetIntermediate
+from .static_routing_network_complex import StaticRoutingNetComplex
 from .partial_static_address_network import PartialStaticAddressNet
 from .static_routing import StaticRoutingNet
-from .static_routing_network_2 import StaticRoutingNet2
+from .static_routing_network_basic import StaticRoutingNetBasic
 from .static_routing_failure import StaticRoutingNetFailure
 from .spanning_tree import SpanningTreeNet
-from .spanning_tree_3 import SpanningTree3
-from .spanning_tree_4 import SpanningTree4
+from .spanning_tree_intermediate import SpanningTreeIntermediate
+from .spanning_tree_complex import SpanningTreeComplex
 from .spanning_tree_bus import SpanningTreeBus
-from .spanning_tree_1 import SpanningTree1
+from .spanning_tree_hub import SpanningTreeHub
 from .spanning_tree_simple import SpanningTreeSimple
 from .spanning_tree_6 import SpanningTree6
 from .spanning_tree_adjust import SpanningTreeAdjust
@@ -41,19 +42,20 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'gre': GRETopo,
          'ssh': SSHTopo,
          'router_adv_network': RouterAdvNet,
+         'ripng_network': RIPngNetwork,
          'simple_openr_network': SimpleOpenrNet,
          'static_address_network': StaticAddressNet,
-         'static_routing_network_3': StaticRoutingNet3,
-         'static_routing_network_4': StaticRoutingNet4,
+         'static_routing_network_intermediate': StaticRoutingNetIntermediate,
+         'static_routing_network_complex': StaticRoutingNetComplex,
          'partial_static_address_network': PartialStaticAddressNet,
          'static_routing_network': StaticRoutingNet,
-         'static_routing_network_2': StaticRoutingNet2,
+         'static_routing_network_basic': StaticRoutingNetBasic,
          'static_routing_network_failure': StaticRoutingNetFailure,
          'spanning_tree_network': SpanningTreeNet,
-         'spanning_tree_3': SpanningTree3,
-         'spanning_tree_4': SpanningTree4,
+         'spanning_tree_intermediate': SpanningTreeIntermediate,
+         'spanning_tree_complex': SpanningTreeComplex,
          'spanning_tree_bus': SpanningTreeBus,
-         'spanning_tree_1': SpanningTree1,
+         'spanning_tree_hub': SpanningTreeHub,
          'spanning_tree_simple': SpanningTreeSimple,
          'spanning_tree_6': SpanningTree6,
          'spanning_tree_adjust':SpanningTreeAdjust,

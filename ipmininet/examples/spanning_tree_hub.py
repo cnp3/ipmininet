@@ -8,7 +8,7 @@ Created on Wed Aug 21 09:50:11 2019
 
 from ipmininet.iptopo import IPTopo
 
-class SpanningTree1(IPTopo):
+class SpanningTreeHub(IPTopo):
 
     def build(self, *args, **kwargs):
         """
@@ -58,17 +58,11 @@ class SpanningTree1(IPTopo):
         l.append(self.addLink(s6,s99))
         self.addLink(s6,s11)
 
+        #adjust the cost for the hubs
+        for i in l:
+            for j in i:
+                i[j].addParams(stp_cost1=1)
+                i[j].addParams(stp_cost2=1)
+                break
 
-        #links with hubs
-        self.addLink(s3,s99)#hub s99
-        self.addLink(s17,s99)
-        self.addLink(s6,s99)
-
-        self.addLink(s6,s100)#hub s100
-        self.addLink(s11,s100)
-        self.addLink(s12,s100)
-
-        #for s in (s3,s6,s10,s11,s12,s17):
-        #    self.addLink(s, self.addHost('h%s' % s))
-
-        super(SpanningTree1, self).build(*args, **kwargs)
+        super(SpanningTreeHub, self).build(*args, **kwargs)

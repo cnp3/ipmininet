@@ -8,60 +8,50 @@ from ipmininet.clean import cleanup
 from ipmininet.ipnet import IPNet
 from ipmininet.tests import require_root
 
-class SimpleSpanningTree(IPTopo):
+class SimpleHubSpanningTree(IPTopo):
 
     def build(self, *args, **kwargs):
         """
-            +-----+s2.2   s3.2+-----+
-            | s2  +-----2-----+ s3  |
-            +--+--+           +--+--+
-           s2.1|         s3.1/   |s3.3
-               |            /    |
-               |           /     |
-               |          /      |
-               |         /       |
-               4        2        2
-               |       /         |
-               |      /          |
-               |     /           |
-               |    /            |
-           s1.1|   /s1.3         |s4.2
-            +--+--+           +--+--+
-            | s1  +-----5-----+ s4  |
-            +-----+s1.2   s4.1+-----+
+            +-----+s2.2   s3.2+-----+s3.2
+            | s2  +-----------+ s3  +---------------+
+            +--+--+           +--+--+               |
+           s2.1|                 |s3.1              |
+               |                 |                  |
+            ==========================[Hub S99]     |
+               |                                    |
+           s1.1|                                    |
+            +--+--+1.2                              |
+            | s1  +---------------------------------+
+            +-----+
         """
         # adding switches
         s1 = self.addSwitch("s1", stp=True, prio=1)
         s2 = self.addSwitch("s2", stp=True, prio=2)
         s3 = self.addSwitch("s3", stp=True, prio=3)
-        s4 = self.addSwitch("s4", stp=True, prio=4)
+        # adding hub
+        s99 = self.addHub("s99")
 
         # adding links
-        l1 = self.addLink(s1, s2)
-        self.addLink(s1, s3)
-        l2 = self.addLink(s1, s4)
+        l = []
+        l.append(self.addLink(s1, s99))
+        l.append(self.addLink(s2, s99))
+        l.append(self.addLink(s3, s99))
         self.addLink(s2, s3)
-        self.addLink(s3, s4)
+        self.addLink(s1, s3)
 
-        #stp_cost
-        l1[0].addParams(stp_cost1=4)
-        l1[0].addParams(stp_cost2=4)
-        l2[0].addParams(stp_cost1=5)
-        l2[0].addParams(stp_cost2=5)
-
-        super(SimpleSpanningTree, self).build(*args, **kwargs)
+        super(SimpleHubSpanningTree, self).build(*args, **kwargs)
 
 @require_root
 @pytest.mark.parametrize("switch,expected_lines", [
-    ("s1", ["forwarding", "forwarding", "forwarding"]),
-    ("s2", ["forwarding", "blocking"]),
-    ("s3", ["forwarding", "forwarding", "forwarding"]),
-    ("s4", ["blocking", "forwarding"])
+    ("s1", ["forwarding", "forwarding"]),
+    ("s2", ["forwarding", "forwarding"]),
+    ("s3", ["forwarding", "blocking", "blocking"]),
+    ("s99", ["forwarding", "forwarding", "forwarding"])
 ])
 
-def test_stp(switch, expected_lines):
+def test_hub(switch, expected_lines):
     try:
-        net = IPNet(topo=SimpleSpanningTree())
+        net = IPNet(topo=SimpleHubSpanningTree())
         net.start()
         partial_cmd = "brctl showstp"
         possible_states = "listening|learning|forwarding|blocking"

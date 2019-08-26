@@ -20,7 +20,16 @@ The following sections will detail the topologies.
    - [StaticAddressNetwork](#staticaddressnetwork)
    - [PartialStaticAddressNet](#partialstaticaddressnetwork)
    - [StaticRoutingNet](#staticroutingnet)
+   - [StaticRoutingNetBasic](#staticroutingnetbasic)
+   - [StaticRoutingNetIntermediate](#staticroutingnetintermediate)
+   - [StaticRoutingNetComplex](#staticroutingnetcomplex)
+   - [StaticRoutingNetFailure](#staticroutingnetfailure)
    - [SpanningTreeNet](#spanningtreenet)
+   - [SpanningTreeHub](#spanningtreehub)
+   - [SpanningTreeBus](#spanningtreebus)
+   - [SpanningTreeIntermediate](#spanningtreeintermediate)
+   - [SpanningTreeComplex](#spanningtreecomplex)
+   - [SpanningTreeAdjust](#spanningtreeadjust)
 
 
 ## SimpleOSPFNetwork
@@ -187,14 +196,36 @@ _args_ : n/a
 This network uses static routes with zebra and static
 daemons.
 
+## StaticRoutingNetBasic
+
+_topo name_ : static_routing_network_basic
+_args_ : n/a
+
+This nework uses static routes with zebra and static daemons. This topology uses only 4 routers.
+
+## StaticRoutingNetIntermediate
+
+_topo name_ : static_routing_network_intermediate
+_args_ : n/a
+
+This network uses static routes with zebra and static daemons. This topology uses 6 routers. The routes are not the same as if they were chosen by OSPF6, but a path from X to Y is the exact opposite to the path from Y to X.
+
+## StaticRoutingNetComplex
+
+_topo name_ : static_routing_network_complex
+_args_ : n/a
+
+This network uses static routes with zebra and statuc daemons. This topologu uses 6 routers. The routes are not the same as if they were chosen by OSPF6. The path from X to Y and its reverse path are not the same.
+
 ## StaticRoutingNetFailure
 
 _topo name_ : static_routing_network_failure
 _args_ : n/a
 
 This network uses static routes with zebra and static
-daemons. These static routes are wrong and lead to a 
-failing communication.
+daemons. These static routes are wrong and lead to a failing communication.
+
+__EXERCICE :__ you must have to change __only 1__ routing table to make all the network work perfectly (a `ping6all` without any drop)
 
 ## SpanningTreeNet
 
@@ -203,3 +234,40 @@ _args_ : n/a
 
 This network contains a single LAN with a loop.
 It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## SpanningTreeHub
+
+_topo name_ : spanning_tree_hub
+_args_ : n/a
+
+This network contains a more complex LAN with many loops, using hubs to simulate one-to-many links between switchs. It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## SpanningTreeBus
+
+_topo name_ : spanning_tree_bus
+_args_ : n/a
+
+This network contains a single LAN without any loop, but using a hub to simulate a bus behavior. It enables the spanning tree protocol to prevent packet looping in the LAN, even if there is no loop here.
+
+## SpanningTreeIntermediate
+
+_topo name_ : spanning_tree_intermediate
+_args_ : n/a
+
+This network contains a single LAN with 2 loops inside. It shows the spanning tree protocol to avoid the packets looping in the network.
+
+## SpanningTreeComplex
+
+_topo name_ : spanning_tree_complex
+_args_ : n/a
+
+This network contains a single LAN with many loops inside. It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## SpanningTreeAdjust
+
+_topo name_ : spannnig_tree_adjust
+_args_ : n/a
+
+This network contains a single LAN with many loops inside. It enables the spanning tree protocol to prevent packets from looping in the network.
+
+__EXERCICE :__ a specific topology is reached by the spanning tree protocol. The goal of this exercice is to adjust only __2__ weights to get the desired topology (see `spanning_tree_adjust.py`).

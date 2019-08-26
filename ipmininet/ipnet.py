@@ -204,26 +204,6 @@ class IPNet(Mininet):
             if not default:
                 log.info('skipping %s , ' % h.name)
         log.info('\n')
-
-        # Adjust the STP cost
-        for myLink in self.links:
-            if 'stp_cost1' in myLink.intf1.params:
-                portName = myLink.intf1
-                node = str(portName).split('-')[0]
-                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf1.params['stp_cost1']))
-            if 'stp_cost2' in myLink.intf1.params:
-                portName = myLink.intf2
-                node = str(portName).split('-')[0]
-                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf1.params['stp_cost2']))
-            if 'stp_cost1' in myLink.intf2.params: #redondant because of the two intf
-                portName = myLink.intf1
-                node = str(portName).split('-')[0]
-                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf2.params['stp_cost1']))
-            if 'stp_cost2' in myLink.intf2.params:
-                portName = myLink.intf2
-                node = str(portName).split('-')[0]
-                self[node].cmd('brctl setpathcost %s %s %d'%(node, portName, myLink.intf2.params['stp_cost2']))
-
                 
     def stop(self):
         log.info('*** Stopping', len(self.routers),  'routers\n')

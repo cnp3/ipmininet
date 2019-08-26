@@ -5,7 +5,7 @@ from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import RouterConfig, STATIC, StaticRoute
 
 
-class StaticRoutingNet4(IPTopo):
+class StaticRoutingNetComplex(IPTopo):
 
     def build(self, *args, **kwargs):
         """
@@ -99,7 +99,7 @@ class StaticRoutingNet4(IPTopo):
                                            ])
         
         
-        super(StaticRoutingNet4, self).build(*args, **kwargs)
+        super(StaticRoutingNetComplex, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name):
         return self.addRouter(name, use_v4=False, use_v6=True, config=RouterConfig)

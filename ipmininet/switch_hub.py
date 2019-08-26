@@ -46,6 +46,24 @@ class SwitchHub( Switch ):
         for i in self.intfList():
             if self.name in i.name:
                 self.cmd( 'brctl addif', self, i )
+            link = i.link
+            if link is not None:
+                if 'stp_cost1' in link.intf1.params:
+                    portName = link.intf1
+                    node = str(portName).split('-')[0]
+                    self.cmd('brctl setpathcost %s %s %d'%(node, portName, link.intf1.params['stp_cost1']))
+                if 'stp_cost2' in link.intf1.params:
+                    portName = link.intf2
+                    node = str(portName).split('-')[0]
+                    self.cmd('brctl setpathcost %s %s %d'%(node, portName, link.intf1.params['stp_cost2']))
+                if 'stp_cost1' in link.intf2.params:  # redundant because of the two intf
+                    portName = link.intf1
+                    node = str(portName).split('-')[0]
+                    self.cmd('brctl setpathcost %s %s %d'%(node, portName, link.intf2.params['stp_cost1']))
+                if 'stp_cost2' in link.intf2.params:
+                    portName = link.intf2
+                    node = str(portName).split('-')[0]
+                    self.cmd('brctl setpathcost %s %s %d'%(node, portName, link.intf2.params['stp_cost2']))
         self.cmd( 'ifconfig', self, 'up' )
 
     def stop( self, deleteIntfs=True ):

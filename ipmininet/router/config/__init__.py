@@ -17,5 +17,5 @@ from .openr import Openr, OpenrDomain
 __all__ = ['BasicRouterConfig', 'Zebra', 'OSPF', 'OSPF6', 'OSPFArea', 'BGP',
            'AS', 'iBGPFullMesh', 'bgp_peering', 'RouterConfig', 'bgp_fullmesh',
            'ebgp_session', 'IPTables', 'IP6Tables', 'SSHd', 'RADVD',
-           'AdvPrefix', 'AdvConnectedPrefix', 'AdvRDNSS', 'PIMD', 'RIPng'
+           'AdvPrefix', 'AdvConnectedPrefix', 'AdvRDNSS', 'PIMD', 'RIPng',
            'STATIC', 'StaticRoute', 'OpenrDaemon', 'Openr', 'OpenrDomain']

@@ -313,7 +313,7 @@ class Peer(object):
         # Explore all interfaces in base ASN recursively, until we find one
         # connected to the peer
         while to_visit:
-            i = to_visit.pop()
+            i = to_visit.pop(0)
             if i in visited:
                 continue
             visited.add(i)

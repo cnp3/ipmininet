@@ -4,13 +4,20 @@ import pytest
 
 from ipmininet.clean import cleanup
 from ipmininet.examples.simple_bgp_network import SimpleBGPTopo
+from ipmininet.examples.bgp_local_pref import BGPTopoLocalPref
+from ipmininet.examples.bgp_med import BGPTopoMed
+from ipmininet.examples.bgp_rr import BGPTopoRR
+from ipmininet.examples.bgp_full_config import BGPTopoFull
 from ipmininet.ipnet import IPNet
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import BGP, bgp_peering, AS, iBGPFullMesh
 from ipmininet.router.config.base import RouterConfig
 from ipmininet.router.config.bgp import AF_INET, AF_INET6
-from ipmininet.tests.utils import assert_connectivity
+from ipmininet.tests.utils import assert_connectivity, assert_path, traceroute
 from . import require_root
+from ipaddress import ip_address
+import sys
+import pexpect
 
 
 class BGPTopo(IPTopo):
@@ -115,3 +122,228 @@ def test_bgp_daemon_params(bgp_params, expected_cfg):
         net.stop()
     finally:
         cleanup()
+
+
+config_ip1 = {
+    'as1r1': [
+        'fd00:1:1::1',
+        'fd00:1:2::1'
+    ],
+    'as1r2': [
+        'fd00:3:1::2',
+        'fd00:4:1::1'
+    ],
+    'as1r3': [
+        'fd00:1:2::2',
+        'fd00:3:1::1',
+        'fd00:3:2::1'
+    ],
+    'as1r4': [
+        'fd00:4:1::2',
+        'fd00:4:2::1'
+    ],
+    'as1r5': [
+        'fd00:4:2::2',
+        'fd00:5:2::2',
+        'fd00:5:1::1'
+    ],
+    'as1r6': [
+        'fd00:1:1::2',
+        'fd00:3:2::2',
+        'fd00:6:1::2',
+        'fd00:5:1::2'
+    ], 
+    'as4r1': [
+        'fd00:6:1::1',
+        'dead:beef::1'
+    ],
+    'as4r2': [
+        'fd00:5:2::1',
+        'dead:beef::2'
+    ],
+    'as4h1': [
+        'dead:beef::1',
+        'dead:beef::2'
+    ]
+}
+
+
+config_ip2 = {
+    'as1r1': [
+        'fd00:1:1::1',
+        'fd00:1:2::1',
+        'fd00:3:1::2'
+    ],
+    'as1r2': [
+        'fd00:1:4::2',
+        'd00:1:5::1'
+    ],
+    'as1r3': [
+        'fd00:1:2::2',
+        'fd00:1:4::1',
+        'fd00:1:3::1'
+    ],
+    'as1r4': [
+        'fd00:1:5::2',
+        'fd00:1:6::1',
+        'fd00:4:1::2'
+    ],
+    'as1r5': [
+        'fd00:1:6::2',
+        'fd00:1:7::1',
+        'fd00:4:2::2'
+    ],
+    'as1r6': [
+        'fd00:1:1::2',
+        'fd00:1:3::2',
+        'fd00:1:7::2',
+        'fd00:5:1::2'
+    ],
+    'as2r1': [
+        'fd00:2:1::2',
+        'fd00:2:2::1',
+        'dead:beef::1'
+    ],
+    'as2h1': [
+        'dead:beef::2'
+    ],
+    'as3r1': [
+        'fd00:3:1::1',
+        'fd00:5:2::1'
+    ],
+    'as5r1': [
+        'fd00:5:1::1',
+        'fd00:5:2::2',
+        'fd00:2:1::1'
+    ],
+    'as4r1': [
+        'fd00:4:2::1',
+        'fd00:2:2::2',
+        'fd00:4:3::1'
+    ], 
+    'as4r2': [
+        'fd00:4:1::1',
+        'fd00:4:3::2'
+    ]
+}
+
+
+local_pref_paths = [
+    ['as1r1', 'as1r6', 'dead:beef::'],
+    ['as1r2', 'as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r4', 'as1r5', 'as1r6', 'dead:beef::'],
+    ['as1r5', 'as1r6', 'dead:beef::'],
+    ['as1r6', 'dead:beef::']
+]
+
+
+@require_root
+def test_bgp_local_pref():
+    try:
+        net = IPNet(topo=BGPTopoLocalPref())
+        net.start()
+        for path in local_pref_paths:
+            assert_path_bgp(net, path, config_ip1)
+        net.stop()
+    finally:
+        cleanup()
+
+
+med_paths = [
+    ['as1r1', 'as1r6', 'as1r5', 'dead:beef::'],
+    ['as1r2', 'as1r4', 'as1r5', 'dead:beef::'],
+    ['as1r3', 'as1r6', 'as1r5', 'dead:beef::'],
+    ['as1r4', 'as1r5', 'dead:beef::'],
+    ['as1r5', 'dead:beef::'],
+    ['as1r6', 'as1r5', 'dead:beef::']
+]
+
+
+@require_root
+def test_bgp_med():
+    try:
+        net = IPNet(topo=BGPTopoMed())
+        net.start()
+        for path in med_paths:
+            assert_path_bgp(net, path, config_ip1)
+        net.stop()
+    finally:
+        cleanup()
+
+
+rr_paths = [
+    ['as1r1', 'as1r6', 'as5r1', 'dead:beef::'],
+    ['as1r2', 'as1r4', 'as4r2', 'as4r1', 'dead:beef::'],
+    # ['as1r3', 'as1r1, 'as1r6', 'as5r1', 'dead:beef::'], to fix
+    ['as1r4', 'as4r2', 'as4r1', 'dead:beef::'],
+    ['as1r5', 'as4r1', 'dead:beef::'],
+    ['as1r6', 'as5r1', 'dead:beef::']
+]
+
+
+@require_root
+def test_bgp_rr():
+    try:
+        net = IPNet(topo=BGPTopoRR())
+        net.start()
+        for path in rr_paths:
+            assert_path_bgp(net, path, config_ip2)
+        net.stop()
+    finally:
+        cleanup()
+
+
+full_paths = [
+    ['as1r1', 'as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r2', 'as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r4', 'as1r2' ,'as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r5', 'as1r6', 'dead:beef::'],
+    ['as1r6', 'dead:beef::']
+]
+
+
+@require_root
+def test_bgp_full_config():
+    try:
+        net = IPNet(topo=BGPTopoFull())
+        net.start()
+        for path in full_paths:
+            assert_path_bgp(net, path, config_ip2)
+        net.stop()
+    finally:
+        cleanup()
+
+
+def assert_path_bgp(net, expected_path, nodes_ips, timeout=300, udp=True):
+    src = expected_path[0]
+    dst = expected_path[-1]
+    dst_ip = ip_address(dst)
+
+    path_ips = traceroute(net, src, dst_ip, timeout=timeout, udp=udp)
+
+    print(path_ips)
+
+    path = [src]
+    for path_ip in path_ips:
+        found = False
+        for node in nodes_ips:
+            for ip in nodes_ips[node]:
+                if path_ip == dst or ip == path_ip:
+                    found = True
+                    break
+            if found:
+                path.append(dst) if path_ip == dst else path.append(node)
+                break
+        assert found, "Traceroute returned the address '%s' " \
+                      "that cannot be linked to a node" % path_ip
+
+    print(path)
+    print(expected_path)
+
+    assert path == expected_path, "We expected the path from %s to %s to go " \
+                                  "through %s but it went through %s" \
+                                  % (src, dst, expected_path[1:-1], path[1:-1])
+
+    

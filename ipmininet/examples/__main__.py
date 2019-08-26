@@ -18,7 +18,10 @@ from .static_address_network import StaticAddressNet
 from .partial_static_address_network import PartialStaticAddressNet
 from .static_routing import StaticRoutingNet
 from .spanning_tree import SpanningTreeNet
-from .simple_topo_local_pref import SimpleBGPTopoLocalPref
+from .bgp_full_config import BGPTopoFull
+from .bgp_local_pref import BGPTopoLocalPref
+from .bgp_med import BGPTopoMed
+from .bgp_rr import BGPTopoRR
 
 from mininet.log import lg, LEVELS
 
@@ -35,7 +38,11 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'partial_static_address_network': PartialStaticAddressNet,
          'static_routing_network': StaticRoutingNet,
          'spanning_tree_network': SpanningTreeNet,
-         'simple_topo_local_pref': SimpleBGPTopoLocalPref}
+         'bgp_full_config': BGPTopoFull,
+         'bgp_local_pref': BGPTopoLocalPref,
+         'bgp_med': BGPTopoMed,
+         'bgp_rr': BGPTopoRR
+         }
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,
@@ -50,7 +57,7 @@ def parse_args():
     parser.add_argument('--log', choices=LEVELS.keys(), default='info',
                         help='The level of details in the logs.')
     parser.add_argument('--args', help='Additional arguments to give'
-                        'to the topology constructor (key=val, key=val, ...)',
+                                       'to the topology constructor (key=val, key=val, ...)',
                         default='')
     return parser.parse_args()
 

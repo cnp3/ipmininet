@@ -15,3 +15,6 @@ tags
 *.ropeproject
 _build/
 docs/api/*.rst
+.vscode
+.idea
+venv

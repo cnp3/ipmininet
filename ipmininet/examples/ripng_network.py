@@ -1,6 +1,7 @@
 """This file contains a simple crash test for RIPng topology"""
 
 from ipmininet.iptopo import IPTopo
+from ipmininet.router.config import RouterConfig
 from ipmininet.router.config.ripng import RIPng
 
 
@@ -22,7 +23,7 @@ class RIPngNetwork(IPTopo):
         """
         r1 = self.addRouter_v6('r1')
         r2 = self.addRouter_v6('r2')
-        r3 = self.addRouter('r3')
+        r3 = self.addRouter_v6('r3')
         r4 = self.addRouter_v6('r4')
         r5 = self.addRouter_v6('r5')
 
@@ -60,13 +61,13 @@ class RIPngNetwork(IPTopo):
         self.addSubnet(nodes=[r4, h4], subnets=["2042:44::/64"])
         self.addSubnet(nodes=[r5, h5], subnets=["2042:55::/64"])
 
-        r1.addDaemon(RIPng)
-        r2.addDaemon(RIPng)
-        r3.addDaemon(RIPng)
+        r1.addDaemon(RIPng, split_horizon=True)
+        r2.addDaemon(RIPng, split_horizon_with_poison=True)
+        r3.addDaemon(RIPng, split_horizon_with_poison=True, split_horizon=True)
         r4.addDaemon(RIPng)
         r5.addDaemon(RIPng)
 
         super(RIPngNetwork, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True)
+        return self.addRouter(name, use_v4=False, use_v6=True, config=RouterConfig)

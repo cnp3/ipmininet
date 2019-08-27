@@ -1,7 +1,7 @@
 from ipmininet.iptopo import IPTopo
 
 
-class SpanningTreeComplex(IPTopo):
+class SpanningTreeFullMesh(IPTopo):
 
     def build(self, *args, **kwargs):
         r"""
@@ -60,4 +60,4 @@ class SpanningTreeComplex(IPTopo):
         for s in (s10, s11, s1, s2, s3, s4, s12, s17):
             self.addLink(s, self.addHost('h%s' % s))
 
-        super(SpanningTreeComplex, self).build(*args, **kwargs)
+        super(SpanningTreeFullMesh, self).build(*args, **kwargs)

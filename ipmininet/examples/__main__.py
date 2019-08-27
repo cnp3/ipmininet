@@ -14,6 +14,7 @@ from .gre import GRETopo
 from .sshd import SSHTopo
 from .router_adv_network import RouterAdvNet
 from .ripng_network import RIPngNetwork
+from .ripng_network_adjust import RIPngNetworkAdjust
 from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
 from .static_routing_network_intermediate import StaticRoutingNetIntermediate
@@ -24,7 +25,7 @@ from .static_routing_network_basic import StaticRoutingNetBasic
 from .static_routing_failure import StaticRoutingNetFailure
 from .spanning_tree import SpanningTreeNet
 from .spanning_tree_intermediate import SpanningTreeIntermediate
-from .spanning_tree_complex import SpanningTreeComplex
+from .spanning_tree_full_mesh import SpanningTreeFullMesh
 from .spanning_tree_bus import SpanningTreeBus
 from .spanning_tree_hub import SpanningTreeHub
 from .spanning_tree_simple import SpanningTreeSimple
@@ -41,6 +42,7 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'ssh': SSHTopo,
          'router_adv_network': RouterAdvNet,
          'ripng_network': RIPngNetwork,
+         'ripng_network_adjust': RIPngNetworkAdjust,
          'simple_openr_network': SimpleOpenrNet,
          'static_address_network': StaticAddressNet,
          'static_routing_network_intermediate': StaticRoutingNetIntermediate,
@@ -51,7 +53,7 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'static_routing_network_failure': StaticRoutingNetFailure,
          'spanning_tree_network': SpanningTreeNet,
          'spanning_tree_intermediate': SpanningTreeIntermediate,
-         'spanning_tree_complex': SpanningTreeComplex,
+         'spanning_tree_full_mesh': SpanningTreeFullMesh,
          'spanning_tree_bus': SpanningTreeBus,
          'spanning_tree_hub': SpanningTreeHub,
          'spanning_tree_simple': SpanningTreeSimple,

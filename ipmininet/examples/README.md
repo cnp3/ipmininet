@@ -28,7 +28,7 @@ The following sections will detail the topologies.
    - [SpanningTreeHub](#spanningtreehub)
    - [SpanningTreeBus](#spanningtreebus)
    - [SpanningTreeIntermediate](#spanningtreeintermediate)
-   - [SpanningTreeComplex](#spanningtreecomplex)
+   - [SpanningTreeFullMesh](#spanningtreefullmesh)
    - [SpanningTreeAdjust](#spanningtreeadjust)
 
 
@@ -256,9 +256,9 @@ _args_ : n/a
 
 This network contains a single LAN with 2 loops inside. It shows the spanning tree protocol to avoid the packets looping in the network.
 
-## SpanningTreeComplex
+## SpanningTreeFullMesh
 
-_topo name_ : spanning_tree_complex
+_topo name_ : spanning_tree_full_mesh
 _args_ : n/a
 
 This network contains a single LAN with many loops inside. It enables the spanning tree protocol to prevent packet looping in the LAN.

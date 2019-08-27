@@ -341,6 +341,51 @@ of the interface. You can also give the name of the DNS server (instead of an IP
             super(MyTopology, self).build(*args, **kwargs)
 
 
+RIPng
+-----
+
+The RIPNG daemon
+
+RIPng uses 2 parameters at the initialization:
+
+* split_horizon: the router uses the split-horizon method
+* split_horizon_with_poison: the router uses the split-horizon with reversed poison method
+
+RIPng uses one link parameter:
+
+* igp_metric: the metric of the link (default value:1)
+
+We can pass parameters to links and interfaces when calling addLink():
+
+.. testcode:: ripng
+
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.router.config import RIPng
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+            r1 = self.addRouter("r1", use_v4=False, use_v6=True)
+            r2 = self.addRouter("r2", use_v4=False, use_v6=True)
+            h1 = self.addHost("h1")
+            h2 = self.addHost("h2")
+
+            lr1r2 = self.addLink(r1, r2, igp_metric=10)
+            lr1r2[r1].addParams(ip=("2042:12::1/64"))
+            lr1r2[r2].addParams(ip=("2042:12::2/64"))
+
+            lr1h1 = self.addLink(r1, h1)
+            lr2h2 = self.addLink(r2, h2)
+
+            self.addSubnet(nodes=[r1, h1], subnets=["2042:11::/64"])
+            self.addSubnet(nodes=[r2, h2], subnets=["2042:22::/64"])
+
+            r1.addDaemon(RIPng)
+            r2.addDaemon(RIPng)
+
+            super(MyTopology, self).build(*args, **kwargs)
+
 SSHd
 ----
 

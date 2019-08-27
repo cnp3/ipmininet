@@ -20,6 +20,9 @@ class RIPng(QuaggaDaemon):
     def build(self):
         cfg = super(RIPng, self).build()
         cfg.redistribute = self.options.redistribute
+        cfg.split_horizon = self.options.split_horizon
+        cfg.split_horizon_with_poison = self.options.split_horizon_with_poison
+        cfg.timers = self._build_timers(self.options.update_timer, self.options.timeout_timer, self.options.garbage_timer)
         interfaces = [itf
                       for itf in realIntfList(self._node)]
         cfg.interfaces = self._build_interfaces(interfaces)
@@ -29,9 +32,8 @@ class RIPng(QuaggaDaemon):
     def _build_networks(self, interfaces):
         """Return the list of RIP networks to advertize from the list of
         active RIP interfaces"""
-        # Check that we have at least one IPv4 network on that interface ...
         return [RIPNetwork(domain=ip_interface(
-            u'%s/%s' % (i.ip, i.prefixLen))) for i in interfaces if i.ip]
+            u'%s/%s' % (i.ip6, i.prefixLen6))) for i in interfaces if i.ip6]
 
     def _build_interfaces(self, interfaces):
         """Return the list of RIP interface properties from the list of
@@ -39,17 +41,22 @@ class RIPng(QuaggaDaemon):
         return [ConfigDict(description=i.describe,
                            name=i.name,
                            # Is the interface between two routers?
-                           active=self.is_active_interface(i))
+                           active=self.is_active_interface(i),
+                           cost=i.igp_metric-1,
+                           domain=ip_interface(u'%s/%s' % (i.ip6, i.prefixLen6)))
                 for i in interfaces]
+    
+    def _build_timers(self, update, timeout, garbage):
+        t = []
+        t.append(update) if update else t.append(30)
+        t.append(timeout) if timeout else t.append(180)
+        t.append(garbage) if garbage else t.append(120)
+        return ' '.join([str(e) for e in t])
     
     def set_defaults(self, defaults):
         """:param debug: the set of debug events that should be logged
-        :param dead_int: Dead interval timer
-        :param hello_int: Hello interval timer
-        :param priority: priority for the interface, used for DR election
-        :param redistribute: set of OSPFRedistributedRoute sources"""
+        :param redistribute: set of RIPngRedistributedRoute sources"""
         defaults.redistribute = []
-        defaults.flush_time = 240 # Arbitrary
         super(RIPng, self).set_defaults(defaults)
     
     def is_active_interface(self, itf):

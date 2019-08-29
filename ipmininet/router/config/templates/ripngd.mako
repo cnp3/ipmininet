@@ -9,9 +9,6 @@ log file ${node.ripngd.logfile}
 debug ripng ${section}
 % endfor
 
-debug ripng event
-debug ripng packet
-
 % for intf in node.ripngd.interfaces:
 interface ${intf.name}
 # ${intf.description}

@@ -8,9 +8,11 @@ from ipaddress import ip_network, ip_address
 from ipmininet.overlay import Overlay
 from ipmininet.utils import realIntfList
 from .zebra import QuaggaDaemon, Zebra, RouteMap, AccessList, AccessListEntry, RouteMapMatchCond, CommunityList, \
-    RouteMapSetAction
+    RouteMapSetAction, PERMIT, DENY
 
 BGP_DEFAULT_PORT = 179
+SHARE = "Share"
+CLIENT_PROVIDER = "Client-Provider"
 
 
 class AS(Overlay):
@@ -68,9 +70,66 @@ def bgp_peering(topo, a, b):
     topo.getNodeInfo(b, 'bgp_peers', list).append(a)
 
 
-def ebgp_session(topo, a, b):
+def ebgp_session(topo, a, b, link_type=None):
     """Register an eBGP peering between two nodes, and disable IGP adjacencies
-    between them."""
+    between them.
+    :param link_type: Can be set to SHARE or CLIENT_PROVIDER. In this case ebgp_session will create import and export
+    filter and set local pref based on the link type
+    """
+    if link_type:
+        com = 1
+        new_access_list(topo, (a, b), 'All', ('any',))
+        new_community_list(topo, (a, b), 'from-client', 2, action=PERMIT)
+        new_community_list(topo, (a, b), 'from-peers', 1, action=PERMIT)
+        new_community_list(topo, (a, b), 'from-up', 3, action=PERMIT)
+        for link in ['Share-link', 'Client-link', 'Provider-link']:
+            com += 1
+        route_maps_a = topo.getNodeInfo(a, 'bgp_route_maps', list)
+        route_maps_b = topo.getNodeInfo(b, 'bgp_route_maps', list)
+        if link_type == SHARE:
+            set_community(topo, a, b, 1, ('All',), 'access-list', direction='in')
+            set_community(topo, b, a, 1, ('All',), 'access-list', direction='in')
+            set_local_pref(topo, a, b, 150, ('All',), 'access-list')
+            set_local_pref(topo, b, a, 150, ('All',), 'access-list')
+            route_maps_a.append(
+                {'match_policy': DENY, 'remote': b, 'match_cond': (
+                     RouteMapMatchCond('community', 'from-up'), ),
+                 'direction': 'out', 'name': 'export-to-peer-' + b, })
+            route_maps_b.append(
+                {'match_policy': DENY, 'remote': a, 'match_cond': (
+                     RouteMapMatchCond('community', 'from-up'), ),
+                 'direction': 'out', 'name': 'export-to-peer-' + a, })
+            route_maps_a.append(
+                {'match_policy': DENY, 'remote': b, 'match_cond': (
+                    RouteMapMatchCond('community', 'from-peers'), ),
+                 'direction': 'out', 'name': 'export-to-peer-' + b,  'order': 15})
+            route_maps_b.append(
+                {'match_policy': DENY, 'remote': a, 'match_cond': (
+                    RouteMapMatchCond('community', 'from-peers'), ),
+                 'direction': 'out', 'name': 'export-to-peer-' + a,  'order': 15})
+            route_maps_a.append(
+                {'match_policy': PERMIT, 'remote': b,
+                 'direction': 'out', 'name': 'export-to-peer-' + b, 'order': 20})
+            route_maps_b.append(
+                {'match_policy': PERMIT, 'remote': a,
+                 'direction': 'out', 'name': 'export-to-peer-' + a, 'order': 20})
+        elif link_type == CLIENT_PROVIDER:
+            set_community(topo, a, b, 3, ('All',), 'access-list', direction='in')
+            set_community(topo, b, a, 2, ('All',), 'access-list', direction='in')
+            set_local_pref(topo, a, b, 100, ('All',), 'access-list')
+            set_local_pref(topo, b, a, 200, ('All',), 'access-list')
+            route_maps_a.append(
+                {'match_policy': DENY, 'remote': b, 'match_cond': (
+                    RouteMapMatchCond('community', 'from-up'), ),
+                 'direction': 'out', 'name': 'export-to-up-' + b,  'order': 10})
+            route_maps_a.append(
+                {'match_policy': DENY, 'remote': b, 'match_cond': (
+                    RouteMapMatchCond('community', 'from-peers'), ),
+                 'direction': 'out', 'name': 'export-to-up-' + b,  'order': 15})
+            route_maps_a.append(
+                {'match_policy': PERMIT, 'remote': b,
+                 'direction': 'out', 'name': 'export-to-up-' + b, 'order': 20})
+
     bgp_peering(topo, a, b)
     topo.linkInfo(a, b)['igp_passive'] = True
 
@@ -87,7 +146,8 @@ def set_local_pref(topo, local, remote, value, filter_names, filter_type):
     for filter_name in filter_names:
         match_cond.append(RouteMapMatchCond(filter_type, filter_name))
     route_maps = topo.getNodeInfo(local, 'bgp_route_maps', list)
-    route_maps.append((value, remote, match_cond, 'local-preference', 'in'))
+    route_maps.append(
+        {'value': value, 'remote': remote, 'match_cond': match_cond, 'action': 'local-preference', 'direction': 'in'})
 
 
 def set_med(topo, local, remote, value, filter_names, filter_type):
@@ -103,7 +163,8 @@ def set_med(topo, local, remote, value, filter_names, filter_type):
     for filter_name in filter_names:
         match_cond.append(RouteMapMatchCond(filter_type, filter_name))
     route_maps = topo.getNodeInfo(local, 'bgp_route_maps', list)
-    route_maps.append((value, remote, match_cond, 'metric', 'out'))
+    route_maps.append(
+        {'value': value, 'remote': remote, 'match_cond': match_cond, 'action': 'metric', 'direction': 'out'})
 
 
 def new_access_list(topo, locals, name, entries=()):
@@ -117,13 +178,20 @@ def new_access_list(topo, locals, name, entries=()):
     """
     for local in locals:
         access_lists = topo.getNodeInfo(local, 'bgp_access_lists', list)
-        access_lists.append(AccessList(name=name, entries=entries))
+        exist = False
+        for al in access_lists:
+            if al.name == name:
+                exist = True
+        if not exist:
+            access_lists.append(AccessList(name=name, entries=entries))
 
 
-def new_community_list(topo, locals, name, community):
+def new_community_list(topo, locals, name, community, action=PERMIT):
     """
     Create a new community list for the router local
 
+    :param locals:
+    :param action:
     :param topo: The current topology
     :param local: List of routers that need the community list
     :param name: Name of the community list
@@ -131,7 +199,12 @@ def new_community_list(topo, locals, name, community):
     """
     for local in locals:
         community_lists = topo.getNodeInfo(local, 'bgp_community_lists', list)
-        community_lists.append(CommunityList(name=name, community=community))
+        exist = False
+        for com in community_lists:
+            if com.name == name and com.community == community:
+                exist = True
+        if not exist:
+            community_lists.append(CommunityList(name=name, community=community, action=action))
 
 
 def set_community(topo, local, remote, value, filter_names, filter_type, direction='out'):
@@ -148,7 +221,8 @@ def set_community(topo, local, remote, value, filter_names, filter_type, directi
     for filter_name in filter_names:
         match_cond.append(RouteMapMatchCond(filter_type, filter_name))
     route_maps = topo.getNodeInfo(local, 'bgp_route_maps', list)
-    route_maps.append((value, remote, match_cond, 'community', direction))
+    route_maps.append(
+        {'value': value, 'remote': remote, 'match_cond': match_cond, 'action': 'community', 'direction': direction})
 
 
 def set_rr(topo, rr, peers=()):
@@ -189,7 +263,7 @@ class BGP(QuaggaDaemon):
         cfg.address_families = self._address_families(
             self.options.address_families, cfg.neighbors)
         cfg.access_lists = self.build_access_list()
-        cfg.community_lists = self._node.get('bgp_community_lists') if self._node.get('bgp_community_lists') else []
+        cfg.community_lists = self.build_community_list()
         cfg.route_maps = self.build_route_map()
         cfg.rr = self._build_rr()
         return cfg
@@ -205,6 +279,16 @@ class BGP(QuaggaDaemon):
                         rr_peers.append(peer)
         return rr_peers
 
+    def build_community_list(self):
+        node_community_lists = self._node.get('bgp_community_lists')
+        if node_community_lists:
+            for list in node_community_lists:
+                if isinstance(list.community, int):
+                    list.community = '%s:%d' % (self._node.asn, list.community)
+            return node_community_lists
+        else:
+            return []
+
     def build_access_list(self):
         node_access_lists = self._node.get('bgp_access_lists')
         access_lists = []
@@ -217,21 +301,37 @@ class BGP(QuaggaDaemon):
         node_route_maps = self._node.get('bgp_route_maps')
         route_maps = []
         if node_route_maps is not None:
-            for (value, node, match_cond, action, direction) in node_route_maps:
-                peer = Peer(self._node, node, True)
-                if not route_maps:
-                    route_maps.append(
-                        RouteMap(neighbor=peer, direction=direction,  match_cond=match_cond,
-                                 set_actions=((action, value),)))
-                else:
-                    for route_map in route_maps:
-                        if route_map.neighbor.peer == peer.peer and route_map.direction == direction:
-                            route_map.append_match_cond(match_cond)
-                            route_map.append_set_action((RouteMapSetAction(action, value),))
-                        else:
+            for kwargs in node_route_maps:
+                set_actions = []
+                match_cond = kwargs.get('match_cond', ())
+                match_policy = kwargs.get('match_policy', PERMIT)
+                try:
+                    action = kwargs.pop('action')
+                    value = kwargs.pop('value')
+                    set_actions = [RouteMapSetAction(action, value)]
+                except KeyError:
+                    pass
+                remote = kwargs.pop('remote')
+                for v6 in [True]:
+                    peer = Peer(self._node, remote, v6)
+                    kwargs['set_actions'] = set_actions
+                    kwargs['neighbor'] = peer
+                    if not route_maps:
+                        route_maps.append(
+                            RouteMap(**kwargs))
+                    else:
+                        exist = False
+                        for route_map in route_maps:
+                            if route_map.neighbor.peer == peer.peer and route_map.direction == kwargs['direction']:
+                                if route_map.match_policy == match_policy and route_map.order == kwargs.get('order', 10):
+                                    exist = True
+                            if exist:
+                                route_map.append_match_cond(match_cond)
+                                route_map.append_set_action(set_actions)
+                                break
+                        if not exist:
                             route_maps.append(
-                                RouteMap(neighbor=peer, direction=direction,  match_cond=match_cond,
-                                         set_actions=((action, value),)))
+                                RouteMap(**kwargs))
         return route_maps
 
     def set_defaults(self, defaults):

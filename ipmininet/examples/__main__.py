@@ -22,6 +22,7 @@ from .bgp_full_config import BGPTopoFull
 from .bgp_local_pref import BGPTopoLocalPref
 from .bgp_med import BGPTopoMed
 from .bgp_rr import BGPTopoRR
+from .simple_bgp_as import SimpleBGPASTopo
 
 from mininet.log import lg, LEVELS
 
@@ -41,12 +42,21 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'bgp_full_config': BGPTopoFull,
          'bgp_local_pref': BGPTopoLocalPref,
          'bgp_med': BGPTopoMed,
-         'bgp_rr': BGPTopoRR
+         'bgp_rr': BGPTopoRR,
+         'simple_bgp_as': SimpleBGPASTopo
          }
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,
-                                   'allocate_IPs': False}}
+                                   'allocate_IPs': False},
+            'bgp_full_config':    {'use_v4': False,
+                                   'use_v6': True},
+            'bgp_local_pref':     {'use_v4': False,
+                                   'use_v6': True},
+            'bgp_med':            {'use_v4': False,
+                                   'use_v6': True},
+            'bgp_rr':             {'use_v4': False,
+                                   'use_v6': True}}
 
 
 def parse_args():

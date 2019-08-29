@@ -216,7 +216,7 @@ class RouteMap(object):
 
     def __init__(self, name=None, match_policy=PERMIT, match_cond=(), set_actions=(), call_action=None,
                  exit_policy=None,
-                 order=10, proto=(), neighbor=any, direction='in'):
+                 order=10, proto=(), neighbor=(), direction='in'):
         """
         :param name: The name of the route-map, defaulting to rm##
         :param match_policy: Deny or permit the actions if the route match the condition
@@ -252,9 +252,11 @@ class RouteMap(object):
         for match_condition in match_conditions:
             exist = False
             for self_match_condition in self.match_cond:
-                exist = (match_condition.condition == self_match_condition.condition and match_condition.type == self_match_condition.type)
-        if not exist:
-            self.match_cond.append(match_condition)
+                if match_condition.condition == self_match_condition.condition:
+                    if match_condition.type == self_match_condition.type:
+                        exist = True
+            if not exist:
+                self.match_cond.append(match_condition)
 
     def append_set_action(self, set_actions):
         """
@@ -265,9 +267,11 @@ class RouteMap(object):
         for set_action in set_actions:
             exist = False
             for self_set_action in self.set_actions:
-                exist = (set_action.type == self_set_action.type and set_action.value == self_set_action.value)
-            if not exist:
+                if set_action.type == self_set_action.type and set_action.value == self_set_action.value:
+                    exist = True
+            if not exist and set_action.type is not None:
                 self.set_actions.append(set_action)
+
     # def __iter__(self):
     #     """This Routemap is the set of all its entries"""
     #     return iter(self._entries)

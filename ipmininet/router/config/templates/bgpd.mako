@@ -8,7 +8,7 @@ log file ${node.bgpd.logfile}
 % for section in node.bgpd.debug:
 debug bgp ${section}
 % endfor
-
+!
 router bgp ${node.bgpd.asn}
     bgp router-id ${node.bgpd.routerid}
     bgp bestpath compare-routerid
@@ -26,8 +26,8 @@ router bgp ${node.bgpd.asn}
 % for af in node.bgpd.address_families:
     address-family ${af.name}
     % for rm in node.bgpd.route_maps:
-        % if rm.neighbor.family == af.name:
-    neighbor ${rm.neighbor.peer} route-map ${rm.name} ${rm.direction}
+        % if rm.neighbor.family == af.name and rm.order == 10:
+    neighbor ${rm.neighbor.peer} route-map ${rm.name}-${af.name} ${rm.direction}
         % endif
     % endfor
     % for net in af.networks:
@@ -50,20 +50,20 @@ router bgp ${node.bgpd.asn}
         %endif
     %endfor
 % endfor
-
+!
 % for al in node.bgpd.access_lists:
     % for e in al.entries:
 ip access-list ${al.name} ${e.action} ${e.prefix}
     % endfor
 % endfor
-
+!
 % for cl in node.bgpd.community_lists:
-ip community-list standard ${cl.name} permit ${cl.community}
+ip community-list standard ${cl.name} ${cl.action} ${cl.community}
 % endfor
-
+!
 % for rm in node.bgpd.route_maps:
-route-map ${rm.name} ${rm.match_policy} ${rm.order}
     %if rm.neighbor.family == "ipv4":
+route-map ${rm.name}-ipv4 ${rm.match_policy} ${rm.order}
         %for match in rm.match_cond:
             %if match.type == "access-list":
     match ip address ${match.condition}
@@ -75,12 +75,13 @@ route-map ${rm.name} ${rm.match_policy} ${rm.order}
         %endfor
         %for action in rm.set_actions:
             %if action.type == 'community':
-    set ${action.type} ${action.value} additive
+    set ${action.type} ${node.bgpd.asn}:${action.value} additive
             %else:
     set ${action.type} ${action.value}
             %endif
         %endfor
     %elif rm.neighbor.family == "ipv6":
+route-map ${rm.name}-ipv6 ${rm.match_policy} ${rm.order}
         %for match in rm.match_cond:
             %if match.type == "access-list":
     match ipv6 address ${match.condition}
@@ -92,11 +93,17 @@ route-map ${rm.name} ${rm.match_policy} ${rm.order}
         %endfor
         %for action in rm.set_actions:
             %if action.type == 'community':
-    set ${action.type} ${action.value} additive
+    set ${action.type} ${node.bgpd.asn}:${action.value} additive
             %else:
     set ${action.type} ${action.value}
             %endif
         %endfor
+        %if rm.call_action:
+    call ${rm.call_action}
+        %endif
+        %if rm.exit_policy:
+    on-match ${rm.exit_policy}
+        %endif
     %endif
 % endfor
 <%block name="router"/>

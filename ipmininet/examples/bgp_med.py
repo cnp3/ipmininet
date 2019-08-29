@@ -7,20 +7,20 @@ class BGPTopoMed(IPTopo):
 
     def build(self, *args, **kwargs):
         """
-	TODO slide 25 iBGP
-		   +----------+                                   +--------+
-					  |                                   |
-		 AS1          |                  AS2              |        AS3
-					  |                                   |
-					  |                                   |
-	+-------+   eBGP  |  +-------+     iBGP    +-------+  |  eBGP   +-------+
-	| as1r1 +------------+ as2r1 +-------------+ as2r2 +------------+ as3r1 |
-	+-------+         |  +-------+             +-------+  |         +-------+
-					  |                                   |
-					  |                                   |
-					  |                                   |
-		 +------------+                                   +--------+
-		"""
+    TODO slide 25 iBGP
+           +----------+                                   +--------+
+                      |                                   |
+         AS1          |                  AS2              |        AS3
+                      |                                   |
+                      |                                   |
+    +-------+   eBGP  |  +-------+     iBGP    +-------+  |  eBGP   +-------+
+    | as1r1 +------------+ as2r1 +-------------+ as2r2 +------------+ as3r1 |
+    +-------+         |  +-------+             +-------+  |         +-------+
+                      |                                   |
+                      |                                   |
+                      |                                   |
+         +------------+                                   +--------+
+        """
         # Add all routers
         as1r1 = self.addRouter('as1r1')
         as1r1.addDaemon(BGP, address_families=(
@@ -87,9 +87,3 @@ class BGPTopoMed(IPTopo):
         #     self.addLink(r, self.addHost('h%s' % r))
         super(BGPTopoMed, self).build(*args, **kwargs)
 
-    def bgp(self, name):
-        r = self.addRouter(name, config=RouterConfig)
-        r.addDaemon(BGP, address_families=(
-            _bgp.AF_INET(redistribute=('connected',)),
-            _bgp.AF_INET6(redistribute=('connected',))))
-        return r

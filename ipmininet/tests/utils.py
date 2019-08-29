@@ -20,12 +20,10 @@ def traceroute(net, src, dst_ip, timeout=300, udp=False):
     same_path_count = 0
     white_space = re.compile(r" +")
     while t != timeout / 5.:
+        cmd = ["traceroute", "-w", "0.05", "-q", "1", "-n",
+                            "-m", len(net.routers) + len(net.hosts), dst_ip]
         if not udp:
-            cmd = ["traceroute", "-w", "0.05", "-q", "1", "-n", "-I",
-                            "-m", len(net.routers) + len(net.hosts), dst_ip]
-        else:
-            cmd = ["traceroute", "-w", "0.05", "-q", "1", "-n",
-                            "-m", len(net.routers) + len(net.hosts), dst_ip]
+            cmd.append("-I")
         out = net[src].cmd(cmd).split("\n")[1:-1]
         path_ips = [str(white_space.split(line)[2])
                     for line in out if "*" not in line and "!" not in line]

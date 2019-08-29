@@ -60,11 +60,11 @@ def assert_path(net, expected_path, v6=False, timeout=300):
                 if found:
                     break
             if found:
-                path.append(n.name)
+                path.append(str(dst_ip)) if ip_address(path_ip) == dst_ip else path.append(n.name)
                 break
         assert found, "Traceroute returned the address '%s' " \
                       "that cannot be linked to a node" % path_ip
-
+    print(path, expected_path)
     assert path == expected_path, "We expected the path from %s to %s to go " \
                                   "through %s but it went through %s" \
                                   % (src, dst, expected_path[1:-1], path[1:-1])

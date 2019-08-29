@@ -183,14 +183,17 @@ class RouteMapMatchCond(object):
     A class representing a RouteMap matching condition
     """
 
-    def __init__(self, type, condition):
+    def __init__(self, cond_type, condition):
         """
         :param condition: Can be an ip address, the id of an accesss or prefix list
         :param type: The type of condition access list, prefix list, peer ...
         """
         # TODO Check if type is correct
         self.condition = condition
-        self.type = type
+        self.cond_type = cond_type
+
+    def __eq__(self, other):
+        return self.condition == other.condition and self.cond_type == other.cond_type
 
 
 class RouteMapSetAction(object):
@@ -198,14 +201,17 @@ class RouteMapSetAction(object):
     A class representing a RouteMap set action
     """
 
-    def __init__(self, type, value):
+    def __init__(self, action_type, value):
         """
         :param type: Type of value to me modified
         :param value: Value to be modified
         """
         # TODO Check if type is correct
-        self.type = type
+        self.action_type = action_type
         self.value = value
+
+    def __eq__(self, other):
+        return self.action_type == other.action_type and self.value == other.value
 
 
 class RouteMap(object):
@@ -232,10 +238,10 @@ class RouteMap(object):
         self.name = name if name else 'rm%d' % RouteMap.count
         self.match_policy = match_policy
         self.match_cond = [e if isinstance(e, RouteMapMatchCond)
-                           else RouteMapMatchCond(type=e[0], condition=e[1])
+                           else RouteMapMatchCond(cond_type=e[0], condition=e[1])
                            for e in match_cond]
         self.set_actions = [e if isinstance(e, RouteMapSetAction)
-                            else RouteMapSetAction(type=e[0], value=e[1])
+                            else RouteMapSetAction(action_type=e[0], value=e[1])
                             for e in set_actions]
         self.call_action = call_action
         self.exit_policy = exit_policy
@@ -244,18 +250,16 @@ class RouteMap(object):
         self.order = order
         self.proto = proto
 
+    def __eq__(self, other):
+        return self.neighbor == other.neighbor and self.direction == other.direction and self.exit_policy == other.exit_policy and self.order == other.order
+
     def append_match_cond(self, match_conditions):
         """
 
         :return:
         """
         for match_condition in match_conditions:
-            exist = False
-            for self_match_condition in self.match_cond:
-                if match_condition.condition == self_match_condition.condition:
-                    if match_condition.type == self_match_condition.type:
-                        exist = True
-            if not exist:
+            if match_condition not in self.match_cond:
                 self.match_cond.append(match_condition)
 
     def append_set_action(self, set_actions):
@@ -265,16 +269,9 @@ class RouteMap(object):
         :return:
         """
         for set_action in set_actions:
-            exist = False
-            for self_set_action in self.set_actions:
-                if set_action.type == self_set_action.type and set_action.value == self_set_action.value:
-                    exist = True
-            if not exist and set_action.type is not None:
+            if set_action not in self.set_actions:
                 self.set_actions.append(set_action)
 
-    # def __iter__(self):
-    #     """This Routemap is the set of all its entries"""
-    #     return iter(self._entries)
 
     @staticmethod
     @property

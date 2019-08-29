@@ -58,12 +58,14 @@ class BGPTopoLocalPref(IPTopo):
         self.addLink(as1r5, as1r6)
         self.addLink(as4r1, as1r6)
         self.addLink(as4r2, as1r5)
+        self.addLink(as4r1, as4h1)
+        self.addLink(as4r2, as4h1)
         self.addSubnet((as4r1, as4h1), subnets=('dead:beef::/32',))
         self.addSubnet((as4h1, as4r2), subnets=('dead:beef::/32',))
 
-        new_access_list(self, (as1r6, as1r5), 'all', ('any',))
-        set_local_pref(self, as1r6, as4r1, 99, filter_type='access-list', filter_names=('all',))
-        set_local_pref(self, as1r5, as4r2, 50, filter_type='access-list', filter_names=('all',))
+        al = new_access_list(name='all', entries=('any',))
+        set_local_pref(self, as1r6, as4r1, 99, filter_list=(al, ))
+        set_local_pref(self, as1r5, as4r2, 50, filter_list=(al, ))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))
@@ -73,14 +75,5 @@ class BGPTopoLocalPref(IPTopo):
         ebgp_session(self, as1r6, as4r1)
         ebgp_session(self, as1r5, as4r2)
 
-        # Add test hosts ?
-        # for r in self.routers():
-        #     self.addLink(r, self.addHost('h%s' % r))
         super(BGPTopoLocalPref, self).build(*args, **kwargs)
 
-    def bgp(self, name):
-        r = self.addRouter(name, config=RouterConfig)
-        r.addDaemon(BGP, address_families=(
-            _bgp.AF_INET(redistribute=('connected',)),
-            _bgp.AF_INET6(redistribute=('connected',))))
-        return r

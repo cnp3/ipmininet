@@ -20,8 +20,7 @@ install_requires = [
     'setuptools',
     'mako>=1.0,<1.1',
     'ipaddress>=1.0.22',
-    'future>=0.17.1',
-    'pexpect>=4.7'
+    'future>=0.17.1'
 ]
 dependency_links = []
 

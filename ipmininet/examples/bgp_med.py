@@ -56,12 +56,14 @@ class BGPTopoMed(IPTopo):
         self.addLink(as1r5, as1r6)
         self.addLink(as4r1, as1r6)
         self.addLink(as4r2, as1r5)
+        self.addLink(as4r1, as4h1)
+        self.addLink(as4r2, as4h1)
         self.addSubnet((as4r1, as4h1), subnets=('dead:beef::/32',))
         self.addSubnet((as4h1, as4r2), subnets=('dead:beef::/32',))
 
-        new_access_list(self, (as4r1, as4r2), 'all', ('any',))
-        set_med(self, as4r1, as1r6, 99, filter_type='access-list', filter_names=('all',))
-        set_med(self, as4r2, as1r5, 50, filter_type='access-list', filter_names=('all',))
+        al = new_access_list(name='all', entries=('any',))
+        set_med(self, as4r1, as1r6, 99, filter_list=(al, ))
+        set_med(self, as4r2, as1r5, 50, filter_list=(al, ))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))
@@ -71,8 +73,5 @@ class BGPTopoMed(IPTopo):
         ebgp_session(self, as1r6, as4r1)
         ebgp_session(self, as1r5, as4r2)
 
-        # Add test hosts ?
-        # for r in self.routers():
-        #     self.addLink(r, self.addHost('h%s' % r))
         super(BGPTopoMed, self).build(*args, **kwargs)
 

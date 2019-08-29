@@ -171,7 +171,7 @@ def test_bgp_med():
 rr_paths = [
     ['as1r1', 'as1r6', 'as5r1', 'dead:beef::'],
     ['as1r2', 'as1r4', 'as4r2', 'as4r1', 'dead:beef::'],
-    # ['as1r3', 'as1r1, 'as1r6', 'as5r1', 'dead:beef::'], to fix
+    ['as1r3', 'as1r1', 'as1r6', 'as5r1', 'dead:beef::'],
     ['as1r4', 'as4r2', 'as4r1', 'dead:beef::'],
     ['as1r5', 'as4r1', 'dead:beef::'],
     ['as1r6', 'as5r1', 'dead:beef::']

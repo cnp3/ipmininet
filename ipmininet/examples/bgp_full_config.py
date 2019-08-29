@@ -59,13 +59,13 @@ class BGPTopoFull(IPTopo):
         self.addLink(switch, as4h1)
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
-        new_access_list(self, (as1r6, as1r5, as4r1, as4r2), 'all', ('any',))
-        new_community_list(self, (as1r6,), 'loc-pref', '1:80')
-        set_local_pref(self, as1r6, as4r1, 99, filter_type='community', filter_names=('loc-pref',))
-        set_community(self, as4r1, as1r6, '1:80', filter_type='access-list', filter_names=('all',))
-        set_med(self, as1r6, as4r1, 50, filter_type='access-list', filter_names=('all',))
-        set_med(self, as4r1, as1r6, 50, filter_type='access-list', filter_names=('all',))
-        set_local_pref(self, as1r5, as4r2, 50, filter_type='access-list', filter_names=('all',))
+        al = new_access_list(name='all', entries=('any',))
+        cl = new_community_list(name='loc-pref', community='1:80')
+        set_local_pref(self, as1r6, as4r1, 99, filter_list=(al,))
+        set_community(self, as4r1, as1r6, '1:80', filter_list=(al,), direction='in')
+        set_med(self, as1r6, as4r1, 50, filter_list=(al,))
+        set_med(self, as4r1, as1r6, 50, filter_list=(al,))
+        set_local_pref(self, as1r5, as4r2, 50, filter_list=(al,))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))

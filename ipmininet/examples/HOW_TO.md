@@ -1,6 +1,6 @@
 # HOW TO: document to help students
 
-The goal of this document is to help students using the examples about static routing and the STP protocol. Through it, the student will learn the important commands to be able to work with the given networks to understand further these concepts of the course.
+The goal of this document is to help students using the examples about static routing, the STP protocol and RIPng (RIP in IPv6). Through it, the student will learn the important commands to be able to work with the given networks to understand further these concepts of the course.
 
 ## Static routing
 
@@ -49,7 +49,8 @@ In this last example, you will see that the current network can't exchange packe
 
 ## Spanning Tree - Local Area Network
 
-*Most of the exercise are taken from the exercise session Local Area Networks: The Spanning Tree Protocol and Virtual LANs. You should do the exercise session first and then compare your results with the one given by the simulations done here.*
+*Most of the exercise are taken from the exercise session Local Area Networks: The Spanning Tree Protocol and Virtual LANs:
+https://www.computer-networking.info/exercises/html/ex-stp.html . You should do the exercise session first and then compare your results with the one given by the simulations done here.*
 
 The spanning tree is computed using  `brctl`. The main differences between this and what you may have seen in the course are:
 
@@ -88,6 +89,8 @@ The spanning tree is computed using  `brctl`. The main differences between this 
 
 ### Exercises
 
+The 4 first exercises are taken from the exercise session. You should check the internet page to see their topology
+
 1. To launch the network, open a terminal in directory `ipmininet` and type
 
     ```
@@ -119,8 +122,30 @@ The spanning tree is computed using  `brctl`. The main differences between this 
    
    Here, the spanning tree is already given to you, it looks like this:
    
+   ![Drag Racing](img/stp_adjust_1.svg)
    
+   Change the weight of only 2 links with the commands of the CLI to get a spanning tree that looks like this:
    
-   Change the weight of only 2 links to get a spanning tree that looks like this:
+   ![Drag Racing](img/stp_adjust_2.svg)
    
+   Keep in mind that all weights are currently set to 2
    
+## RIPng
+
+RIPng is the reincarnation of RIP but for IPv6. It is a simple distance vector routing protocol.
+
+### Usefull commands
+
+* `ping6all` gives the connectivity between all the hosts
+
+* `[node1] traceroute [node2]` gives the path followed by the packets in the network. `[node1]` and `[node2]`
+    can be either hosts or routers in the network.
+
+### Exercises
+
+1. The first exercise is `ripng_network`. Here, the links are given different weights. Try to do some
+traceroute bewteen 2 routers and check if you compute the same paths as the one given by traceroute
+
+2. The second exercise is `ripng_network_adjust`. After launching the exercise, you are asked to give
+    the weights of all the links. The goal of this exercise is to play with the weight of the links between the routers
+    to get the following paths: h1 -> r1 -> r5 -> r4 -> h4 and h3 -> r3 -> r2 -> r4 -> h4

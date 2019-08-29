@@ -32,8 +32,10 @@ class RIPngNetworkAdjust(IPTopo):
        +-----+                                     +-----+
         """
 
-        weights = input("""The goal of this exercice is to play with the weight of the links between the routers to get the following paths:
-        h1 -> r1 -> r5 -> r4 -> h4 and h3 -> r3 -> r2 -> r4 -> h4 \nusing RIP for IPv6 (distance vector routing).\nEnter all the weights of the links, from 'a' to 'g', separated only by a space. \nRecall: the valid weights in RIP are [1, 16]\n""")
+        weights = input("""The goal of this exercise is to play with the weight of the links between the routers to 
+        get the following paths: h1 -> r1 -> r5 -> r4 -> h4 and h3 -> r3 -> r2 -> r4 -> h4 \nusing RIP for IPv6 (
+        distance vector routing).\nEnter all the weights of the links, from 'a' to 'g', separated only by a space. 
+        \nRecall: the valid weights in RIP are [1, 16]\n""")
 
         while(True):
             try:
@@ -64,8 +66,8 @@ class RIPngNetworkAdjust(IPTopo):
         self.addLink(h5, r5)
 
         lr1r2 = self.addLink(r1, r2, igp_metric=w[4])
-        lr1r2[r1].addParams(ip=("2042:12::1/64"))
-        lr1r2[r2].addParams(ip=("2042:12::2/64"))
+        lr1r2[r1].addParams(ip="2042:12::1/64")
+        lr1r2[r2].addParams(ip="2042:12::2/64")
         lr1r3 = self.addLink(r1, r3, igp_metric=w[0])
         lr1r3[r1].addParams(ip="2042:13::1/64")
         lr1r3[r3].addParams(ip="2042:13::3/64")

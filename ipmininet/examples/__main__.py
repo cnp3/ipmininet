@@ -30,8 +30,6 @@ from .spanning_tree_bus import SpanningTreeBus
 from .spanning_tree_hub import SpanningTreeHub
 from .spanning_tree_simple import SpanningTreeSimple
 from .spanning_tree_adjust import SpanningTreeAdjust
-from .simple_rip6_crash_test import MinimalRIPngNetTest
-from .test import MinimalRIPngNet
 
 from mininet.log import lg, LEVELS
 
@@ -59,9 +57,7 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'spanning_tree_bus': SpanningTreeBus,
          'spanning_tree_hub': SpanningTreeHub,
          'spanning_tree_simple': SpanningTreeSimple,
-         'spanning_tree_adjust':SpanningTreeAdjust,
-         'simple_ripng_network': MinimalRIPngNetTest,
-         'test': MinimalRIPngNet}
+         'spanning_tree_adjust':SpanningTreeAdjust,}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v,6': True,

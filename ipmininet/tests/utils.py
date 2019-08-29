@@ -79,7 +79,6 @@ def host_connected(net, v6=False, timeout=0.5):
                 cmd = "nmap%s -sn -n --max-retries 0 --max-rtt-timeout %dms %s"\
                       % (" -6" if v6 else "", int(timeout * 1000), dst_ip)
                 out = src.cmd(cmd.split(" "))
-                print(out)
                 if u"0 hosts up" in out:
                     return False
     return True
@@ -92,12 +91,12 @@ def assert_connectivity(net, v6=False, timeout=300):
         time.sleep(5)
     assert host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
-def assert_no_connectivity(net, v6=False, timeout=5):
+def assert_no_connectivity(net, v6=False, timeout=300):
     t = 0
     while t != timeout / 5. and host_connected(net, v6=v6):
         t += 1
         time.sleep(5)
-    assert not host_connected(net, v6=v6), "All the hosts are connected over %s" % ("IPv4" if not v6 else "IPv6")
+    assert not host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
 
 def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=300):

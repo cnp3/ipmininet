@@ -9,7 +9,7 @@ from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import RIPng
 from ipmininet.router.config.base import RouterConfig
 from ipmininet.router.config.ripng import RIPRedistributedRoute
-from ipmininet.tests.utils import assert_connectivity, assert_path, assert_no_connectivity
+from ipmininet.tests.utils import assert_connectivity, assert_path, assert_no_connectivity, host_connected
 from . import require_root
 from time import sleep
 
@@ -88,6 +88,7 @@ def test_ripng():
     finally:
         cleanup()
 
+
 @require_root
 def test_ripng_flush_connectivity():
     try:
@@ -98,6 +99,7 @@ def test_ripng_flush_connectivity():
         net.stop()
     finally:
         cleanup()
+
 
 @require_root
 @pytest.mark.parametrize("router, expected_ipv6", [
@@ -118,7 +120,7 @@ def test_ripng_flush_routing_tables(router, expected_ipv6):
         while any(item in ips for item in expected_ipv6):
             if count == 60:
                 pytest.fail("[RIPng] the timers are not set correctly")
-            sleep(1)
+            sleep(2)
             count += 1
             out = net[router].cmd(cmd)
             ips = re.findall(expected_ipv6, out)

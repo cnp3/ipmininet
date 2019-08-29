@@ -61,11 +61,11 @@ class RIPngNetwork(IPTopo):
         self.addSubnet(nodes=[r4, h4], subnets=["2042:44::/64"])
         self.addSubnet(nodes=[r5, h5], subnets=["2042:55::/64"])
 
-        r1.addDaemon(RIPng, split_horizon=True)
-        r2.addDaemon(RIPng, split_horizon_with_poison=True)
-        r3.addDaemon(RIPng, split_horizon_with_poison=True, split_horizon=True)
-        r4.addDaemon(RIPng)
-        r5.addDaemon(RIPng)
+        r1.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
+        r2.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
+        r3.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
+        r4.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
+        r5.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
 
         super(RIPngNetwork, self).build(*args, **kwargs)
 

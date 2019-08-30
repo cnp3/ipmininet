@@ -23,6 +23,11 @@ from .bgp_local_pref import BGPTopoLocalPref
 from .bgp_med import BGPTopoMed
 from .bgp_rr import BGPTopoRR
 from .simple_bgp_as import SimpleBGPASTopo
+from .bgp_network_centralized import BGPCentralized
+from .bgp_network_failure import BGPFailure
+from .bgp_prefix_connected import BGPPrefixConnectedTopo
+from .bgp_adjust import BGPAdjust
+from .bgp_multiple_ways import BGPMultipleWays
 
 from mininet.log import lg, LEVELS
 
@@ -43,7 +48,12 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'bgp_local_pref': BGPTopoLocalPref,
          'bgp_med': BGPTopoMed,
          'bgp_rr': BGPTopoRR,
-         'simple_bgp_as': SimpleBGPASTopo
+         'simple_bgp_as': SimpleBGPASTopo,
+         'simple_bgp_network_centralized': BGPCentralized,
+         'simple_bgp_network_failure': BGPFailure,
+         'bgp_prefix_connected': BGPPrefixConnectedTopo,
+         'bgp_adjust': BGPAdjust,
+         'bgp_multiple_ways': BGPMultipleWays
          }
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,

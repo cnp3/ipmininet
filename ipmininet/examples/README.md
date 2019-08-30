@@ -12,6 +12,9 @@ The following sections will detail the topologies.
    - [SimpleOSPFNetwork](#simpleospfnetwork)
    - [SimpleBGPNetwork](#simplebgpnetwork)
    - [BGPDecisionProcess](#bgpdecisionprocess)
+   - [BGPPrefixConnected](#bgpprefixconnected)
+   - [BGPAdjust](#bgpadjust)
+   - [BGPMultipleWays](#bgpmultipleways)
    - [IPTables](#iptables)
    - [GRETopo](#gretopo)
    - [SSHd](#sshd)
@@ -194,3 +197,29 @@ _args_ : n/a
 
 This network contains a single LAN with a loop.
 It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## BGPPrefixConnected
+
+_topo name_ : bgp_prefix_connected
+_args_ : n/a
+
+This network contains a simple bgp topology. 
+The user should check if all ASes are capable of reaching all the other ASes
+
+## BGPAdjust
+
+_topo name_ : bgp_adjust
+_args_ : n/a
+
+This network contains a topology with 5 share-cost and 2 client-provider links.
+Some ASes cannot reach all other ASes. The user can add a link to ensure
+the connectivity of all ASes 
+
+## BGPMultipleWays
+
+_topo name_ : bgp_multiple_ways
+_args_ : n/a
+
+This network contains a more complex topology with 8 ASes and 11 links.
+Multiple ways are available to reach other ASes. The user should compute them and
+find the one chosen as best path

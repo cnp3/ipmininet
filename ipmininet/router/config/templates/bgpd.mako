@@ -39,14 +39,19 @@ router bgp ${node.bgpd.asn}
     % for n in af.neighbors:
         % if n.family == af.name:
     neighbor ${n.peer} activate
-            % if n.nh_self:
+            % if n.nh_self and not node.bgpd.rr:
     neighbor ${n.peer} ${n.nh_self}
+            % elif n.nh_self and node.bgpd.rr:
+    neighbor ${n.peer} route-reflector-client
             % endif
             % if node.bgpd.rr and n.asn == node.bgpd.asn:
     neighbor ${n.peer} route-reflector-client
             % endif
         % endif
     % endfor
+    % if node.bgpd.rr:
+    bgp cluster-id 10.0.0.0
+    % endif
 % endfor
 !
 % for al in node.bgpd.access_lists:

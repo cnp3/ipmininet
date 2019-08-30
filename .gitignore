@@ -6,8 +6,6 @@ dist
 *.egg-info
 *.egg
 *.cache
-venv
-.idea
 __ipmininet_temp_key
 __ipmininet_temp_key.pub
 tags

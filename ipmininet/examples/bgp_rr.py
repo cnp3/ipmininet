@@ -57,38 +57,22 @@ class BGPTopoRR(IPTopo):
         as2h1 = self.addHost('as21')
 
         # Add Links
-        self.addLink(as1r1, as1r6, params1={"ip": ("fd00:1:1::1/48",)},
-                     params2={"ip": ("fd00:1:1::2/48",)})
-        self.addLink(as1r1, as1r3, params1={"ip": ("fd00:1:2::1/48",)},
-                     params2={"ip": ("fd00:1:2::2/48",)})
-        self.addLink(as1r3, as1r2, params1={"ip": ("fd00:1:4::1/48",)},
-                     params2={"ip": ("fd00:1:4::2/48",)})
-        self.addLink(as1r3, as1r6, params1={"ip": ("fd00:1:3::1/48",)},
-                     params2={"ip": ("fd00:1:3::2/48",)})
-        self.addLink(as1r2, as1r4, params1={"ip": ("fd00:1:5::1/48",)},
-                     params2={"ip": ("fd00:1:5::2/48",)})
-        self.addLink(as1r4, as1r5, params1={"ip": ("fd00:1:6::1/48",)},
-                     params2={"ip": ("fd00:1:6::2/48",)})
-        self.addLink(as1r5, as1r6, params1={"ip": ("fd00:1:7::1/48",)},
-                     params2={"ip": ("fd00:1:7::2/48",)})
-        self.addLink(as4r1, as1r5, params1={"ip": ("fd00:4:2::1/48",)},
-                     params2={"ip": ("fd00:4:2::2/48",)})
-        self.addLink(as4r2, as1r4, params1={"ip": ("fd00:4:1::1/48",)},
-                     params2={"ip": ("fd00:4:1::2/48",)})
-        self.addLink(as3r1, as1r1, params1={"ip": ("fd00:3:1::1/48",)},
-                     params2={"ip": ("fd00:3:1::2/48",)})
-        self.addLink(as5r1, as1r6, params1={"ip": ("fd00:5:1::1/48",)},
-                     params2={"ip": ("fd00:5:1::2/48",)})
-        self.addLink(as3r1, as5r1, params1={"ip": ("fd00:5:2::1/48",)},
-                     params2={"ip": ("fd00:5:2::2/48",)})
-        self.addLink(as5r1, as2r1, params1={"ip": ("fd00:2:1::1/48",)},
-                     params2={"ip": ("fd00:2:1::2/48",)})
-        self.addLink(as2r1, as4r1, params1={"ip": ("fd00:2:2::1/48",)},
-                     params2={"ip": ("fd00:2:2::2/48",)})
-        self.addLink(as4r1, as4r2, params1={"ip": ("fd00:4:3::1/48",)},
-                     params2={"ip": ("fd00:4:3::2/48",)})
-        self.addLink(as2r1, as2h1, params1={"ip": ("dead:beef::1/32",)},
-                     params2={"ip": ("dead:beef::2/32",)})
+        self.addLink(as1r1, as1r6)
+        self.addLink(as1r1, as1r3)
+        self.addLink(as1r3, as1r2)
+        self.addLink(as1r3, as1r6)
+        self.addLink(as1r2, as1r4)
+        self.addLink(as1r4, as1r5)
+        self.addLink(as1r5, as1r6)
+        self.addLink(as4r1, as1r5)
+        self.addLink(as4r2, as1r4)
+        self.addLink(as3r1, as1r1)
+        self.addLink(as5r1, as1r6)
+        self.addLink(as3r1, as5r1)
+        self.addLink(as5r1, as2r1)
+        self.addLink(as2r1, as4r1)
+        self.addLink(as4r1, as4r2)
+        self.addSubnet((as2r1, as2h1), subnets=('dead:beef::/32',))
 
 
         set_rr(self, as1r1, peers=[as1r3, as1r2, as1r4, as1r5, as1r6])

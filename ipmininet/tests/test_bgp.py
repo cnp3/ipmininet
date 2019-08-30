@@ -124,110 +124,6 @@ def test_bgp_daemon_params(bgp_params, expected_cfg):
         cleanup()
 
 
-config_ip1 = {
-    'as1r1': [
-        'fd00:1:1::1',
-        'fd00:1:2::1'
-    ],
-    'as1r2': [
-        'fd00:3:1::2',
-        'fd00:4:1::1'
-    ],
-    'as1r3': [
-        'fd00:1:2::2',
-        'fd00:3:1::1',
-        'fd00:3:2::1'
-    ],
-    'as1r4': [
-        'fd00:4:1::2',
-        'fd00:4:2::1'
-    ],
-    'as1r5': [
-        'fd00:4:2::2',
-        'fd00:5:2::2',
-        'fd00:5:1::1'
-    ],
-    'as1r6': [
-        'fd00:1:1::2',
-        'fd00:3:2::2',
-        'fd00:6:1::2',
-        'fd00:5:1::2'
-    ], 
-    'as4r1': [
-        'fd00:6:1::1',
-        'dead:beef::1'
-    ],
-    'as4r2': [
-        'fd00:5:2::1',
-        'dead:beef::2'
-    ],
-    'as4h1': [
-        'dead:beef::1',
-        'dead:beef::2'
-    ]
-}
-
-
-config_ip2 = {
-    'as1r1': [
-        'fd00:1:1::1',
-        'fd00:1:2::1',
-        'fd00:3:1::2'
-    ],
-    'as1r2': [
-        'fd00:1:4::2',
-        'd00:1:5::1'
-    ],
-    'as1r3': [
-        'fd00:1:2::2',
-        'fd00:1:4::1',
-        'fd00:1:3::1'
-    ],
-    'as1r4': [
-        'fd00:1:5::2',
-        'fd00:1:6::1',
-        'fd00:4:1::2'
-    ],
-    'as1r5': [
-        'fd00:1:6::2',
-        'fd00:1:7::1',
-        'fd00:4:2::2'
-    ],
-    'as1r6': [
-        'fd00:1:1::2',
-        'fd00:1:3::2',
-        'fd00:1:7::2',
-        'fd00:5:1::2'
-    ],
-    'as2r1': [
-        'fd00:2:1::2',
-        'fd00:2:2::1',
-        'dead:beef::1'
-    ],
-    'as2h1': [
-        'dead:beef::2'
-    ],
-    'as3r1': [
-        'fd00:3:1::1',
-        'fd00:5:2::1'
-    ],
-    'as5r1': [
-        'fd00:5:1::1',
-        'fd00:5:2::2',
-        'fd00:2:1::1'
-    ],
-    'as4r1': [
-        'fd00:4:2::1',
-        'fd00:2:2::2',
-        'fd00:4:3::1'
-    ], 
-    'as4r2': [
-        'fd00:4:1::1',
-        'fd00:4:3::2'
-    ]
-}
-
-
 local_pref_paths = [
     ['as1r1', 'as1r6', 'dead:beef::'],
     ['as1r2', 'as1r3', 'as1r6', 'dead:beef::'],
@@ -244,7 +140,7 @@ def test_bgp_local_pref():
         net = IPNet(topo=BGPTopoLocalPref())
         net.start()
         for path in local_pref_paths:
-            assert_path_bgp(net, path, config_ip1)
+            assert_path(net, path, v6=True)
         net.stop()
     finally:
         cleanup()
@@ -266,7 +162,7 @@ def test_bgp_med():
         net = IPNet(topo=BGPTopoMed())
         net.start()
         for path in med_paths:
-            assert_path_bgp(net, path, config_ip1)
+            assert_path(net, path, v6=True)
         net.stop()
     finally:
         cleanup()
@@ -288,7 +184,7 @@ def test_bgp_rr():
         net = IPNet(topo=BGPTopoRR())
         net.start()
         for path in rr_paths:
-            assert_path_bgp(net, path, config_ip2)
+            assert_path(net, path, v6=True)
         net.stop()
     finally:
         cleanup()
@@ -298,7 +194,7 @@ full_paths = [
     ['as1r1', 'as1r3', 'as1r6', 'dead:beef::'],
     ['as1r2', 'as1r3', 'as1r6', 'dead:beef::'],
     ['as1r3', 'as1r6', 'dead:beef::'],
-    ['as1r4', 'as1r2' ,'as1r3', 'as1r6', 'dead:beef::'],
+    ['as1r4', 'as1r2', 'as1r3', 'as1r6', 'dead:beef::'],
     ['as1r5', 'as1r6', 'dead:beef::'],
     ['as1r6', 'dead:beef::']
 ]
@@ -310,40 +206,7 @@ def test_bgp_full_config():
         net = IPNet(topo=BGPTopoFull())
         net.start()
         for path in full_paths:
-            assert_path_bgp(net, path, config_ip2)
+            assert_path(net, path, v6=True)
         net.stop()
     finally:
         cleanup()
-
-
-def assert_path_bgp(net, expected_path, nodes_ips, timeout=300, udp=True):
-    src = expected_path[0]
-    dst = expected_path[-1]
-    dst_ip = ip_address(dst)
-
-    path_ips = traceroute(net, src, dst_ip, timeout=timeout, udp=udp)
-
-    print(path_ips)
-
-    path = [src]
-    for path_ip in path_ips:
-        found = False
-        for node in nodes_ips:
-            for ip in nodes_ips[node]:
-                if path_ip == dst or ip == path_ip:
-                    found = True
-                    break
-            if found:
-                path.append(dst) if path_ip == dst else path.append(node)
-                break
-        assert found, "Traceroute returned the address '%s' " \
-                      "that cannot be linked to a node" % path_ip
-
-    print(path)
-    print(expected_path)
-
-    assert path == expected_path, "We expected the path from %s to %s to go " \
-                                  "through %s but it went through %s" \
-                                  % (src, dst, expected_path[1:-1], path[1:-1])
-
-    

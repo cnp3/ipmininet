@@ -14,7 +14,7 @@ import mininet.log
 from ipaddress import ip_address
 
 
-def traceroute(net, src, dst_ip, timeout=300, udp=False):
+def traceroute(net, src, dst_ip, timeout=300):
     t = 0
     old_path_ips = []
     same_path_count = 0
@@ -22,8 +22,6 @@ def traceroute(net, src, dst_ip, timeout=300, udp=False):
     while t != timeout / 5.:
         cmd = ["traceroute", "-w", "0.05", "-q", "1", "-n",
                             "-m", len(net.routers) + len(net.hosts), dst_ip]
-        if not udp:
-            cmd.append("-I")
         out = net[src].cmd(cmd).split("\n")[1:-1]
         path_ips = [str(white_space.split(line)[2])
                     for line in out if "*" not in line and "!" not in line]
@@ -42,15 +40,12 @@ def traceroute(net, src, dst_ip, timeout=300, udp=False):
     assert False, "The network did not converged"
 
 
-def assert_path(net, expected_path, v6=False, timeout=300, ip_dest=False, udp=False):
+def assert_path(net, expected_path, v6=False, timeout=300):
     src = expected_path[0]
-    if ip_dest:
-        dst_ip = ip_address(expected_path[-1])
-    else:
-        dst = expected_path[-1]
-        dst_ip = net[dst].defaultIntf().ip6 if v6 else net[dst].defaultIntf().ip
+    dst = expected_path[-1]
+    dst_ip = get_dst_ip(net, dst, v6=v6)
 
-    path_ips = traceroute(net, src, dst_ip, timeout=timeout, udp=udp)
+    path_ips = traceroute(net, src, dst_ip, timeout=timeout)
 
     path = [src]
     for path_ip in path_ips:
@@ -73,6 +68,15 @@ def assert_path(net, expected_path, v6=False, timeout=300, ip_dest=False, udp=Fa
     assert path == expected_path, "We expected the path from %s to %s to go " \
                                   "through %s but it went through %s" \
                                   % (src, dst, expected_path[1:-1], path[1:-1])
+
+
+def get_dst_ip(net, dst, v6=False):
+    try:
+        dst_ip = ip_address(dst)
+    except:
+        dst_ip = net[dst].defaultIntf().ip6 if v6 else net[dst].defaultIntf().ip
+    finally:
+        return dst_ip
 
 
 def host_connected(net, v6=False, timeout=0.5):

@@ -106,12 +106,15 @@ class CommunityList(object):
 
         :param name:
         :param action:
-        :param commmunity:
+        :param community:
         """
         CommunityList.count += 1
         self.name = name if name else 'cml%d' % CommunityList.count
         self.action = action
         self.community = community
+
+    def __eq__(self, other):
+        return self.name == other.name and self.action == other.action
 
 
 class AccessListEntry(object):
@@ -146,36 +149,8 @@ class AccessList(object):
                         else AccessListEntry(prefix=e)
                         for e in entries]
 
-    # def __iter__(self):
-    #     """Iterating over this ACL is basically iterating over all entries"""
-    #     return iter(self.entries)
-
-
-#  @property
-#  def acl_type():
-#      """Return the zebra string describing this ACL
-#      (access-list, prefix-list, ...)"""
-#      return 'access-list'
-
-
-class RouteMapEntry(object):
-    """A class representing a set of match clauses in a route map with
-    an action applied to it"""
-
-    def __init__(self, action=DENY, match=(), prio=10):
-        """:param action: Wether routes matching this route map entry will be
-                          accepted or not
-        :param match: The set of ACL that will match in this route map entry, default is none
-        :param Set action List of actions to apply/deny on the matching route
-        :param prio: The priority of this route map entry wrt. other in the
-                     route map"""
-        self.action = action
-        self._match = match
-        self.prio = prio
-
-    def __iter__(self):
-        """A route map entry is a set of match clauses"""
-        return iter(self._match)
+    def __eq__(self, other):
+        return self.name == other.name
 
 
 class RouteMapMatchCond(object):
@@ -186,9 +161,8 @@ class RouteMapMatchCond(object):
     def __init__(self, cond_type, condition):
         """
         :param condition: Can be an ip address, the id of an accesss or prefix list
-        :param type: The type of condition access list, prefix list, peer ...
+        :param cond_type: The type of condition access list, prefix list, peer ...
         """
-        # TODO Check if type is correct
         self.condition = condition
         self.cond_type = cond_type
 
@@ -203,10 +177,9 @@ class RouteMapSetAction(object):
 
     def __init__(self, action_type, value):
         """
-        :param type: Type of value to me modified
+        :param action_type: Type of value to me modified
         :param value: Value to be modified
         """
-        # TODO Check if type is correct
         self.action_type = action_type
         self.value = value
 
@@ -227,12 +200,15 @@ class RouteMap(object):
         :param name: The name of the route-map, defaulting to rm##
         :param match_policy: Deny or permit the actions if the route match the condition
         :param match_cond: Specify one or more conditions which must be matched if the entry is to be considered further
+        :param set_actions: Specify one or more actions to do if there is a match
         :param call_action: call to an other route map
         :param exit_policy: An entry may, optionally specify an alternative exit policy if the entry matched
                      or of (action, [acl, acl, ...]) tuples that will compose
                      the route map
         :param order Priority of the route map compare to others
         :param proto: The set of protocols to which this route-map applies
+        :param neighbor: List of peers this route map is applied to
+        :param direction: Direction of the routemap(in, out, both)
         """
         RouteMap.count += 1
         self.name = name if name else 'rm%d' % RouteMap.count
@@ -271,7 +247,6 @@ class RouteMap(object):
         for set_action in set_actions:
             if set_action not in self.set_actions:
                 self.set_actions.append(set_action)
-
 
     @staticmethod
     @property

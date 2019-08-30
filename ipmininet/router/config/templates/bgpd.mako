@@ -60,38 +60,19 @@ ip community-list standard ${cl.name} ${cl.action} ${cl.community}
 % endfor
 !
 % for rm in node.bgpd.route_maps:
-    %if rm.neighbor.family == "ipv4":
-route-map ${rm.name}-ipv4 ${rm.match_policy} ${rm.order}
+route-map ${rm.name}-${rm.neighbor.family} ${rm.match_policy} ${rm.order}
         %for match in rm.match_cond:
             %if match.cond_type == "access-list":
-    match ip address ${match.condition}
+    match ${ip_statement(rm.neighbor.peer)} address ${match.condition}
             %elif match.cond_type == "prefix-list" or match.cond_type =='next-hop':
-    match ip address ${match.cond_type} ${match.condition}
+    match {ip_statement(rm.neighbor.peer)} address ${match.cond_type} ${match.condition}
             %else:
     match ${match.cond_type} ${match.condition}
             %endif
         %endfor
         %for action in rm.set_actions:
-            %if action.action_type == 'community':
-    set ${action.action_type} ${node.bgpd.asn}:${action.value} additive
-            %else:
-    set ${action.action_type} ${action.value}
-            %endif
-        %endfor
-    %elif rm.neighbor.family == "ipv6":
-route-map ${rm.name}-ipv6 ${rm.match_policy} ${rm.order}
-        %for match in rm.match_cond:
-            %if match.cond_type == "access-list":
-    match ipv6 address ${match.condition}
-            %elif match.cond_type == "prefix-list" or match.cond_type =='next-hop':
-    match ipv6 address ${match.cond_type} ${match.condition}
-            %else:
-    match ${match.cond_type} ${match.condition}
-            %endif
-        %endfor
-        %for action in rm.set_actions:
-            %if action.action_type == 'community':
-    set ${action.action_type} ${node.bgpd.asn}:${action.value} additive
+            %if action.action_type == 'community' and isinstance(action.value, int):
+    set ${action.action_type} ${node.bgpd.asn}:${action.value}
             %else:
     set ${action.action_type} ${action.value}
             %endif
@@ -102,7 +83,6 @@ route-map ${rm.name}-ipv6 ${rm.match_policy} ${rm.order}
         %if rm.exit_policy:
     on-match ${rm.exit_policy}
         %endif
-    %endif
 % endfor
 <%block name="router"/>
 !

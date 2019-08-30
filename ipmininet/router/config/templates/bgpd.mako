@@ -47,6 +47,9 @@ router bgp ${node.bgpd.asn}
             % endif
         % endif
     % endfor
+    % if node.bgpd.rr:
+    bgp cluster-id 10.0.0.0
+    % endif
 % endfor
 
 % for al in node.bgpd.access_lists:

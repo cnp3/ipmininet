@@ -428,8 +428,8 @@ class Peer(object):
             self.port = other.config.daemon(BGP).port
         except KeyError:  # No configured daemon - yet - use default
             self.port = BGP_DEFAULT_PORT
-        # We default to nexthop self for all peering type
-        self.nh_self = 'next-hop-self force'
+        # We default to nexthop self for eBGP routes only
+        self.nh_self = 'next-hop-self'
         # We enable eBGP multihop if eBGP is in use
         ebgp = self.asn != base.asn
         self.ebgp_multihop = ebgp

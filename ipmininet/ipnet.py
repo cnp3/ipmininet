@@ -4,7 +4,9 @@ unspecified by the user"""
 from builtins import str
 
 import math
+import os
 from operator import attrgetter, methodcaller
+from shutil import copyfile
 
 from ipaddress import ip_network, ip_interface
 
@@ -200,9 +202,13 @@ class IPNet(Mininet):
                     break
             if not default:
                 log.info('skipping %s , ' % h.name)
+        if self.topo.register_hosts:
+            self._register_etc_hosts("hosts_copy")
         log.info('\n')
 
     def stop(self):
+        if self.topo.register_hosts:
+            self._unregister_etc_hosts("hosts_copy")
         log.info('*** Stopping', len(self.routers),  'routers\n')
         for router in self.routers:
             log.info(router.name + ' ')
@@ -522,6 +528,40 @@ class IPNet(Mininet):
         """Ping (IPv6-only) between first two hosts, useful for testing.
            return: ploss packet loss percentage"""
         return self.pingPair(use_v4=False)
+    
+    def _register_etc_hosts(self, filenamecopy):
+        """Makes a copy of the file /etc/hosts, and changes it to add the hosts of the network"""
+        # For the moment the name of the file is fixed, but it can be changed in the future
+        src = "/etc/"
+        filename = src + "hosts"
+
+        # Copy the file
+        copyfile(filename, src+filenamecopy)
+        with open(filename, 'a') as fd:
+            for link in self.links:
+                intf1 = link.intf1 # Interface objects
+                intf2 = link.intf2
+                ipv6_1 = intf1.addresses[6] # IPv6 addresses
+                ipv6_2 = intf2.addresses[6]
+
+                for i1 in ipv6_1:
+                    fd.write(i1._string_from_ip_int(i1._ip) + ' ' + intf1.name + '\n')
+                for i2 in ipv6_2:
+                    fd.write(i2._string_from_ip_int(i2._ip) + ' ' + intf2.name + '\n')
+    
+    def _unregister_etc_hosts(self, filenamecopy):
+        """Removes the file changed by the network launch, and put back the initial file
+        only if there was a copy specified by filenamecopy"""
+        src = "/etc/"
+        filename = src + "hosts"
+
+        if os.path.exists("/etc/" + filenamecopy):
+            # The file exists, we can delete the previous one
+            os.remove(filename)
+            os.rename("/etc/" + filenamecopy, filename)
+    
+
+
 
 
 class BroadcastDomain(object):

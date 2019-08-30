@@ -4,6 +4,11 @@ import ipmininet.router.config.bgp as _bgp
 
 
 class BGPFailure(IPTopo):
+
+    def __init__(self, register_hosts=False, *args, **kwargs):
+        self.register_hosts = register_hosts
+        super(BGPFailure, self).__init__(*args, **kwargs)
+
     """This topology builds a 5-AS network exchanging BGP reachability
     information. Links failure are used to show the evolution of the active topology
     of the network."""
@@ -29,6 +34,9 @@ class BGPFailure(IPTopo):
     | as1r+---------------->+ as4r|
     +-----+                 +-----+
         """
+
+        self.register_hosts = True
+
         # Add all routers
         as1r = self.bgp('as1r')
         as2r = self.bgp('as2r')

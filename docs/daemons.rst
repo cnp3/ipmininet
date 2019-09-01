@@ -346,10 +346,13 @@ RIPng
 
 The RIPNG daemon
 
-RIPng uses 2 parameters at the initialization:
+RIPng uses 5 parameters at the initialization:
 
 * split_horizon: the router uses the split-horizon method
 * split_horizon_with_poison: the router uses the split-horizon with reversed poison method
+* update_timer: routing table timer value in second (default value:30)
+* timeout_timer: routing information timeout timer (default value:180)
+* garbage_timer: garbage collection timer (default value:120)
 
 RIPng uses one link parameter:
 

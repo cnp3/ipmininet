@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug 19 15:03:29 2019
-
-@author: Louis
-"""
-
 from ipmininet.iptopo import IPTopo
 from ipmininet.switch_hub import SwitchHub
 

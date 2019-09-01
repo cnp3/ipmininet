@@ -47,6 +47,10 @@ class RIPng(QuaggaDaemon):
                 for i in interfaces]
     
     def _build_timers(self, update, timeout, garbage):
+        """Return a list of timer values for RIP for the router
+        :param update: routing table timer value in second (default value:30)
+        :param timeout: routing information timeout timer (default value:180)
+        :param garbage: garbage collection timer (default value:120)"""
         t = []
         t.append(update) if update else t.append(30)
         t.append(timeout) if timeout else t.append(180)

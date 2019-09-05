@@ -47,12 +47,13 @@ routers and links between the nodes.
 
             super(MyTopology, self).build(*args, **kwargs)
 
-We can add daemons to the routers as well.
+We can add daemons to the routers and hosts as well.
 
 .. testcode:: topo creation addDaemon
 
     from ipmininet.iptopo import IPTopo
     from ipmininet.router.config import SSHd
+    from ipmininet.host.config import Named
 
     class MyTopology(IPTopo):
 
@@ -60,6 +61,9 @@ We can add daemons to the routers as well.
 
             r1 = self.addRouter("r1")
             r1.addDaemon(SSHd)
+
+            h1 = self.addHost("h1")
+            h1.addDaemon(Named)
 
             # [...]
 

@@ -1,7 +1,7 @@
 Configuring daemons
 ===================
 
-We can add daemons to the routers and pass options to them.
+We can add daemons to the routers or hosts and pass options to them.
 In the following code snippet, we add BGP daemon to r1.
 
 .. testcode:: addDaemons
@@ -301,6 +301,144 @@ When adding PIMD to a router with ``router.addDaemon(PIMD, **kargs)``, we can gi
 
 .. automethod:: ipmininet.router.config.pimd.PIMD.set_defaults
     :noindex:
+
+
+Named
+-----
+
+When adding PIMD to a host with ``host.addDaemon(Named, **kargs)``, we can give the following parameters:
+
+.. automethod:: ipmininet.host.config.named.Named.set_defaults
+    :noindex:
+
+Named uses an overlay to declare DNS zones:
+
+.. automethod:: ipmininet.host.config.named.DNSZone.__init__
+    :noindex:
+
+The following code will create a DNS server in dns_master and dns_slave
+with one DNS zone: 'mydomain.org'. This will also create one reverse DNS zones
+for both IPv4 and IPv6.
+
+.. testcode:: named
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.host.config import Named
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+
+            # Add router
+            r = self.addRouter("r")
+
+            # Add hosts
+            h1 = self.addHost("h1")
+            h2 = self.addHost("h2")
+            h3 = self.addHost("h3")
+            dns_master = self.addHost("dns_master")
+            dns_master.addDaemon(Named)
+            dns_slave = self.addHost("dns_slave")
+            dns_slave.addDaemon(Named)
+
+            # Add links
+            for h in self.hosts():
+                self.addLink(r, h)
+
+            # Define a DNS Zone
+            self.addDNSZone(name="mydomain.org",
+                            dns_master=dns_master,
+                            dns_slaves=[dns_slave],
+                            nodes=self.hosts())
+
+            super(MyTopology, self).build(*args, **kwargs)
+
+By default, the DNSZone will create all the NS, A and AAAA records.
+If you need to change the TTL of one of these record, you can define it explicitly.
+
+.. testcode:: named explicit record
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.host.config import Named, NSRecord
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+
+            # Add router
+            r = self.addRouter("r")
+
+            # Add hosts
+            h1 = self.addHost("h1")
+            h2 = self.addHost("h2")
+            h3 = self.addHost("h3")
+            dns_master = self.addHost("dns_master")
+            dns_master.addDaemon(Named)
+            dns_slave = self.addHost("dns_slave")
+            dns_slave.addDaemon(Named)
+
+            # Add links
+            for h in self.hosts():
+                self.addLink(r, h)
+
+            # Define a DNS Zone
+            records = [NSRecord("mydomain.org", dns_master, ttl=120), NSRecord("mydomain.org", dns_slave, ttl=120)]
+            self.addDNSZone(name="mydomain.org",
+                            dns_master=dns_master,
+                            dns_slaves=[dns_slave],
+                            records=records,
+                            nodes=self.hosts())
+
+            super(MyTopology, self).build(*args, **kwargs)
+
+By default, one `reverse DNS zone <https://en.wikipedia.org/wiki/Reverse_DNS_lookup>`_
+are created for all A records and another for all AAAA records. However, you may want to split
+the PTR records more than two different zones. You may also want to change the default values of the zones
+or their PTR records. To change this, you can declare the reverse DNS zone yourself. No need to add the
+PTR records that you don't want to modify, they will be created for you and placed in the zone that you declared
+if they fit in its domain name. Otherwise, another zone will be created.
+
+.. testcode:: named explicit reverse dns
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.host.config import Named, PTRRecord
+    from ipaddress import ip_address
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+
+            # Add router
+            r = self.addRouter("r")
+
+            # Add hosts
+            h1 = self.addHost("h1")
+            h2 = self.addHost("h2")
+            h3 = self.addHost("h3")
+            dns_master = self.addHost("dns_master")
+            dns_master.addDaemon(Named)
+            dns_slave = self.addHost("dns_slave")
+            dns_slave.addDaemon(Named)
+
+            # Add links
+            for h in [h1, h2, dns_master, dns_slave]:
+                self.addLink(r, h)
+            lrh3 = self.addLink(r, h3)
+            self.addSubnet(links=[lrh3], subnets=["192.168.0.0/24", "fc00::/64"])
+
+            # Define a DNS Zone
+            self.addDNSZone(name="mydomain.org",
+                            dns_master=dns_master,
+                            dns_slaves=[dns_slave],
+                            nodes=self.hosts())
+
+            # Change the TTL of one PTR record and the retry_time of its zone
+            ptr_record = PTRRecord("fc00::2", h3 + ".mydomain.org", ttl=120)
+            reverse_domain_name = ip_address(u"fc00::").reverse_pointer[-10:]  # keeps "f.ip6.arpa"
+            self.addDNSZone(name=reverse_domain_name, dns_master=dns_master, dns_slaves=[dns_slave],
+                            records=[ptr_record], ns_domain_name="mydomain.org", retry_time=8200)
+
+            super(MyTopology, self).build(*args, **kwargs)
 
 
 RADVD

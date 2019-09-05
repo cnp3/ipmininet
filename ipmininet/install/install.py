@@ -28,6 +28,7 @@ def parse_args():
     parser.add_argument("-r", "--install-radvd", help="Install the RADVD daemon",
                         action="store_true")
     parser.add_argument("-s", "--install-sshd", help="Install the OpenSSH server", action="store_true")
+    parser.add_argument("-n", "--install-named", help="Install the Named daemon", action="store_true")
     parser.add_argument("-6", "--enable-ipv6", help="Enable IPv6", action="store_true")
     parser.add_argument("-f", "--install-openr",
                         help="Install OpenR. OpenR is not installed with '-a' option since the build takes quite long.\

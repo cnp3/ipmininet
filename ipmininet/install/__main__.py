@@ -23,6 +23,12 @@ if __name__ == "__main__":
     if args.all or args.install_sshd:
         dist.install("openssh-server")
 
+    if args.all or args.install_named:
+        if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
+            dist.install("bind9")
+        elif dist.NAME == "Fedora":
+            dist.install("bind")
+
     # Install IPMininet
 
     if args.install_ipmininet:

@@ -10,14 +10,14 @@ from ipmininet.overlay import Overlay, Subnet
 from ipmininet.utils import get_set
 from ipmininet.router.config import BasicRouterConfig, OSPFArea, AS,\
     iBGPFullMesh, OpenrDomain
-from ipmininet.host.config import HostConfig
+from ipmininet.host.config import HostConfig, DNSZone
 
 
 class IPTopo(Topo):
     """A topology that supports L3 routers"""
 
     OVERLAYS = {cls.__name__: cls
-                for cls in (AS, iBGPFullMesh, OpenrDomain, OSPFArea, Subnet)}
+                for cls in (AS, iBGPFullMesh, OpenrDomain, OSPFArea, Subnet, DNSZone)}
 
     def __init__(self, *args, **kwargs):
         self.overlays = []

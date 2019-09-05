@@ -36,6 +36,7 @@ The following sections will detail the topologies.
    - [SpanningTreeFullMesh](#spanningtreefullmesh)
    - [SpanningTreeAdjust](#spanningtreeadjust)
    - [SpanningTreeCost](#spanningtreecost)
+   - [DNSNetwork](#dnsnetwork)
 
 
 ## SimpleOSPFNetwork
@@ -408,3 +409,20 @@ _args_ : n/a
 This network contains a single LAN with one loop inside.
 It enables the spanning tree protocol to prevent packet looping in the LAN.
 It also changes the STP cost one link.
+
+## DNSNetwork
+
+_topo name_ : dns_network
+_args_ : n/a
+
+This network contains two DNS server, a master and a slave.
+The domain name is 'mydomain.org' and it contains the address mapping
+of all the hosts of the network.
+You can query the DNS servers with, for instance, one of the following commands:
+
+```bash
+master dig @locahost -t NS mydomain.org
+master dig @locahost -t AAAA server.mydomain.org
+slave dig @locahost -t NS mydomain.org
+slave dig @locahost -t AAAA server.mydomain.org
+```

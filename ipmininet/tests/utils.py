@@ -185,6 +185,49 @@ def assert_routing_table(router, expected_prefixes, timeout=120):
     assert len(prefixes) == 0
 
 
+def search_dns_reply(reply, regex):
+
+    got_answer = False
+    for line in reply.split("\n"):
+        if got_answer:
+            if "SECTION" in line:
+                break  # End of the answer section
+            match = regex.match(line)
+            if match is not None:
+                return True, match  # Got the right answer
+        elif ";; ANSWER SECTION:" in line:  # Beginning of the answer section
+            got_answer = True
+    return got_answer, None
+
+
+def assert_dns_record(node, dns_server_address, record, port=53, timeout=60):
+
+    server_cmd = "dig @{address} -p {port} -t {rtype} {domain_name}"\
+        .format(address=dns_server_address, rtype=record.rtype,
+                domain_name=record.domain_name, port=port)
+    out_regex = re.compile(r" *{name}[ \t]+{ttl}[ \t]+IN[ \t]+{rtype}[ \t]+{rdata}"
+                           .format(rtype=record.rtype, ttl=record.ttl, name=record.domain_name,
+                                   rdata=record.rdata))
+
+    t = 0
+    out = node.cmd(server_cmd.split(" "))
+    got_answer, match = search_dns_reply(out, out_regex)
+    while t < timeout * 2 and match is None:
+        t += 1
+        time.sleep(.5)
+        out = node.cmd(server_cmd.split(" "))
+        got_answer, match = search_dns_reply(out, out_regex)
+
+    assert got_answer, "No answer was received in %s" \
+                       " from server %s in the reply of '%s':\n%s" \
+                       % (node.name, dns_server_address, server_cmd, out)
+
+    assert match is not None, "The expected data '%s' cannot be found " \
+                              "in the DNS reply of '%s' received by %s from %s:\n%s" \
+                              % (out_regex.pattern, server_cmd, node.name,
+                                 dns_server_address, out)
+
+
 class CLICapture(object):
 
     def __init__(self, loglevel):

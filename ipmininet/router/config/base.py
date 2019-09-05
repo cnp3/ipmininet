@@ -263,32 +263,37 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
         self.files = []
 
     def render(self, cfg, **kwargs):
-        """Render the configuration file for this daemon
+        """Render the configuration content for each config file of this daemon
 
         :param cfg: The global config for the node
         :param kwargs: Additional keywords args. will be passed directly
                        to the template"""
-        self.files.append(self.cfg_filename)
-        log.debug('Generating %s\n' % self.cfg_filename)
-        try:
-            return self.template_lookup.get_template(self.template_filename)\
-                                       .render(node=cfg,
-                                               ip_statement=ip_statement,
-                                               **kwargs)
-        except:
-            # Display template errors in a less cryptic way
-            log.error('Couldn''t render a config file(',
-                      self.template_filename, ')')
-            log.error(mako.exceptions.text_error_template().render())
-            raise ValueError('Cannot render a configuration [%s: %s]' % (
-                self._node.name, self.NAME))
+        self.files.extend(self.cfg_filenames)
+        cfg_content = {}
+        for i, filename in enumerate(self.cfg_filenames):
+            log.debug('Generating %s\n' % filename)
+            try:
+                cfg.current_filename = filename
+                cfg_content[filename] = self.template_lookup.get_template(self.template_filenames[i])\
+                                            .render(node=cfg,
+                                                    ip_statement=ip_statement,
+                                                    **kwargs)
+            except:
+                # Display template errors in a less cryptic way
+                log.error('Couldn''t render a config file(',
+                          self.template_filenames[i], ')')
+                log.error(mako.exceptions.text_error_template().render())
+                raise ValueError('Cannot render a configuration [%s: %s]' % (
+                    self._node.name, self.NAME))
+        return cfg_content
 
     def write(self, cfg):
-        """Write down the configuration for this daemon
+        """Write down the configuration files for this daemon
 
         :param cfg: The configuration string"""
-        with closing(open(self.cfg_filename, 'w')) as f:
-            f.write(cfg)
+        for filename in self.cfg_filenames:
+            with closing(open(filename, 'w')) as f:
+                f.write(cfg[filename])
 
     @abc.abstractproperty
     def startup_line(self):
@@ -314,12 +319,17 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
 
     @property
     def cfg_filename(self):
-        """Return the filename in which this daemon config should be stored"""
-        return self._file(suffix='cfg')
+        """Return the main filename in which this daemon config should be stored"""
+        return self.cfg_filenames[0]
 
     @property
-    def template_filename(self):
-        return '%s.mako' % self.NAME
+    def cfg_filenames(self):
+        """Return the list of filenames in which this daemon config should be stored"""
+        return [self._file(suffix='cfg')]
+
+    @property
+    def template_filenames(self):
+        return ['%s.mako' % self.NAME]
 
     def _defaults(self, **kwargs):
         """Return the default options for this daemon

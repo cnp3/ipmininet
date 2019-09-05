@@ -1,7 +1,7 @@
 import os
 import socket
 
-from .base import Daemon
+from .base import RouterDaemon
 from .utils import ConfigDict
 
 #  Route Map actions
@@ -9,7 +9,7 @@ DENY = 'deny'
 PERMIT = 'permit'
 
 
-class QuaggaDaemon(Daemon):
+class QuaggaDaemon(RouterDaemon):
     """The base class for all Quagga-derived daemons"""
 
     # Additional parameters to pass when starting the daemon

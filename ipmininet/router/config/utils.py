@@ -2,14 +2,7 @@
 from builtins import str
 from ipmininet import basestring
 
-import os
-
 from ipaddress import ip_interface
-from mako.lookup import TemplateLookup
-
-__TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
-
-template_lookup = TemplateLookup(directories=[__TEMPLATES_DIR])
 
 
 class ConfigDict(dict):

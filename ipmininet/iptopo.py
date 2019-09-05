@@ -10,6 +10,7 @@ from ipmininet.overlay import Overlay, Subnet
 from ipmininet.utils import get_set
 from ipmininet.router.config import BasicRouterConfig, OSPFArea, AS,\
     iBGPFullMesh, OpenrDomain
+from ipmininet.host.config import HostConfig
 
 
 class IPTopo(Topo):
@@ -48,6 +49,12 @@ class IPTopo(Topo):
         except KeyError:  # node not found
             return False
 
+    def addHost(self, name, **kwargs):
+        """Add a host to the topology
+
+           :param name: the name of the node"""
+        return HostDescription(super(IPTopo, self).addHost(str(name), **kwargs), self)
+
     def addRouter(self, name, **kwargs):
         """Add a router to the topology
 
@@ -78,11 +85,11 @@ class IPTopo(Topo):
         link_description = LinkDescription(self, node1, node2, key, self.linkInfo(node1, node2, key))
         return link_description
 
-    def addDaemon(self, router, daemon, default_cfg_class=BasicRouterConfig,
+    def addDaemon(self, node, daemon, default_cfg_class=BasicRouterConfig,
                   cfg_daemon_list="daemons", **daemon_params):
         """Add the daemon to the list of daemons to start on the router.
 
-        :param router: router name
+        :param node: node name
         :param daemon: daemon class
         :param default_cfg_class: config class to use
             if there is no configuration class defined for the router yet.
@@ -93,12 +100,12 @@ class IPTopo(Topo):
         :param daemon_params: all the parameters to give
             when instantiating the daemon class."""
 
-        config = self.nodeInfo(router).setdefault("config", default_cfg_class)
+        config = self.nodeInfo(node).setdefault("config", default_cfg_class)
         try:
             config_params = config[1]
         except (IndexError, TypeError):
             config_params = {cfg_daemon_list: []}
-            self.nodeInfo(router)["config"] = (config, config_params)
+            self.nodeInfo(node)["config"] = (config, config_params)
 
         daemon_list = config_params.setdefault(cfg_daemon_list, [])
         daemon_list.append((daemon, daemon_params))
@@ -180,18 +187,18 @@ class OverlayWrapper(object):
         return self.topo.addOverlay(self.overlay(*args, **kwargs))
 
 
-class RouterDescription(str):
+class NodeDescription(str):
 
     def __new__(cls, value, *args, **kwargs):
-        return super(RouterDescription, cls).__new__(cls, value)
+        return super(NodeDescription, cls).__new__(cls, value)
 
     def __init__(self, o, topo=None):
         self.topo = topo
-        super(RouterDescription, self).__init__()
+        super(NodeDescription, self).__init__()
 
     def addDaemon(self, daemon, default_cfg_class=BasicRouterConfig,
                   cfg_daemon_list="daemons", **daemon_params):
-        """Add the daemon to the list of daemons to start on the router.
+        """Add the daemon to the list of daemons to start on the node.
 
         :param daemon: daemon class
         :param default_cfg_class: config class to use
@@ -208,6 +215,19 @@ class RouterDescription(str):
 
     def get_config(self, daemon, **kwargs):
         return daemon.get_config(topo=self.topo, router=self, **kwargs)
+
+
+class RouterDescription(NodeDescription):
+    def addDaemon(self, daemon, default_cfg_class=BasicRouterConfig, **kwargs):
+        super(RouterDescription, self).addDaemon(daemon, default_cfg_class=default_cfg_class,
+                                                 **kwargs)
+
+
+class HostDescription(NodeDescription):
+
+    def addDaemon(self, daemon, default_cfg_class=HostConfig, **kwargs):
+        super(HostDescription, self).addDaemon(daemon, default_cfg_class=default_cfg_class,
+                                               **kwargs)
 
 
 @functools.total_ordering
@@ -253,7 +273,7 @@ class LinkDescription(object):
         return self.key.__lt__(other)
 
 
-class IntfDescription(RouterDescription):
+class IntfDescription(NodeDescription):
 
     def __init__(self, o, topo, link, intf_attrs):
         self.link = link

@@ -40,8 +40,7 @@ def traceroute(net, src, dst_ip, timeout=300):
             old_path_ips = []
         time.sleep(5)
         t += 1
-
-    assert False, "The network did not converged"
+    return []
 
 
 def assert_path(net, expected_path, v6=False, retry=5, timeout=300):

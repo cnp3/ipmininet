@@ -1,4 +1,5 @@
-"""This modules defines a L3 router class, with a modulable config system."""
+"""This modules defines a L3 router class,
+   with a modulable config system."""
 from builtins import str
 
 import sys
@@ -7,7 +8,7 @@ import time
 from ipmininet import DEBUG_FLAG
 from ipmininet.utils import L3Router
 from ipmininet.link import IPIntf
-from .config import BasicRouterConfig
+from .config import BasicRouterConfig, NodeConfig
 
 import mininet.clean
 from mininet.node import Node
@@ -65,52 +66,45 @@ class ProcessHelper(object):
                 pass  # Process is already dead
 
 
-class Router(Node, L3Router):
-    """The actualy router, which manages a set of daemons"""
+class IPNode(Node):
+    """A Node which manages a set of daemons"""
 
     def __init__(self, name,
-                 config=BasicRouterConfig,
+                 config=NodeConfig,
                  cwd='/tmp',
                  process_manager=ProcessHelper,
                  use_v4=True,
                  use_v6=True,
-                 password='zebra',
                  *args, **kwargs):
-        """Most of the heavy lifting for this router should happen in the
+        """Most of the heavy lifting for this node should happen in the
         associated config object.
 
-        :param config: The configuration generator for this router. Either a
+        :param config: The configuration generator for this node. Either a
                         class or a tuple (class, kwargs)
         :param cwd: The base directory for temporary files such as configs
         :param process_manager: The class that will manage all the associated
-                                processes for this router
-        :param use_v4: Wether this router has IPv4
-        :param use_v6: Wether this router has IPv6
-        :param password: The password for the routing daemons vtysh access"""
-        super(Router, self).__init__(name, *args, **kwargs)
+                                processes for this node
+        :param use_v4: Whether this node has IPv4
+        :param use_v6: Whether this node has IPv6"""
+        super(IPNode, self).__init__(name, *args, **kwargs)
         self.use_v4 = use_v4
         self.use_v6 = use_v6
-        self.password = password
         self.cwd = cwd
         self._old_sysctl = {}
         try:
-            self.config = config[0](self, **config[1])
+            self.nconfig = config[0](self, **config[1])
         except (TypeError, IndexError):
-            self.config = config(self)
+            self.nconfig = config(self)
         self._processes = process_manager(self)
 
-        # This interface already exists in the router,
-        # so no need to move it
-        IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None)
-
     def start(self):
-        """Start the router: Configure the daemons, set the relevant sysctls,
+        """Start the node: Configure the daemons, set the relevant sysctls,
         and fire up all needed processes"""
         # Build the config
-        self.config.build()
+        self.nconfig.build()
         # Check them
         err_code = False
-        for d in self.config.daemons:
+        for d in self.nconfig.daemons:
             out, err, code = self._processes.pexec(shlex.split(d.dry_run))
             err_code = err_code or code
             if code:
@@ -123,23 +117,23 @@ class Router(Node, L3Router):
             mininet.clean.cleanup()
             sys.exit(1)
         # Set relevant sysctls
-        for opt, val in self.config.sysctl:
+        for opt, val in self.nconfig.sysctl:
             self._old_sysctl[opt] = self._set_sysctl(opt, val)
         # Fire up all daemons
-        for d in self.config.daemons:
+        for d in self.nconfig.daemons:
             self._processes.popen(shlex.split(d.startup_line))
             # Busy-wait if the daemon needs some time before being started
             while not d.has_started():
                 time.sleep(.001)
 
     def terminate(self):
-        """Stops this router and sets back all sysctls to their old values"""
+        """Stops this node and sets back all sysctls to their old values"""
         self._processes.terminate()
         if not DEBUG_FLAG:
-            self.config.cleanup()
+            self.nconfig.cleanup()
         for opt, val in self._old_sysctl.items():
             self._set_sysctl(opt, val)
-        super(Router, self).terminate()
+        super(IPNode, self).terminate()
 
     def _set_sysctl(self, key, val):
         """Change a sysctl value, and return the previous set value"""
@@ -155,8 +149,24 @@ class Router(Node, L3Router):
         return v
 
     def get(self, key, val=None):
-        """Check for a given key in the router parameters"""
+        """Check for a given key in the node parameters"""
         return self.params.get(key, val)
+
+
+class Router(IPNode, L3Router):
+    """The actual router, which manages a set of daemons"""
+
+    def __init__(self, name,
+                 config=BasicRouterConfig,
+                 password='zebra',
+                 *args, **kwargs):
+        """:param password: The password for the routing daemons vtysh access"""
+        super(Router, self).__init__(name, config=config, *args, **kwargs)
+        self.password = password
+
+        # This interface already exists in the node,
+        # so no need to move it
+        IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None)
 
     @property
     def asn(self):

@@ -440,7 +440,7 @@ class Peer(object):
         self.asn = other.asn
         self.family = 'ipv4' if not v6 else 'ipv6'
         try:
-            self.port = other.config.daemon(BGP).port
+            self.port = other.nconfig.daemon(BGP).port
         except KeyError:  # No configured daemon - yet - use default
             self.port = BGP_DEFAULT_PORT
         # We default to nexthop self for eBGP routes only

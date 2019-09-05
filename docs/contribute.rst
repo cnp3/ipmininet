@@ -105,8 +105,10 @@ Adding a new daemon
 When adding a new daemon to IPMininet, you have to perform the following tasks:
 
 - Create a new `mako template <https://www.makotemplates.org/>`_
-  in the folder ``ipmininet/router/config/templates/`` for the daemon configuration.
-- Create a new ``Daemon`` subclass in the folder ``ipmininet/router/config/``.
+  in the folder ``ipmininet/router/config/templates/`` or
+  ``ipmininet/host/config/templates/`` for the daemon configuration.
+- Create a new ``RouterDaemon`` or ``HostDaemon`` subclass in the folder ``ipmininet/router/config/``
+  or ``ipmininet/host/config/``.
   The following things are required in this new subclass:
 
   * Set the class variable ``NAME`` with a unique name.
@@ -122,7 +124,7 @@ When adding a new daemon to IPMininet, you have to perform the following tasks:
   * Extend the method ``build()`` to set the ConfigDict object
     that will be fed to the template.
   * Declare the daemon and its helper classes
-    in ``ipmininet/router/config/__init__.py``.
+    in ``ipmininet/router/config/__init__.py`` or ``ipmininet/host/config/__init__.py``.
 
 - Add at least one example for the users (see :ref:`contribute_example`).
 - Implement the tests to prove the correct configuration of the daemon.

@@ -1,6 +1,6 @@
 """This modules provides a config object for a router,
 that is able to provide configurations for a set of routing daemons.
-It also defines the base class for a routing daemon, as well as a minimalistic
+It also defines the base class for a daemon, as well as a minimalistic
 configuration for a router."""
 from future.utils import with_metaclass
 from ipmininet import basestring
@@ -10,8 +10,9 @@ import abc
 from contextlib import closing
 from operator import attrgetter
 from ipaddress import ip_address
+from mako.lookup import TemplateLookup
 
-from .utils import ConfigDict, template_lookup, ip_statement
+from .utils import ConfigDict, ip_statement
 from ipmininet.utils import require_cmd, realIntfList
 from ipmininet.link import OrderedAddress
 
@@ -22,10 +23,13 @@ from mininet.log import lg as log
 
 last_routerid = ip_address(u'0.0.0.1')
 
+__TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+template_lookup = TemplateLookup(directories=[__TEMPLATES_DIR])
 
-class RouterConfig(object):
+
+class NodeConfig(object):
     """This class manages a set of daemons, and generates the global
-    configuration for a router"""
+    configuration for a node"""
 
     def __init__(self, node, daemons=(), sysctl=None,
                  *args, **kwargs):
@@ -41,26 +45,21 @@ class RouterConfig(object):
         for d in daemons:
             self.register_daemon(d)
         self._cfg = ConfigDict()  # Our root config object
-        self._sysctl = {'net.ipv4.ip_forward': 1,
-                        'net.ipv6.conf.all.forwarding': 1}
-        self.routerid = None
-        if sysctl:
-            self._sysctl.update(sysctl)
-        super(RouterConfig, self).__init__(*args, **kwargs)
+        self._sysctl = sysctl if sysctl is not None else {}
+        super(NodeConfig, self).__init__(*args, **kwargs)
 
     def build(self):
         """Build the configuration for each daemon, then write the
         configuration files"""
         self._cfg.clear()
-        self._cfg.password = self._node.password
         self._cfg.name = self._node.name
         # Check that all daemons have their dependencies satisfied
         for cls in list(self._daemons.values()):
             for c in cls.DEPENDS:
                 if c.NAME not in self._daemons:
                     self.register_daemon(c)
-        # Set the router id
-        self.routerid = self.compute_routerid()
+        # Execute any post registering action
+        self.post_register_daemons()
         # Build their config
         for name, d in self._daemons.items():
             self._cfg[name] = d.build()
@@ -69,6 +68,9 @@ class RouterConfig(object):
         for d in self._daemons.values():
             cfg = d.render(self._cfg)
             d.write(cfg)
+
+    def post_register_daemons(self):
+        """Method called after all daemon classes were instantiated"""
 
     def cleanup(self):
         """Cleanup all temporary files for the daemons"""
@@ -132,6 +134,22 @@ class RouterConfig(object):
             key = key.NAME
         return self._daemons[key]
 
+
+class RouterConfig(NodeConfig):
+
+    def __init__(self, node, sysctl=None, *args, **kwargs):
+        self._sysctl = {'net.ipv4.ip_forward': 1,
+                        'net.ipv6.conf.all.forwarding': 1}
+        if sysctl:
+            self._sysctl.update(sysctl)
+        super(RouterConfig, self).__init__(node, sysctl=self._sysctl, *args, **kwargs)
+        self.routerid = None
+
+    def post_register_daemons(self):
+        self._cfg.password = self._node.password
+        # Set the router id
+        self.routerid = self.compute_routerid()
+
     @staticmethod
     def incr_last_routerid():
         global last_routerid
@@ -140,13 +158,13 @@ class RouterConfig(object):
     def _equal_routerid(self, n):
 
         # Router id of 'n' already set
-        if n.config.routerid:
-            return str(n.config.routerid) != str(last_routerid)
+        if n.nconfig.routerid:
+            return str(n.nconfig.routerid) != str(last_routerid)
 
         # Check that a router id explicitly set
         # in any other daemon is not in conflict
         # with the current router id
-        for d in n.config.daemons:
+        for d in n.nconfig.daemons:
             if d != self \
                     and d.options.routerid \
                     and str(d.options.routerid) == str(last_routerid):
@@ -212,12 +230,13 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
     # The kill patterns to cleanup any processes started by this daemon
     KILL_PATTERNS = ()
 
-    def __init__(self, node, **kwargs):
+    def __init__(self, node, template_lookup=template_lookup, **kwargs):
         """:param node: The node for which we build the config
         :param kwargs: Pre-set options for the daemon, see defaults()"""
         self._node = node
         self._startup_line = None
         self.files = []
+        self.template_lookup = template_lookup
         self._options = self._defaults(**kwargs)
         super(Daemon, self).__init__()
 
@@ -232,8 +251,6 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
         :return: ConfigDict-like object describing this configuration"""
         cfg = ConfigDict()
         cfg.logfile = self._options['logfile']
-        cfg.routerid = self._options.routerid if self._options.routerid \
-                                              else self._node.config.routerid
         return cfg
 
     def cleanup(self):
@@ -254,10 +271,10 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
         self.files.append(self.cfg_filename)
         log.debug('Generating %s\n' % self.cfg_filename)
         try:
-            return template_lookup.get_template(self.template_filename)\
-                                  .render(node=cfg,
-                                          ip_statement=ip_statement,
-                                          **kwargs)
+            return self.template_lookup.get_template(self.template_filename)\
+                                       .render(node=cfg,
+                                               ip_statement=ip_statement,
+                                               **kwargs)
         except:
             # Display template errors in a less cryptic way
             log.error('Couldn''t render a config file(',
@@ -307,8 +324,7 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
     def _defaults(self, **kwargs):
         """Return the default options for this daemon
 
-        :param logfile: the path to the logfile for the daemon
-        :param routerid: the router id for this daemon"""
+        :param logfile: the path to the logfile for the daemon"""
         defaults = ConfigDict()
         defaults.logfile = self._file('log')
         # Apply daemon-specific defaults
@@ -329,6 +345,20 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
     def get_config(cls, topo, router, **kwargs):
         """Returns a config object for the daemon if any"""
         return None
+
+
+class RouterDaemon(with_metaclass(abc.ABCMeta, Daemon)):
+
+    def build(self):
+        cfg = super(RouterDaemon, self).build()
+        cfg.routerid = self._options.routerid if self._options.routerid \
+                                              else self._node.nconfig.routerid
+        return cfg
+
+    @abc.abstractmethod
+    def set_defaults(self, defaults):
+        """:param logfile: the path to the logfile for the daemon
+        :param routerid: the router id for this daemon"""
 
 
 class BasicRouterConfig(RouterConfig):

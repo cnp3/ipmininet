@@ -1,8 +1,8 @@
-from .base import Daemon
-from .utils import ConfigDict, template_lookup
+from .base import RouterDaemon
+from .utils import ConfigDict
 
 
-class OpenrDaemon(Daemon):
+class OpenrDaemon(RouterDaemon):
     """The base class for the OpenR daemon"""
 
     NAME = 'openr'
@@ -236,8 +236,8 @@ class OpenrDaemon(Daemon):
         the openr.mako template and passed to the daemon as argument."""
         cfg = ConfigDict()
         cfg[self.NAME] = self.build()
-        return template_lookup.get_template(self.template_filename)\
-                              .render(node=cfg)
+        return self.template_lookup.get_template(self.template_filename)\
+                                   .render(node=cfg)
 
     @property
     def dry_run(self):

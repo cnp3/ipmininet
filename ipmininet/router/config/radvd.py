@@ -4,7 +4,7 @@ from ipaddress import ip_address
 
 from ipmininet.utils import find_node
 from ipmininet.utils import realIntfList
-from .base import Daemon
+from .base import RouterDaemon
 from .utils import ConfigDict
 from ipmininet.utils import is_container
 
@@ -60,7 +60,7 @@ class AdvRDNSS(ConfigDict):
             pass
 
 
-class RADVD(Daemon):
+class RADVD(RouterDaemon):
     """The class representing the radvd daemon,
     used for router advertisements"""
 

@@ -1,6 +1,6 @@
-"""This module defines a modular router that is able to support multiple
-routing daemons
+"""This module defines a modular router that is able to support
+   multiple daemons
 """
-from .__router import Router, ProcessHelper
+from .__router import Router, ProcessHelper, IPNode
 
-__all__ = ['Router', 'ProcessHelper']
+__all__ = ['IPNode', 'Router', 'ProcessHelper']

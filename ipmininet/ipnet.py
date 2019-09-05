@@ -10,6 +10,7 @@ from ipaddress import ip_network, ip_interface
 
 from . import MIN_IGP_METRIC, OSPF_DEFAULT_AREA
 from .utils import otherIntf, realIntfList, L3Router, address_pair, has_cmd
+from .host import IPHost
 from .router import Router
 from .router.config import BasicRouterConfig
 from .link import IPIntf, IPLink, PhysicalInterface
@@ -37,6 +38,7 @@ class IPNet(Mininet):
                  max_v6_prefixlen=48,
                  igp_metric=MIN_IGP_METRIC,
                  igp_area=OSPF_DEFAULT_AREA,
+                 host=IPHost,
                  link=IPLink,
                  intf=IPIntf,
                  switch=IPSwitch,
@@ -73,7 +75,7 @@ class IPNet(Mininet):
         self.igp_area = igp_area
         self.allocate_IPs = allocate_IPs
         self.physical_interface = {}  # itf: node
-        super(IPNet, self).__init__(ipBase=ipBase, switch=switch, link=link,
+        super(IPNet, self).__init__(ipBase=ipBase, host=host, switch=switch, link=link,
                                     intf=intf, controller=controller,
                                     *args, **kwargs)
 
@@ -174,6 +176,10 @@ class IPNet(Mininet):
         for router in self.routers:
             log.info(router.name + ' ')
             router.start()
+        log.info('*** Starting, ', len(self.hosts), 'hosts\n')
+        for host in self.hosts:
+            log.info(host.name + ' ')
+            host.start()
         log.info('\n')
         log.info('*** Setting default host routes\n')
         for h in self.hosts:
@@ -184,10 +190,10 @@ class IPNet(Mininet):
             for itf in realIntfList(h):
                 for r in itf.broadcast_domain.routers:
                     log.info('%s via %s, ' % (h.name, r.name))
-                    if self.use_v4 and len(r.addresses[4]) > 0:
+                    if self.use_v4 and h.use_v4 and len(r.addresses[4]) > 0:
                         h.setDefaultRoute('via %s' % r.ip)
                         default = True
-                    if (self.use_v6 and len(r.addresses[6]) > 0 and
+                    if (self.use_v6 and h.use_v6 and len(r.addresses[6]) > 0 and
                             len(r.ra_prefixes)) == 0:
                         # We define a default route only if router xi
                         # advertisement are not activated. If we call the same
@@ -531,7 +537,7 @@ class BroadcastDomain(object):
 
     # The set of object that will define L3 domain boundaries
     # FIXME Where do we put middleboxes in this model ?
-    BOUNDARIES = (Host, Router)
+    BOUNDARIES = (Host, IPHost, Router)
 
     def __init__(self, interfaces=None, *args, **kwargs):
         """Initialize the broadcast domain and optionally explore a set of

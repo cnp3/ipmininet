@@ -1,6 +1,6 @@
-"""This module holds the configuration generators for routing daemons
+"""This module holds the configuration generators for daemons
 that can be used in a router."""
-from .base import BasicRouterConfig, RouterConfig
+from .base import BasicRouterConfig, RouterConfig, NodeConfig
 from .zebra import Zebra
 from .staticd import STATIC, StaticRoute
 from .ospf import OSPF, OSPFArea
@@ -15,7 +15,7 @@ from .ripng import RIPng
 from .openrd import OpenrDaemon
 from .openr import Openr, OpenrDomain
 
-__all__ = ['BasicRouterConfig', 'Zebra', 'OSPF', 'OSPF6', 'OSPFArea', 'BGP',
+__all__ = ['BasicRouterConfig', 'NodeConfig', 'Zebra', 'OSPF', 'OSPF6', 'OSPFArea', 'BGP',
            'AS', 'SHARE', 'CLIENT_PROVIDER', 'iBGPFullMesh', 'bgp_peering', 'RouterConfig', 'bgp_fullmesh',
            'ebgp_session', 'CommunityList', 'set_rr', 'AccessList', 'IPTables', 'IP6Tables', 'SSHd', 'RADVD',
            'AdvPrefix', 'AdvConnectedPrefix', 'AdvRDNSS', 'PIMD', 'RIPng',

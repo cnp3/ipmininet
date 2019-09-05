@@ -79,9 +79,9 @@ def test_radvd_cleanup():
     try:
         net = IPNet(topo=RouterAdvNet(), use_v4=False, use_v6=True, allocate_IPs=False)
         net.start()
-        net["r"].config.daemon(RADVD).cleanup()
+        net["r"].nconfig.daemon(RADVD).cleanup()
         try:
-            net["r"].config.daemon(RADVD).cleanup()
+            net["r"].nconfig.daemon(RADVD).cleanup()
         except Exception as e:
             assert False, "An exception '%s' was raised" \
                           " while cleaning twice RADVD daemon" % e

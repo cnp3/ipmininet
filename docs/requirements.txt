@@ -1,7 +1,4 @@
-future
-git+https://github.com/mininet/mininet.git
-ipaddress
-mako
+ipmininet
 sphinx_rtd_theme
 sphinxcontrib-apidoc
 sphinxcontrib-napoleon

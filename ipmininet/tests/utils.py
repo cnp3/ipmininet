@@ -21,18 +21,11 @@ def traceroute(net, src, dst_ip, timeout=300):
     same_path_count = 0
     white_space = re.compile(r" +")
     while t != timeout / 5.:
-        out = net[src].cmd(["traceroute", "-w", "0.05", "-q", "1", "-n", "-I",
+        out = net[src].cmd(["traceroute", "-w", "0.05", "-q", "1", "-n",
                             "-m", len(net.routers) + len(net.hosts), dst_ip])
         lines = out.split("\n")[1:-1]
-        if "*" not in out and "!" not in out:
+        if "*" not in out and "!" not in out and "unreachable" not in out:
             path_ips = [str(white_space.split(line)[2]) for line in lines]
-            print()
-            print(t)
-            print(out)
-            print()
-            if "r1" in net:
-                print(net["r1"].cmd(["ip", "-6", "route", "get", "2042:2b::2"]))
-                print()
             if len(path_ips) > 0 and path_ips[-1] == str(dst_ip) and old_path_ips == path_ips:
                 same_path_count += 1
                 if same_path_count > 2:

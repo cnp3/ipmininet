@@ -4,12 +4,16 @@ import pytest
 
 from ipmininet.clean import cleanup
 from ipmininet.examples.simple_bgp_network import SimpleBGPTopo
+from ipmininet.examples.bgp_local_pref import BGPTopoLocalPref
+from ipmininet.examples.bgp_med import BGPTopoMed
+from ipmininet.examples.bgp_rr import BGPTopoRR
+from ipmininet.examples.bgp_full_config import BGPTopoFull
 from ipmininet.ipnet import IPNet
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import BGP, bgp_peering, AS, iBGPFullMesh
 from ipmininet.router.config.base import RouterConfig
 from ipmininet.router.config.bgp import AF_INET, AF_INET6
-from ipmininet.tests.utils import assert_connectivity
+from ipmininet.tests.utils import assert_connectivity, assert_path
 from . import require_root
 
 
@@ -112,6 +116,94 @@ def test_bgp_daemon_params(bgp_params, expected_cfg):
         # Check reachability
         assert_connectivity(net, v6=False)
         assert_connectivity(net, v6=True)
+        net.stop()
+    finally:
+        cleanup()
+
+
+local_pref_paths = [
+    ['as1r1', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r2', 'as1r3', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r3', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r4', 'as1r5', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r5', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r6', 'as4r1', 'as4h1']
+]
+
+
+@require_root
+def test_bgp_local_pref():
+    try:
+        net = IPNet(topo=BGPTopoLocalPref())
+        net.start()
+        for path in local_pref_paths:
+            assert_path(net, path, v6=True)
+        net.stop()
+    finally:
+        cleanup()
+
+
+med_paths = [
+    ['as1r1', 'as1r6', 'as1r5', 'as4r2', 'as4h1'],
+    ['as1r2', 'as1r3', 'as1r6', 'as1r5', 'as4r2', 'as4h1'],
+    ['as1r3', 'as1r6', 'as1r5', 'as4r2', 'as4h1'],
+    ['as1r4', 'as1r5', 'as4r2', 'as4h1'],
+    ['as1r5', 'as4r2', 'as4h1'],
+    ['as1r6', 'as1r5', 'as4r2', 'as4h1']
+]
+
+
+@require_root
+def test_bgp_med():
+    try:
+        net = IPNet(topo=BGPTopoMed())
+        net.start()
+        for path in med_paths:
+            assert_path(net, path, v6=True)
+        net.stop()
+    finally:
+        cleanup()
+
+
+rr_paths = [
+    ['as1r1', 'as1r6', 'as5r1', 'as2r1', 'as2h1'],
+    ['as1r2', 'as1r3', 'as1r6', 'as5r1', 'as2r1', 'as2h1'],
+    ['as1r3', 'as1r6', 'as5r1', 'as2r1', 'as2h1'],
+    ['as1r4', 'as4r2', 'as4r1', 'as2r1', 'as2h1'],
+    ['as1r5', 'as4r1', 'as2r1', 'as2h1'],
+    ['as1r6', 'as5r1', 'as2r1', 'as2h1']
+]
+
+
+@require_root
+def test_bgp_rr():
+    try:
+        net = IPNet(topo=BGPTopoRR())
+        net.start()
+        for path in rr_paths:
+            assert_path(net, path, v6=True)
+        net.stop()
+    finally:
+        cleanup()
+
+
+full_paths = [
+    ['as1r1', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r2', 'as1r3', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r3', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r4', 'as1r5', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r5', 'as1r6', 'as4r1', 'as4h1'],
+    ['as1r6', 'as4r1', 'as4h1']
+]
+
+
+@require_root
+def test_bgp_full_config():
+    try:
+        net = IPNet(topo=BGPTopoFull())
+        net.start()
+        for path in full_paths:
+            assert_path(net, path, v6=True)
         net.stop()
     finally:
         cleanup()

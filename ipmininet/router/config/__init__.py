@@ -10,11 +10,12 @@ from .radvd import RADVD, AdvPrefix, AdvRDNSS, AdvConnectedPrefix
 from .iptables import IPTables, IP6Tables
 from .sshd import SSHd
 from .pimd import PIMD
+from .ripng import RIPng
 from .openrd import OpenrDaemon
 from .openr import Openr, OpenrDomain
 
 __all__ = ['BasicRouterConfig', 'Zebra', 'OSPF', 'OSPF6', 'OSPFArea', 'BGP',
            'AS', 'iBGPFullMesh', 'bgp_peering', 'RouterConfig', 'bgp_fullmesh',
            'ebgp_session', 'IPTables', 'IP6Tables', 'SSHd', 'RADVD',
-           'AdvPrefix', 'AdvConnectedPrefix', 'AdvRDNSS', 'PIMD',
+           'AdvPrefix', 'AdvConnectedPrefix', 'AdvRDNSS', 'PIMD', 'RIPng',
            'STATIC', 'StaticRoute', 'OpenrDaemon', 'Openr', 'OpenrDomain']

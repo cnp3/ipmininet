@@ -8,11 +8,17 @@ from ipmininet.examples.bgp_local_pref import BGPTopoLocalPref
 from ipmininet.examples.bgp_med import BGPTopoMed
 from ipmininet.examples.bgp_rr import BGPTopoRR
 from ipmininet.examples.bgp_full_config import BGPTopoFull
+from ipmininet.examples.bgp_policies_1 import BGPPoliciesTopo1
+from ipmininet.examples.bgp_policies_2 import BGPPoliciesTopo2
+from ipmininet.examples.bgp_policies_4 import BGPPoliciesTopo4
+from ipmininet.examples.bgp_policies_3 import BGPPoliciesTopo3
+from ipmininet.examples.bgp_policies_5 import BGPPoliciesTopo5
+from ipmininet.examples.bgp_policies_adjust import BGPPoliciesAdjustTopo
 from ipmininet.ipnet import IPNet
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import BGP, bgp_peering, AS, iBGPFullMesh
 from ipmininet.router.config.base import RouterConfig
-from ipmininet.router.config.bgp import AF_INET, AF_INET6
+from ipmininet.router.config.bgp import AF_INET, AF_INET6, CLIENT_PROVIDER
 from ipmininet.tests.utils import assert_connectivity, assert_path
 from . import require_root
 
@@ -204,6 +210,72 @@ def test_bgp_full_config():
         net.start()
         for path in full_paths:
             assert_path(net, path, v6=True)
+        net.stop()
+    finally:
+        cleanup()
+
+
+policies_paths = {
+    BGPPoliciesTopo1.__name__: [
+        ['has1r1', 'as1r1', 'as5r1', 'has5r1'],
+        ['has1r1', 'as1r1', 'as2r1', 'has2r1'],
+        ['has1r1', 'as1r1', 'as2r1', 'as2r2', 'has2r2'],
+        ['has2r1', 'as2r1', 'as5r1', 'has5r1'],
+        ['has2r2', 'as2r2', 'as2r1', 'as5r1', 'has5r1'],
+        ['has2r2', 'as2r2', 'as2r1', 'as5r1', 'has5r1'],
+        ['has4r1', 'as4r1', 'as5r1', 'as1r1', 'has1r1']
+    ],
+    BGPPoliciesTopo2.__name__: [
+        ['has1', 'as1', 'as2', 'has2'],
+        ['has4', 'as4', 'as3', 'has3'],
+        ['has2', 'as2', 'as3', 'has3']
+    ],
+    BGPPoliciesTopo3.__name__: [
+        ['has2r', 'as2r', 'as1r', 'has1r'],
+        ['has2r', 'as2r', 'as3r', 'has3r'],
+        ['has1r', 'as1r', 'as4r', 'has4r'],
+        ['has3r', 'as3r', 'as4r', 'has4r']
+    ],
+    BGPPoliciesTopo4.__name__: [
+        ['has2r', 'as2r', 'as3r', 'has3r'],
+        ['has2r', 'as2r', 'as5r', 'has5r'],
+        ['has2r', 'as2r', 'as1r', 'has1r'],
+        ['has3r', 'as3r', 'as4r', 'has4r']
+    ],
+    BGPPoliciesTopo5.__name__: [
+        ['has1r', 'as1r', 'as4r', 'as6r', 'as7r', 'as5r', 'has5r'],
+        ['has5r', 'as5r', 'as2r', 'as1r', 'has1r']
+    ],
+    BGPPoliciesAdjustTopo.__name__: [
+        ['has4r', 'as4r', 'as1r', 'has1r'],
+        ['has5r', 'as5r', 'as3r', 'has3r']
+    ],
+}
+
+
+@require_root
+@pytest.mark.parametrize("topology", [
+    BGPPoliciesTopo1, BGPPoliciesTopo2, BGPPoliciesTopo3,
+    BGPPoliciesTopo4, BGPPoliciesTopo5, BGPPoliciesAdjustTopo
+])
+def test_bgp_policies(topology):
+    try:
+        net = IPNet(topo=topology())
+        net.start()
+        for path in policies_paths[topology.__name__]:
+            assert_path(net, path, v6=True)
+        net.stop()
+    finally:
+        cleanup()
+
+
+@require_root
+def test_bgp_policies_adjust():
+    try:
+        # Adding this new peering link should enable all hosts to ping each others
+        net = IPNet(topo=BGPPoliciesAdjustTopo(as_start="as5r", as_end="as2r", bgp_policy=CLIENT_PROVIDER))
+        net.start()
+        assert_connectivity(net, v6=True)
         net.stop()
     finally:
         cleanup()

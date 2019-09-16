@@ -61,8 +61,8 @@ class BGPTopoLocalPref(IPTopo):
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
         al = new_access_list(name='all', entries=('any',))
-        set_local_pref(self, as1r6, as4r1, 99, filter_list=(al, ))
-        set_local_pref(self, as1r5, as4r2, 50, filter_list=(al, ))
+        set_local_pref(self, router=as1r6, peer=as4r1, value=99, filter_list=(al, ))
+        set_local_pref(self, router=as1r5, peer=as4r2, value=50, filter_list=(al, ))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))

@@ -61,16 +61,17 @@ class BGPTopoFull(IPTopo):
 
         al = new_access_list(name='all', entries=('any',))
         cl = new_community_list(name='loc-pref', community='1:80')
-        set_local_pref(self, as1r6, as4r1, 99, filter_list=(al,))
-        set_community(self, as4r1, as1r6, '1:80', filter_list=(al,), direction='in')
-        set_med(self, as1r6, as4r1, 50, filter_list=(al,))
-        set_med(self, as4r1, as1r6, 50, filter_list=(al,))
-        set_local_pref(self, as1r5, as4r2, 50, filter_list=(al,))
+
+        set_local_pref(self, router=as1r6, peer=as4r1, value=99, filter_list=(al,))
+        set_community(self, router=as4r1, peer=as1r6, value='1:80', filter_list=(al,), direction='in')
+        set_med(self, router=as1r6, peer=as4r1, value=50, filter_list=(al,))
+        set_med(self, router=as4r1, peer=as1r6, value=50, filter_list=(al,))
+        set_local_pref(self, router=as1r5, peer=as4r2, value=50, filter_list=(al,))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))
         self.addAS(1, (as1r1, as1r2, as1r3, as1r4, as1r5, as1r6))
-        set_rr(self, as1r3, (as1r1, as1r2, as1r4, as1r5, as1r6))
+        set_rr(self, rr=as1r3, peers=(as1r1, as1r2, as1r4, as1r5, as1r6))
 
         # Add eBGP session
         ebgp_session(self, as1r6, as4r1)

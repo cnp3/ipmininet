@@ -76,8 +76,8 @@ class BGPTopoRR(IPTopo):
         self.addLink(as2r1, as2h1)
         self.addSubnet((as2r1, as2h1), subnets=('dead:beef::/32',))
 
-        set_rr(self, as1r1, peers=[as1r3, as1r2, as1r4, as1r5, as1r6])
-        set_rr(self, as1r5, peers=[as1r1, as1r2, as1r4, as1r3, as1r6])
+        set_rr(self, rr=as1r1, peers=[as1r3, as1r2, as1r4, as1r5, as1r6])
+        set_rr(self, rr=as1r5, peers=[as1r1, as1r2, as1r4, as1r3, as1r6])
 
         # Add full mesh
         self.addAS(2, (as2r1,))

@@ -33,12 +33,12 @@ from .bgp_full_config import BGPTopoFull
 from .bgp_local_pref import BGPTopoLocalPref
 from .bgp_med import BGPTopoMed
 from .bgp_rr import BGPTopoRR
-from .simple_bgp_as import SimpleBGPASTopo
-from .bgp_network_centralized import BGPCentralized
-from .bgp_network_failure import BGPFailure
-from .bgp_prefix_connected import BGPPrefixConnectedTopo
-from .bgp_adjust import BGPAdjust
-from .bgp_multiple_ways import BGPMultipleWays
+from .bgp_policies_1 import BGPPoliciesTopo1
+from .bgp_policies_2 import BGPPoliciesTopo2
+from .bgp_policies_4 import BGPPoliciesTopo4
+from .bgp_policies_3 import BGPPoliciesTopo3
+from .bgp_policies_adjust import BGPPoliciesAdjustTopo
+from .bgp_policies_5 import BGPPoliciesTopo5
 
 from mininet.log import lg, LEVELS
 
@@ -70,12 +70,12 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'bgp_local_pref': BGPTopoLocalPref,
          'bgp_med': BGPTopoMed,
          'bgp_rr': BGPTopoRR,
-         'simple_bgp_as': SimpleBGPASTopo,
-         'simple_bgp_network_centralized': BGPCentralized,
-         'simple_bgp_network_failure': BGPFailure,
-         'bgp_prefix_connected': BGPPrefixConnectedTopo,
-         'bgp_adjust': BGPAdjust,
-         'bgp_multiple_ways': BGPMultipleWays}
+         'bgp_policies_1': BGPPoliciesTopo1,
+         'bgp_policies_2': BGPPoliciesTopo2,
+         'bgp_policies_3': BGPPoliciesTopo3,
+         'bgp_policies_4': BGPPoliciesTopo4,
+         'bgp_policies_adjust': BGPPoliciesAdjustTopo,
+         'bgp_policies_5': BGPPoliciesTopo5}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,

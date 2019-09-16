@@ -61,8 +61,8 @@ class BGPTopoMed(IPTopo):
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
         al = new_access_list(name='all', entries=('any',))
-        set_med(self, as4r1, as1r6, 99, filter_list=(al, ))
-        set_med(self, as4r2, as1r5, 50, filter_list=(al, ))
+        set_med(self, router=as4r1, peer=as1r6, value=99, filter_list=(al, ))
+        set_med(self, router=as4r2, peer=as1r5, value=50, filter_list=(al, ))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))

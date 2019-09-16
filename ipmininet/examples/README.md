@@ -12,9 +12,12 @@ The following sections will detail the topologies.
    - [SimpleOSPFNetwork](#simpleospfnetwork)
    - [SimpleBGPNetwork](#simplebgpnetwork)
    - [BGPDecisionProcess](#bgpdecisionprocess)
-   - [BGPPrefixConnected](#bgpprefixconnected)
-   - [BGPAdjust](#bgpadjust)
-   - [BGPMultipleWays](#bgpmultipleways)
+   - [BGPLocalPref](#bgplocalpref)
+   - [BGPMED](#bgpmed)
+   - [BGPRR](#bgprr)
+   - [BGPFullConfig](#bgpfullconfig)
+   - [BGPPolicies](#bgppolicies)
+   - [BGPPoliciesAdjust](#bgppoliciesadjust)
    - [IPTables](#iptables)
    - [GRETopo](#gretopo)
    - [SSHd](#sshd)
@@ -105,6 +108,87 @@ once BGP has converged:
    - net > as2r3 ip route show 1.2.3.0/24
    - [noecho as2r3] telnet localhost bgpd > password is zebra > enable > show ip bgp 1.2.3.0/24
 
+## BGPLocalPref
+
+_topo name_ : bgp_local_pref
+_args_ : n/a
+
+This topology is composed of two ASes connected in dual homing
+with a higher local pref on one of the BGP peerings.
+Thus, all the traffic coming from AS1 will go through the upper link.
+
+## BGPMED
+
+_topo name_ : bgp_med
+_args_ : n/a
+
+This topology is composed of two ASes connected in dual homing
+with a higher MED for routes from the upper peering than the lower one.
+Thus, all the traffic coming from AS1 will go through the lower link.
+
+## BGPRR
+
+_topo name_ : bgp_rr
+_args_ : n/a
+
+This topology is composed of five AS.
+AS1 uses two router reflectors.
+
+## BGPFullConfig
+
+_topo name_ : bgp_full_config
+_args_ : n/a
+
+This topology is composed of two AS connected in dual homing with different local pref,
+MED and communities. AS1 has one route reflector as well.
+
+## BGPPolicies
+
+The following topologies are built from the exercise sessions
+of [CNP3 syllabus](https://www.computer-networking.info/exercises/html/).
+
+_topo name_ : bgp_policies_1
+_args_ : n/a
+
+_topo name_ : bgp_policies_2
+_args_ : n/a
+
+_topo name_ : bgp_policies_3
+_args_ : n/a
+
+_topo name_ : bgp_policies_4
+_args_ : n/a
+
+_topo name_ : bgp_policies_5
+_args_ : n/a
+
+All of these topologies have routes exchanging BGP reachability.
+They use two predefined BGP policies: shared-cost and client/provider peerings.
+
+ASes always favor routes received from clients, then routes from shared-cost peering,
+and finally, routes received from providers.
+Moreover, ASes filter out routes depending on the peering type:
+ - Routes learned from shared-cost are not forwarded to providers and other shared-cost peers.
+ - Routes learned from providers are not forwarded to shared-cost peers and other providers.
+
+## BGPPoliciesAdjust
+
+The following topology is built from the exercise sessions
+of [CNP3 syllabus](https://www.computer-networking.info/exercises/html/).
+
+_topo name_ : bgp_policies_adjust
+_args_ : as_start (defaults to None), as_end (defaults to None), bgp_policy (defaults to 'Share')
+
+This network contains a topology with 5 shared-cost and 2 client-provider peerings.
+Some ASes cannot reach all other ASes.
+The user can add a peering to ensure connectivity.
+To do so, use the topology arguments.
+For instance, the following command will add a link between AS1 and AS3
+and start a shared-cost BGP peering.
+
+```bash
+python -m ipmininet.examples --topo=bgp_policies_adjust --args as_start=as1r,as_end=as3r,bgp_policy=Share
+```
 
 ## IPTables
 
@@ -324,29 +408,3 @@ _args_ : n/a
 This network contains a single LAN with one loop inside.
 It enables the spanning tree protocol to prevent packet looping in the LAN.
 It also changes the STP cost one link.
-
-## BGPPrefixConnected
-
-_topo name_ : bgp_prefix_connected
-_args_ : n/a
-
-This network contains a simple bgp topology. 
-The user should check if all ASes are capable of reaching all the other ASes
-
-## BGPAdjust
-
-_topo name_ : bgp_adjust
-_args_ : n/a
-
-This network contains a topology with 5 share-cost and 2 client-provider links.
-Some ASes cannot reach all other ASes. The user can add a link to ensure
-the connectivity of all ASes 
-
-## BGPMultipleWays
-
-_topo name_ : bgp_multiple_ways
-_args_ : n/a
-
-This network contains a more complex topology with 8 ASes and 11 links.
-Multiple ways are available to reach other ASes. The user should compute them and
-find the one chosen as best path

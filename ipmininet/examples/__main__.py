@@ -13,6 +13,7 @@ from .iptables import IPTablesTopo
 from .gre import GRETopo
 from .sshd import SSHTopo
 from .router_adv_network import RouterAdvNet
+from .ripng_network import RIPngNetwork
 from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
 from .static_routing_network_intermediate import StaticRoutingNetIntermediate
@@ -39,6 +40,7 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'gre': GRETopo,
          'ssh': SSHTopo,
          'router_adv_network': RouterAdvNet,
+         'ripng_network': RIPngNetwork,
          'simple_openr_network': SimpleOpenrNet,
          'static_address_network': StaticAddressNet,
          'static_routing_network_intermediate': StaticRoutingNetIntermediate,

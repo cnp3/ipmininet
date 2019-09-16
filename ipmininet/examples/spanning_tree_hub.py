@@ -1,7 +1,7 @@
 from ipmininet.iptopo import IPTopo
 
 
-class SpanningTree1(IPTopo):
+class SpanningTreeHub(IPTopo):
 
     def build(self, *args, **kwargs):
         """
@@ -47,4 +47,4 @@ class SpanningTree1(IPTopo):
         self.addLink(s6, s99)
         self.addLink(s6, s11)
 
-        super(SpanningTree1, self).build(*args, **kwargs)
+        super(SpanningTreeHub, self).build(*args, **kwargs)

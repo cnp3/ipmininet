@@ -4,13 +4,13 @@ from ipmininet.iptopo import IPTopo
 class SpanningTreeSimple(IPTopo):
 
     def build(self, *args, **kwargs):
-        """
+        r"""
                         +-----+
                         | s1  |
                         +-----+
-                        |      \
-                        |       \
-                        |        \
+                        |      \ 
+                        |       \ 
+                        |        \ 
                      +--+--+   +--+--+
                      | s2  +---+ s3  |
                      +-----+   +-----+

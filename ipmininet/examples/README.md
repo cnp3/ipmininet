@@ -21,6 +21,11 @@ The following sections will detail the topologies.
    - [PartialStaticAddressNet](#partialstaticaddressnetwork)
    - [StaticRoutingNet](#staticroutingnet)
    - [SpanningTreeNet](#spanningtreenet)
+   - [SpanningTreeHub](#spanningtreehub)
+   - [SpanningTreeBus](#spanningtreebus)
+   - [SpanningTreeIntermediate](#spanningtreeintermediate)
+   - [SpanningTreeComplex](#spanningtreecomplex)
+   - [SpanningTreeAdjust](#spanningtreeadjust)
 
 
 ## SimpleOSPFNetwork
@@ -203,3 +208,47 @@ _args_ : n/a
 
 This network contains a single LAN with a loop.
 It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## SpanningTreeHub
+
+_topo name_ : spanning_tree_hub
+_args_ : n/a
+
+This network contains a more complex LAN with many loops,
+using hubs to simulate one-to-many links between switches.
+ It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## SpanningTreeBus
+
+_topo name_ : spanning_tree_bus
+_args_ : n/a
+
+This network contains a single LAN without any loop,
+but using a hub to simulate a bus behavior.
+It enables the spanning tree protocol to prevent packet looping in the LAN,
+even if there is no loop here.
+
+## SpanningTreeIntermediate
+
+_topo name_ : spanning_tree_intermediate
+_args_ : n/a
+
+This network contains a single LAN with 2 loops inside.
+It shows the spanning tree protocol to avoid the packets looping in the network.
+
+## SpanningTreeComplex
+
+_topo name_ : spanning_tree_complex
+_args_ : n/a
+
+This network contains a single LAN with many loops inside.
+It enables the spanning tree protocol to prevent packet looping in the LAN.
+
+## SpanningTreeAdjust
+
+_topo name_ : spannnig_tree_adjust
+_args_ : n/a
+
+This network contains a single LAN with many loops inside.
+It enables the spanning tree protocol to prevent packets
+from looping in the network.

@@ -72,11 +72,12 @@ def bgp_peering(topo, a, b):
 def ebgp_session(topo, a, b, link_type=None):
     """Register an eBGP peering between two nodes, and disable IGP adjacencies
     between them.
+
     :param topo: The current topology
     :param a: Local router
     :param b: Peer router
     :param link_type: Can be set to SHARE or CLIENT_PROVIDER. In this case ebgp_session will create import and export
-    filter and set local pref based on the link type
+      filter and set local pref based on the link type
     """
     if link_type:
         all_al = new_access_list('All', ('any',))
@@ -265,7 +266,7 @@ def new_community_list(name, community, action=PERMIT):
 
     :param name: Name of the community list
     :param community: Community to filter
-    :param action:
+    :param action: either 'permit' or 'deny'
     """
     return CommunityList(name=name, community=community, action=action)
 

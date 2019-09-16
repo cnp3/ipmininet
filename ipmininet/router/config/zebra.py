@@ -203,7 +203,7 @@ class RouteMap(object):
         :param exit_policy: An entry may, optionally specify an alternative exit policy if the entry matched
                      or of (action, [acl, acl, ...]) tuples that will compose
                      the route map
-        :param order Priority of the route map compare to others
+        :param order: Priority of the route map compare to others
         :param proto: The set of protocols to which this route-map applies
         :param neighbor: List of peers this route map is applied to
         :param direction: Direction of the routemap(in, out, both)

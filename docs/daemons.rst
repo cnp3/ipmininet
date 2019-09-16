@@ -62,7 +62,9 @@ The following code shows how to use all these abstractions:
 .. testcode:: bgp
 
     from ipmininet.iptopo import IPTopo
-    from ipmininet.router.config import BGP, bgp_fullmesh, bgp_peering, ebgp_session, RouterConfig
+    from ipmininet.router.config import BGP, bgp_fullmesh, bgp_peering, \
+        ebgp_session, RouterConfig, new_access_list, new_community_list, \
+        set_local_pref, set_community, set_med
 
     class MyTopology(IPTopo):
 
@@ -115,13 +117,13 @@ The following code shows how to use all these abstractions:
             loc_pref = new_community_list('loc-pref', '2:80')
 
             # as2r1 set the local pref of all the route coming from as1r1 and matching the community list community to 80
-            set_local_pref(self, as2r1, as1r6, 80, filter_list=('loc-pref',))
+            set_local_pref(self, router=as2r1, peer=as1r1, value=80, filter_list=(loc_pref,))
 
             # as1r1 set the community of all the route sent to as2r1 and matching the access list allto 2:80
-            set_community(self, as1r1, as2r1, '2:80', filter_list=('all_al',))
+            set_community(self, router=as1r1, peer=as2r1, value='2:80', filter_list=(all_al,), direction='out')
 
             #  as3r1 set the med of all the route coming from as2r3 and matching the access list all to 50
-            set_med(self, as3r1, as2r3, 50, filter_list=('all_al',))
+            set_med(self, router=as3r1, peer=as2r3, value=50, filter_list=(all_al,))
 
             # AS1 is composed of 3 routers that have a full-mesh set of iBGP peering between them
             self.addiBGPFullMesh(1, routers=[as1r1, as1r2, as1r3])

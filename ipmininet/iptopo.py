@@ -132,7 +132,7 @@ class IPTopo(Topo):
 
     def routers(self, sort=True):
         """Return a list of router node names"""
-        return [n for n in self.nodes(sort) if self.isRouter(n)]
+        return [RouterDescription(n, self) for n in self.nodes(sort) if self.isRouter(n)]
 
     def hubs(self, sort=True):
         """Return a list of hub node names"""
@@ -185,7 +185,7 @@ class RouterDescription(str):
     def __new__(cls, value, *args, **kwargs):
         return super(RouterDescription, cls).__new__(cls, value)
 
-    def __init__(self, o, topo):
+    def __init__(self, o, topo=None):
         self.topo = topo
         super(RouterDescription, self).__init__()
 

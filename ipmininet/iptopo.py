@@ -206,6 +206,9 @@ class RouterDescription(str):
         self.topo.addDaemon(self, daemon, default_cfg_class=default_cfg_class,
                             cfg_daemon_list=cfg_daemon_list, **daemon_params)
 
+    def get_config(self, daemon, **kwargs):
+        return daemon.get_config(topo=self.topo, router=self, **kwargs)
+
 
 @functools.total_ordering
 class LinkDescription(object):

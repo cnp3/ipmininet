@@ -122,3 +122,6 @@ class BGPPoliciesAdjustTopo(IPTopo):
         if self.bgp_policy not in [CLIENT_PROVIDER, SHARE]:
             raise ValueError("bgp_policy '%s' is not a BGP policy among %s"
                              % (self.bgp_policy, ", ".join([CLIENT_PROVIDER, SHARE])))
+
+        self.as_start = [r for r in routers if r == self.as_start][0]
+        self.as_end = [r for r in routers if r == self.as_end][0]

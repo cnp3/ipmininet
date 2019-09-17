@@ -38,15 +38,15 @@ The overlay iBGPFullMesh extends the AS class and allows us to establish iBGP se
 
 There are also some helper functions:
 
-.. automethod:: ipmininet.router.config.bgp.new_access_list
+.. automethod:: ipmininet.router.config.bgp.BGPConfig.set_local_pref
     :noindex:
-.. automethod:: ipmininet.router.config.bgp.new_community_list
+.. automethod:: ipmininet.router.config.bgp.BGPConfig.set_med
     :noindex:
-.. automethod:: ipmininet.router.config.bgp.set_local_pref
+.. automethod:: ipmininet.router.config.bgp.BGPConfig.set_community
     :noindex:
-.. automethod:: ipmininet.router.config.bgp.set_med
+.. automethod:: ipmininet.router.config.bgp.BGPConfig.deny
     :noindex:
-.. automethod:: ipmininet.router.config.bgp.set_community
+.. automethod:: ipmininet.router.config.bgp.BGPConfig.permit
     :noindex:
 .. automethod:: ipmininet.router.config.bgp.bgp_fullmesh
     :noindex:
@@ -63,8 +63,7 @@ The following code shows how to use all these abstractions:
 
     from ipmininet.iptopo import IPTopo
     from ipmininet.router.config import BGP, bgp_fullmesh, bgp_peering, \
-        ebgp_session, RouterConfig, new_access_list, new_community_list, \
-        set_local_pref, set_community, set_med
+        ebgp_session, RouterConfig, AccessList, CommunityList
 
     class MyTopology(IPTopo):
 
@@ -110,20 +109,21 @@ The following code shows how to use all these abstractions:
             self.addLink(as1r1, as2r1)
             self.addLink(as2r3, as3r1)
 
-            # Add an access list to ...
-            all_al = new_access_list('all', ('any',))
+            # Add an access list to 'any'
+            # This can be an IP prefix or address instead
+            all_al = AccessList('all', ('any',))
 
             # Add a community list to as2r1
-            loc_pref = new_community_list('loc-pref', '2:80')
+            loc_pref = CommunityList('loc-pref', '2:80')
 
             # as2r1 set the local pref of all the route coming from as1r1 and matching the community list community to 80
-            set_local_pref(self, router=as2r1, peer=as1r1, value=80, filter_list=(loc_pref,))
+            as2r1.get_config(BGP).set_local_pref(80, from_peer=as1r1, matching=(loc_pref,))
 
-            # as1r1 set the community of all the route sent to as2r1 and matching the access list allto 2:80
-            set_community(self, router=as1r1, peer=as2r1, value='2:80', filter_list=(all_al,), direction='out')
+            # as1r1 set the community of all the route sent to as2r1 and matching the access list all_al to 2:80
+            as1r1.get_config(BGP).set_community('2:80', to_peer=as2r1, matching=(all_al,))
 
-            #  as3r1 set the med of all the route coming from as2r3 and matching the access list all to 50
-            set_med(self, router=as3r1, peer=as2r3, value=50, filter_list=(all_al,))
+            #  as3r1 set the med of all the route coming from as2r3 and matching the access list all_al to 50
+            as3r1.get_config(BGP).set_med(50, to_peer=as2r3, matching=(all_al,))
 
             # AS1 is composed of 3 routers that have a full-mesh set of iBGP peering between them
             self.addiBGPFullMesh(1, routers=[as1r1, as1r2, as1r3])

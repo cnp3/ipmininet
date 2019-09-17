@@ -1,5 +1,5 @@
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import BGP, ebgp_session, set_med, new_access_list, AF_INET6
+from ipmininet.router.config import BGP, ebgp_session, AccessList, AF_INET6
 
 
 class BGPTopoMed(IPTopo):
@@ -60,9 +60,9 @@ class BGPTopoMed(IPTopo):
         self.addLink(switch, as4h1)
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
-        al = new_access_list(name='all', entries=('any',))
-        set_med(self, router=as4r1, peer=as1r6, value=99, filter_list=(al, ))
-        set_med(self, router=as4r2, peer=as1r5, value=50, filter_list=(al, ))
+        al = AccessList(name='all', entries=('any',))
+        as4r1.get_config(BGP).set_med(99, to_peer=as1r6, matching=(al, ))
+        as4r2.get_config(BGP).set_med(50, to_peer=as1r5, matching=(al, ))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))

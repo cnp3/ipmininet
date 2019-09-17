@@ -7,7 +7,7 @@ from ipaddress import ip_network, ip_address
 
 from ipmininet.overlay import Overlay
 from ipmininet.utils import realIntfList
-from .zebra import QuaggaDaemon, Zebra, RouteMap, AccessList, AccessListEntry, RouteMapMatchCond, CommunityList, \
+from .zebra import QuaggaDaemon, Zebra, RouteMap, AccessList, RouteMapMatchCond, CommunityList, \
     RouteMapSetAction, PERMIT, DENY
 
 BGP_DEFAULT_PORT = 179
@@ -80,195 +80,202 @@ def ebgp_session(topo, a, b, link_type=None):
       filter and set local pref based on the link type
     """
     if link_type:
-        all_al = new_access_list('All', ('any',))
+        all_al = AccessList('All', ('any',))
         # Create the community filter for the export policy
-        for router in [a, b]:
-            peers_link = new_community_list('from-peers', 1, action=PERMIT)
-            up_link = new_community_list('from-up', 3, action=PERMIT)
-            community_lists = topo.getNodeInfo(router, 'bgp_community_lists', list)
-            for f in [peers_link, up_link]:
-                if f not in community_lists:
-                    community_lists.append(f)
-        route_maps_a = topo.getNodeInfo(a, 'bgp_route_maps', list)
-        route_maps_b = topo.getNodeInfo(b, 'bgp_route_maps', list)
+        peers_link = CommunityList(name='from-peers', community=1, action=PERMIT)
+        up_link = CommunityList(name='from-up', community=3, action=PERMIT)
 
         if link_type == SHARE:
             # Set the community and local pref for the import policy
-            set_community(topo, a, b, 1, (all_al,), direction='in')
-            set_community(topo, b, a, 1, (all_al,), direction='in')
-            set_local_pref(topo, a, b, 150, (all_al,))
-            set_local_pref(topo, b, a, 150, (all_al,))
+            a.get_config(BGP)\
+                .set_community(1, from_peer=b, matching=(all_al,)) \
+                .set_local_pref(150, from_peer=b, matching=(all_al,))
+            b.get_config(BGP)\
+                .set_community(1, from_peer=a, matching=(all_al,))\
+                .set_local_pref(150, from_peer=a, matching=(all_al,))
 
             # Create route maps to filter exported route
-            route_maps_a.append(
-                {'match_policy': DENY, 'peer': b, 'match_cond': (
-                    RouteMapMatchCond('community', 'from-up'),),
-                 'direction': 'out', 'name': 'export-to-peer-' + b, })
-            route_maps_b.append(
-                {'match_policy': DENY, 'peer': a, 'match_cond': (
-                    RouteMapMatchCond('community', 'from-up'),),
-                 'direction': 'out', 'name': 'export-to-peer-' + a, })
-            route_maps_a.append(
-                {'match_policy': DENY, 'peer': b, 'match_cond': (
-                    RouteMapMatchCond('community', 'from-peers'),),
-                 'direction': 'out', 'name': 'export-to-peer-' + b, 'order': 15})
-            route_maps_b.append(
-                {'match_policy': DENY, 'peer': a, 'match_cond': (
-                    RouteMapMatchCond('community', 'from-peers'),),
-                 'direction': 'out', 'name': 'export-to-peer-' + a, 'order': 15})
-            route_maps_a.append(
-                {'match_policy': PERMIT, 'peer': b,
-                 'direction': 'out', 'name': 'export-to-peer-' + b, 'order': 20})
-            route_maps_b.append(
-                {'match_policy': PERMIT, 'peer': a,
-                 'direction': 'out', 'name': 'export-to-peer-' + a, 'order': 20})
+            a.get_config(BGP)\
+                .deny('export-to-peer-' + b, to_peer=b, matching=(up_link,), order=10)\
+                .deny('export-to-peer-' + b, to_peer=b, matching=(peers_link,), order=15)\
+                .permit('export-to-peer-' + b, to_peer=b, order=20)
+
+            b.get_config(BGP)\
+                .deny('export-to-peer-' + a, to_peer=a, matching=(up_link,), order=10)\
+                .deny('export-to-peer-' + a, to_peer=a, matching=(peers_link,), order=15)\
+                .permit('export-to-peer-' + a, to_peer=a, order=20)
+
         elif link_type == CLIENT_PROVIDER:
             # Set the community and local pref for the import policy
-            set_community(topo, a, b, 3, (all_al,), direction='in')
-            set_community(topo, b, a, 2, (all_al,), direction='in')
-            set_local_pref(topo, a, b, 100, (all_al,), )
-            set_local_pref(topo, b, a, 200, (all_al,), )
+            a.get_config(BGP)\
+                .set_community(3, from_peer=b, matching=(all_al,)) \
+                .set_local_pref(100, from_peer=b, matching=(all_al,))
+            b.get_config(BGP)\
+                .set_community(2, from_peer=a, matching=(all_al,))\
+                .set_local_pref(200, from_peer=a, matching=(all_al,))
 
             # Create route maps to filter exported route
-            route_maps_a.append(
-                {'match_policy': DENY, 'peer': b, 'match_cond': (
-                    RouteMapMatchCond('community', 'from-up'),),
-                 'direction': 'out', 'name': 'export-to-up-' + b, 'order': 10})
-            route_maps_a.append(
-                {'match_policy': DENY, 'peer': b, 'match_cond': (
-                    RouteMapMatchCond('community', 'from-peers'),),
-                 'direction': 'out', 'name': 'export-to-up-' + b, 'order': 15})
-            route_maps_a.append(
-                {'match_policy': PERMIT, 'peer': b,
-                 'direction': 'out', 'name': 'export-to-up-' + b, 'order': 20})
+            a.get_config(BGP)\
+                .deny('export-to-up-' + b, to_peer=b, matching=(up_link,), order=10)\
+                .deny('export-to-up-' + b, to_peer=b, matching=(peers_link,), order=15)\
+                .permit('export-to-up-' + b, to_peer=b, order=20)
 
     bgp_peering(topo, a, b)
     topo.linkInfo(a, b)['igp_passive'] = True
 
 
-def set_local_pref(topo, router, peer, value, filter_list):
-    """Set a local pref on a link between two nodes
+class BGPConfig(object):
 
-    :param topo: The current topology
-    :param router: The router that apply the routemap
-    :param peer: The peer to which the routemap is applied
-    :param value: The local pref value to set
-    :param filter_list: A list of filter, can be empty
-    """
-    match_cond = []
-    set_actions = []
-    access_lists = topo.getNodeInfo(router, 'bgp_access_lists', list)
-    community_lists = topo.getNodeInfo(router, 'bgp_community_lists', list)
+    def __init__(self, topo, router):
+        self.topo = topo
+        self.router = router
 
-    # Create match_conditions based on the provided filters
-    for f in filter_list:
-        if isinstance(f, CommunityList):
-            match_cond.append(RouteMapMatchCond('community', f.name))
-            if f not in community_lists:
-                community_lists.append(f)
-        elif isinstance(f, AccessList):
-            match_cond.append(RouteMapMatchCond('access-list', f.name))
-            if f not in access_lists:
-                access_lists.append(f)
-        else:
-            raise Exception("Filter not yet implemented")
+    def set_local_pref(self, local_pref, from_peer, matching=()):
+        """Set local pref on a peering with 'from_peer' on routes
+         matching all of the access and community lists in 'matching'
 
-    # Create set action based on the provided value
-    set_actions.append(RouteMapSetAction('local-preference', value))
-    route_maps = topo.getNodeInfo(router, 'bgp_route_maps', list)
-    route_maps.append(
-        {'peer': peer, 'match_cond': match_cond, 'set_actions': set_actions, 'direction': 'in'})
+        :param local_pref: The local pref value to set
+        :param from_peer: The peer on which the local pref is applied
+        :param matching: A list of AccessList and/or CommunityList
+        :return: self
+        """
+        self.add_set_action(peer=from_peer,
+                            set_action=RouteMapSetAction('local-preference', local_pref),
+                            matching=matching, direction='in')
+        return self
 
+    def set_med(self, med, to_peer, matching=()):
+        """Set MED on a peering with 'to_peer' on routes
+         matching all of the access and community lists in 'matching'
 
-def set_med(topo, router, peer, value, filter_list):
-    """Set bgp med on an exported route
+        :param med: The local pref value to set
+        :param to_peer: The peer to which the med is applied
+        :param matching: A list of AccessList and/or CommunityList
+        :return: self
+        """
+        self.add_set_action(peer=to_peer, set_action=RouteMapSetAction('metric', med),
+                            matching=matching, direction='out')
+        return self
 
-    :param topo: The current topology
-    :param router: The router that apply the routemap
-    :param peer: The peer to which the routemap is applied
-    :param value: The med value to set
-    :param filter_list: A list of filter, can be empty
-    """
-    match_cond = []
-    set_actions = []
-    access_lists = topo.getNodeInfo(router, 'bgp_access_lists', list)
-    community_lists = topo.getNodeInfo(router, 'bgp_community_lists', list)
+    def set_community(self, community, from_peer=None, to_peer=None, matching=()):
+        """Set community on a routes received from 'from_peer'
+         and routes sent to 'to_peer' on routes matching
+         all of the access and community lists in 'matching'
 
-    # Create match_conditions based on the provided filters
-    for f in filter_list:
-        if isinstance(f, CommunityList):
-            match_cond.append(RouteMapMatchCond('community', f.name))
-            if f not in community_lists:
-                community_lists.append(f)
-        elif isinstance(f, AccessList):
-            match_cond.append(RouteMapMatchCond('access-list', f.name))
-            if f not in access_lists:
-                access_lists.append(f)
-        else:
-            raise Exception("Filter not yet implemented")
+        :param community: The community value to set
+        :param from_peer: The peer on which received routes have to have the community
+        :param to_peer: The peer on which sent routes have to have the community
+        :param matching: A list of AccessList and/or CommunityList
+        :return: self
+        """
+        if to_peer is not None:
+            self.add_set_action(peer=to_peer, set_action=RouteMapSetAction('community', community),
+                                matching=matching, direction='out')
+        if from_peer is not None:
+            self.add_set_action(peer=from_peer, set_action=RouteMapSetAction('community', community),
+                                matching=matching, direction='in')
+        return self
 
-    # Create set action based on the provided value
-    set_actions.append(RouteMapSetAction('metric', value))
-    route_maps = topo.getNodeInfo(router, 'bgp_route_maps', list)
-    route_maps.append(
-        {'peer': peer, 'match_cond': match_cond, 'set_actions': set_actions, 'direction': 'out'})
+    def filter(self, name=None, policy=DENY, from_peer=None, to_peer=None, matching=(), order=10):
+        """Either accept or deny all routes received from 'from_peer'
+         and routes sent to 'to_peer' matching
+         all of the access and community lists in 'matching'
 
+        :param name: The name of the route-map
+        :param policy: Either 'deny' or 'permit'
+        :param from_peer: The peer on which received routes have to have the community
+        :param to_peer: The peer on which sent routes have to have the community
+        :param matching: A list of AccessList and/or CommunityList
+        :param order: The order in which route-maps are applied,
+         i.e., lower order means applied before
+        :return: self
+        """
+        route_maps = self.topo.getNodeInfo(self.router, 'bgp_route_maps', list)
+        if from_peer:
+            route_maps.append({
+                'match_policy': policy,
+                'peer': from_peer,
+                'match_cond': self.filters_to_match_cond(matching),
+                'direction': 'in',
+                'name': name,
+                'order': order
+            })
+        if to_peer:
+            route_maps.append({
+                'match_policy': policy,
+                'peer': to_peer,
+                'match_cond': self.filters_to_match_cond(matching),
+                'direction': 'out',
+                'name': name,
+                'order': order
+            })
+        return self
 
-def set_community(topo, router, peer, value, filter_list, direction):
-    """
-    Set community on imported or exported route
+    def deny(self, name=None, from_peer=None, to_peer=None, matching=(), order=10):
+        """Deny all routes received from 'from_peer'
+         and routes sent to 'to_peer' matching
+         all of the access and community lists in 'matching'
 
-    :param topo: The current topology
-    :param router: The router that apply the routemap
-    :param peer: The peer to which the routemap is applied
-    :param value: The value of the community as:com, if you only specify com the asn of the router will be automatically set
-    :param filter_list: A lise of filter, can be empty
-    :param direction: direction of the route map(in, out, both)
-    """
-    match_cond = []
-    set_actions = []
-    access_lists = topo.getNodeInfo(router, 'bgp_access_lists', list)
-    community_list = topo.getNodeInfo(router, 'bgp_community_lists', list)
+        :param name: The name of the route-map
+        :param from_peer: The peer on which received routes have to have the community
+        :param to_peer: The peer on which sent routes have to have the community
+        :param matching: A list of AccessList and/or CommunityList
+        :param order: The order in which route-maps are applied,
+         i.e., lower order means applied before
+        :return: self
+        """
+        return self.filter(name, policy=DENY, from_peer=from_peer, to_peer=to_peer,
+                           matching=matching, order=order)
 
-    # Create match_conditions based on the provided filters
-    for f in filter_list:
-        if isinstance(f, CommunityList):
-            match_cond.append(RouteMapMatchCond('community', f.name))
-            if f not in community_list:
-                community_list.append(f)
-        elif isinstance(f, AccessList):
-            match_cond.append(RouteMapMatchCond('access-list', f.name))
-            if f not in access_lists:
-                access_lists.append(f)
-        else:
-            raise Exception("Filter not yet implemented")
+    def permit(self, name=None, from_peer=None, to_peer=None, matching=(), order=10):
+        """Accept all routes received from 'from_peer'
+         and routes sent to 'to_peer' matching
+         all of the access and community lists in 'matching'
 
-    # Create set action based on the provided value
-    set_actions.append(RouteMapSetAction('community', value))
-    route_maps = topo.getNodeInfo(router, 'bgp_route_maps', list)
-    route_maps.append(
-        {'peer': peer, 'match_cond': match_cond, 'set_actions': set_actions, 'direction': direction})
+        :param name: The name of the route-map
+        :param from_peer: The peer on which received routes have to have the community
+        :param to_peer: The peer on which sent routes have to have the community
+        :param matching: A list of AccessList and/or CommunityList
+        :param order: The order in which route-maps are applied,
+         i.e., lower order means applied before
+        :return: self
+        """
+        return self.filter(name, policy=PERMIT, from_peer=from_peer, to_peer=to_peer,
+                           matching=matching, order=order)
 
+    def filters_to_match_cond(self, filter_list):
+        match_cond = []
+        access_lists = self.topo.getNodeInfo(self.router, 'bgp_access_lists', list)
+        community_list = self.topo.getNodeInfo(self.router, 'bgp_community_lists', list)
 
-def new_access_list(name, entries=()):
-    """
-    Create and return new access list to be used as a filter for RouteMap
+        # Create match_conditions based on the provided filters
+        for f in filter_list:
+            if isinstance(f, CommunityList):
+                match_cond.append(RouteMapMatchCond('community', f.name))
+                if f not in community_list:
+                    community_list.append(f)
+            elif isinstance(f, AccessList):
+                match_cond.append(RouteMapMatchCond('access-list', f.name))
+                if f not in access_lists:
+                    access_lists.append(f)
+            else:
+                raise Exception("Filter not yet implemented")
+        return match_cond
 
-    :param name: Name of the access list
-    :param entries: List of prefix to filter
-    """
-    return AccessList(name=name, entries=entries)
+    def add_set_action(self, peer, set_action, matching, direction):
+        """Add a 'RouteMapSetAction' to a BGP peering between two nodes
 
-
-def new_community_list(name, community, action=PERMIT):
-    """
-    Create a new community list to be used as a filter for RouteMap
-
-    :param name: Name of the community list
-    :param community: Community to filter
-    :param action: either 'permit' or 'deny'
-    """
-    return CommunityList(name=name, community=community, action=action)
+        :param peer: The peer to which the routemap is applied
+        :param set_action: The RouteMapSetAction to set
+        :param matching: A list of filter, can be empty
+        :param direction: direction of the route map: 'in', 'out' or 'both'
+        :return: self
+        """
+        match_cond = self.filters_to_match_cond(matching)
+        route_maps = self.topo.getNodeInfo(self.router, 'bgp_route_maps', list)
+        route_maps.append(
+            {'peer': peer, 'match_cond': match_cond, 'set_actions': [set_action], 'direction': direction})
+        return self
 
 
 def set_rr(topo, rr, peers=()):
@@ -390,6 +397,10 @@ class BGP(QuaggaDaemon):
         for a in af:
             a.neighbors.extend(nei)
         return af
+
+    @classmethod
+    def get_config(cls, topo, router, **kwargs):
+        return BGPConfig(topo=topo, router=router)
 
 
 class AddressFamily(object):

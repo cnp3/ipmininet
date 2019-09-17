@@ -325,6 +325,11 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
         """Return whether this daemon has started or not"""
         return True
 
+    @classmethod
+    def get_config(cls, topo, router, **kwargs):
+        """Returns a config object for the daemon if any"""
+        return None
+
 
 class BasicRouterConfig(RouterConfig):
     """A basic router that will run an OSPF daemon"""

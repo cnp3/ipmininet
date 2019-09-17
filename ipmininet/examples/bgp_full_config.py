@@ -1,6 +1,6 @@
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import BGP, ebgp_session, set_local_pref, set_med, set_rr, new_access_list, \
-    set_community, new_community_list, AF_INET6
+from ipmininet.router.config import BGP, ebgp_session, set_rr, AccessList, \
+    CommunityList, AF_INET6
 
 
 class BGPTopoFull(IPTopo):
@@ -59,14 +59,18 @@ class BGPTopoFull(IPTopo):
         self.addLink(switch, as4h1)
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
-        al = new_access_list(name='all', entries=('any',))
-        cl = new_community_list(name='loc-pref', community='1:80')
+        al = AccessList(name='all', entries=('any',))
+        cl = CommunityList(name='loc-pref', community='1:80')
 
-        set_local_pref(self, router=as1r6, peer=as4r1, value=99, filter_list=(al,))
-        set_community(self, router=as4r1, peer=as1r6, value='1:80', filter_list=(al,), direction='in')
-        set_med(self, router=as1r6, peer=as4r1, value=50, filter_list=(al,))
-        set_med(self, router=as4r1, peer=as1r6, value=50, filter_list=(al,))
-        set_local_pref(self, router=as1r5, peer=as4r2, value=50, filter_list=(al,))
+        as1r6.get_config(BGP)\
+            .set_local_pref(99, from_peer=as4r1, matching=(al,))\
+            .set_med(50, to_peer=as4r1, matching=(al,))
+
+        as4r1.get_config(BGP)\
+            .set_community('1:80', from_peer=as1r6, matching=(al,))\
+            .set_med(50, to_peer=as1r6, matching=(al,))
+
+        as1r5.get_config(BGP).set_local_pref(50, from_peer=as4r2, matching=(al,))
 
         # Add full mesh
         self.addAS(4, (as4r1, as4r2))

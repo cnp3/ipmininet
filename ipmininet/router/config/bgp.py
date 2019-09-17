@@ -326,14 +326,15 @@ class BGP(QuaggaDaemon):
         Build and return a list of community_filter
         """
         node_community_lists = self._node.get('bgp_community_lists')
+        community_lists = []
         if node_community_lists:
             for list in node_community_lists:
                 # If community is an int change it to the right format asn:community by adding node asn
+                cl = CommunityList(name=list.name, community=list.community, action=list.action)
+                community_lists.append(cl)
                 if isinstance(list.community, int):
-                    list.community = '%s:%d' % (self._node.asn, list.community)
-            return node_community_lists
-        else:
-            return []
+                    cl.community = '%s:%d' % (self._node.asn, cl.community)
+        return community_lists
 
     def build_access_list(self):
         """

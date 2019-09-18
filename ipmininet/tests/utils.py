@@ -6,6 +6,7 @@ except ImportError:
     # Python 3
     from io import StringIO
 
+import pytest
 import re
 import signal
 import time
@@ -123,6 +124,41 @@ def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=300
     server_p.send_signal(signal.SIGINT)
     server_p.wait()
     return code, out, err
+
+
+def assert_stp_state(switch, expected_states, timeout=60):
+    """
+    :param switch: The switch to test
+    :param expected_states: Dictionary mapping an interface name to its expected state
+    :param timeout: Time to wait for the stp convergence
+    :return:
+    """
+    partial_cmd = "brctl showstp"
+    possible_states = "listening|learning|forwarding|blocking"
+    ignore_state = "listening", "learning"  # In these states the STP has not converged
+    cmd = ("%s %s" % (partial_cmd, switch.name))
+    out = switch.cmd(cmd)
+    states = re.findall(possible_states, out)
+    # wait for the ports to be bounded
+    count = 0
+    while any(item in states for item in ignore_state):
+        if count == timeout:
+            pytest.fail("Timeout of %d seconds"
+                        " while waiting for the spanning tree to be computed" % timeout)
+        time.sleep(1)
+        count += 1
+        out = switch.cmd(cmd)
+        states = re.findall(possible_states, out)
+
+    interfaces = re.findall(switch.name + r"-eth[0-9]+", out)
+    state_map = {interfaces[i]: states[i] for i in range(len(states))}
+    for itf, state in expected_states.items():
+        assert itf in state_map,\
+            "The port %s of switch %s was not mentioned in the output of 'brctl showstp':\n%s"\
+            % (itf, switch.name, out)
+        assert state_map[itf] == expected_states[itf],\
+            "The state of port %s of switch %s wasn't correct: excepted '%s' got '%s'"\
+            % (itf, switch.name, expected_states[itf], state_map[itf])
 
 
 class CLICapture(object):

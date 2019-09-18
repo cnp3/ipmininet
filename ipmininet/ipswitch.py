@@ -28,6 +28,5 @@ class IPSwitch(LinuxBridge):
         for i in self.intfList():
             if self.name in i.name:
                 self.cmd('brctl addif', self, i)
-                if 'stp_cost' in i.params:
-                    self.cmd('brctl setpathcost %s %s %d' % (self.name, i.name, i.params['stp_cost']))
+                self.cmd('brctl setpathcost %s %s %d' % (self.name, i.name, i.params.get('stp_cost', 1)))
         self.cmd('ifconfig', self, 'up')

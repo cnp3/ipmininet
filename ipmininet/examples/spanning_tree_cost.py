@@ -1,7 +1,7 @@
 from ipmininet.iptopo import IPTopo
 
 
-class SpanningTreeSimple(IPTopo):
+class SpanningTreeCost(IPTopo):
 
     def build(self, *args, **kwargs):
         r"""
@@ -9,7 +9,7 @@ class SpanningTreeSimple(IPTopo):
                         | s1  |
                         +-----+
                         |      \ 
-                        |       \ 
+                        |       \ 10
                         |        \ 
                      +--+--+   +--+--+
                      | s2  +---+ s3  |
@@ -21,6 +21,9 @@ class SpanningTreeSimple(IPTopo):
 
         self.addLink(s1, s2)
         self.addLink(s2, s3)
-        self.addLink(s3, s1, cost=10)
+        self.addLink(s3, s1, stp_cost=10)
 
-        super(SpanningTreeSimple, self).build(*args, **kwargs)
+        for s in self.switches():
+            self.addLink(s, self.addHost('h%s' % s))
+
+        super(SpanningTreeCost, self).build(*args, **kwargs)

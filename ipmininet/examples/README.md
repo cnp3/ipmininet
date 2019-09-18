@@ -30,6 +30,7 @@ The following sections will detail the topologies.
    - [SpanningTreeIntermediate](#spanningtreeintermediate)
    - [SpanningTreeFullMesh](#spanningtreefullmesh)
    - [SpanningTreeAdjust](#spanningtreeadjust)
+   - [SpanningTreeCost](#spanningtreecost)
 
 
 ## SimpleOSPFNetwork
@@ -248,7 +249,7 @@ _args_ : n/a
 
 This network contains a more complex LAN with many loops,
 using hubs to simulate one-to-many links between switches.
- It enables the spanning tree protocol to prevent packet looping in the LAN.
+It enables the spanning tree protocol to prevent packet looping in the LAN.
 
 ## SpanningTreeBus
 
@@ -279,8 +280,31 @@ It enables the spanning tree protocol to prevent packet looping in the LAN.
 ## SpanningTreeAdjust
 
 _topo name_ : spannnig_tree_adjust
-_args_ : n/a
+
+_args_ :
+ - l1_start: Endpoint interface of the 1st link on which we want to change the cost
+ - l1_end: Endpoint interface of the 1st link on which we want to change the cost
+ - l1_cost: Cost to set on the first link
+ - l2_start: Endpoint interface of the 2nd link on which we want to change the cost
+ - l2_end: Endpoint interface of the 2nd link on which we want to change the cost
+ - l2_cost: Cost to set on the second link
 
 This network contains a single LAN with many loops inside.
 It enables the spanning tree protocol to prevent packets
 from looping in the network.
+The arguments of this topology allows users to change the STP cost on two links.
+
+For instance, the following command changes STP cost of the link between s6.1 and s3.4 to 2:
+
+```bash
+python -m ipmininet.examples --topo=spannnig_tree_adjust --args l1_start=s6-eth1,l1_end=s3-eth4,l1_cost=2
+```
+
+## SpanningTreeCost
+
+_topo name_: spannnig_tree_cost
+_args_ : n/a
+
+This network contains a single LAN with one loop inside.
+It enables the spanning tree protocol to prevent packet looping in the LAN.
+It also changes the STP cost one link.

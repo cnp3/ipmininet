@@ -1,6 +1,6 @@
 """This file contains an example of topology using static routing.
    There is no connectivity between all the routers.
-   Changing one static route would ensure connectivity."""
+   Changing one routing table would ensure connectivity."""
 
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import RouterConfig, STATIC, StaticRoute

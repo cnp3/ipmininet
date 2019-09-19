@@ -21,7 +21,6 @@ The following sections will detail the topologies.
    - [PartialStaticAddressNet](#partialstaticaddressnetwork)
    - [StaticRoutingNet](#staticroutingnet)
    - [StaticRoutingNetBasic](#staticroutingnetbasic)
-   - [StaticRoutingNetIntermediate](#staticroutingnetintermediate)
    - [StaticRoutingNetComplex](#staticroutingnetcomplex)
    - [StaticRoutingNetFailure](#staticroutingnetfailure)
    - [SpanningTreeNet](#spanningtreenet)
@@ -204,16 +203,6 @@ _args_ : n/a
 
 This nework uses static routes with zebra and static daemons.
 This topology uses only 4 routers.
-
-## StaticRoutingNetIntermediate
-
-_topo name_ : static_routing_network_intermediate
-_args_ : n/a
-
-This network uses static routes with zebra and static daemons.
-This topology uses 6 routers. The routes are not the same as
-if they were chosen by OSPF6, but a path from X to Y is the
-exact opposite to the path from Y to X.
 
 ## StaticRoutingNetComplex
 

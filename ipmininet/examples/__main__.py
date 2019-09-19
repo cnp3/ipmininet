@@ -17,7 +17,6 @@ from .ripng_network import RIPngNetwork
 from .ripng_network_adjust import RIPngNetworkAdjust
 from .simple_openr_network import SimpleOpenrNet
 from .static_address_network import StaticAddressNet
-from .static_routing_network_intermediate import StaticRoutingNetIntermediate
 from .static_routing_network_complex import StaticRoutingNetComplex
 from .partial_static_address_network import PartialStaticAddressNet
 from .static_routing import StaticRoutingNet
@@ -45,7 +44,6 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'ripng_network_adjust': RIPngNetworkAdjust,
          'simple_openr_network': SimpleOpenrNet,
          'static_address_network': StaticAddressNet,
-         'static_routing_network_intermediate': StaticRoutingNetIntermediate,
          'static_routing_network_complex': StaticRoutingNetComplex,
          'partial_static_address_network': PartialStaticAddressNet,
          'static_routing_network': StaticRoutingNet,

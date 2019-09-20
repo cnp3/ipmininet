@@ -1,4 +1,4 @@
-"""This file contains a simple crash test for RIPng topology"""
+"""This file contains a simple example of topology connected with RIPng"""
 
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import RouterConfig
@@ -61,11 +61,11 @@ class RIPngNetwork(IPTopo):
         self.addSubnet(nodes=[r4, h4], subnets=["2042:44::/64"])
         self.addSubnet(nodes=[r5, h5], subnets=["2042:55::/64"])
 
-        r1.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
-        r2.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
-        r3.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
-        r4.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
-        r5.addDaemon(RIPng, timeout_timer=1, garbage_timer=2)
+        r1.addDaemon(RIPng)
+        r2.addDaemon(RIPng)
+        r3.addDaemon(RIPng)
+        r4.addDaemon(RIPng)
+        r5.addDaemon(RIPng)
 
         super(RIPngNetwork, self).build(*args, **kwargs)
 

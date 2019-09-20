@@ -1,4 +1,4 @@
-"""This file contains a simple crash test for RIPng topology"""
+"""This file contains a topology controlled by RIPng daemons. The weight can be customized"""
 
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config.ripng import RIPng
@@ -6,6 +6,27 @@ from ipmininet.router.config import RouterConfig
 
 
 class RIPngNetworkAdjust(IPTopo):
+
+    def __init__(self, lr1r2_cost=1, lr1r3_cost=1, lr1r5_cost=1, lr2r3_cost=1,
+                 lr2r4_cost=1, lr2r5_cost=1, lr4r5_cost=1, *args, **kwargs):
+        """
+        :param lr1r2_cost: Cost of link between R1 and R2
+        :param lr1r3_cost: Cost of link between R1 and R3
+        :param lr1r5_cost: Cost of link between R1 and R5
+        :param lr2r3_cost: Cost of link between R2 and R3
+        :param lr2r4_cost: Cost of link between R2 and R4
+        :param lr2r5_cost: Cost of link between R2 and R5
+        :param lr4r5_cost: Cost of link between R4 and R5
+        """
+
+        self.lr1r2_cost = int(lr1r2_cost)
+        self.lr1r3_cost = int(lr1r3_cost)
+        self.lr1r5_cost = int(lr1r5_cost)
+        self.lr2r3_cost = int(lr2r3_cost)
+        self.lr2r4_cost = int(lr2r4_cost)
+        self.lr2r5_cost = int(lr2r5_cost)
+        self.lr4r5_cost = int(lr4r5_cost)
+        super(RIPngNetworkAdjust, self).__init__(*args, **kwargs)
 
     def build(self, *args, **kwargs):
         r"""
@@ -16,33 +37,21 @@ class RIPngNetworkAdjust(IPTopo):
                   +--+--+               +--+--+
                   | r3  |               | r4  |
                   +--+--+               +--+--+
-                    / \                   / \ 
-                   /   \                 /   \ 
-                  /     \               /     \ 
-                 /       \             /       \ 
-                / a       \ b       c /         \ d
-               /           \         /           \ 
-              /             \       /             \ 
-       +-----+      e        +-----+     f         +-----+
+                    / \                   / \
+                   /   \                 /   \
+                  /     \               /     \
+                 /       \             /       \
+                /         \           /         \
+               /           \         /           \
+              /             \       /             \
+       +-----+               +-----+               +-----+
        | r1  +---------------+ r2  +---------------+ r5  |
        +--+--+               +-----+               +--+--+
           |   \                                   /   |
-       +--+--+ \              g                  / +--+--+
+       +--+--+ \                                 / +--+--+
        | h1  |  +-------------------------------+  | h5  |
        +-----+                                     +-----+
         """
-
-        weights = input("""The goal of this exercise is to play with the weight of the links between the routers to 
-        get the following paths: h1 -> r1 -> r5 -> r4 -> h4 and h3 -> r3 -> r2 -> r4 -> h4 \nusing RIP for IPv6 (
-        distance vector routing).\nEnter all the weights of the links, from 'a' to 'g', separated only by a space. 
-        \nRecall: the valid weights in RIP are [1, 16]\n""")
-
-        while(True):
-            try:
-                w = self.check_correct_weights(weights)
-                break
-            except Exception as e:
-                weights = input('Error: {}\n Try again:\n'.format(str(e)))
 
         r1 = self.addRouter_v6('r1')
         r2 = self.addRouter_v6('r2')
@@ -65,25 +74,25 @@ class RIPngNetworkAdjust(IPTopo):
         self.addLink(h4, r4)
         self.addLink(h5, r5)
 
-        lr1r2 = self.addLink(r1, r2, igp_metric=w[4])
+        lr1r2 = self.addLink(r1, r2, igp_metric=self.lr1r2_cost)
         lr1r2[r1].addParams(ip="2042:12::1/64")
         lr1r2[r2].addParams(ip="2042:12::2/64")
-        lr1r3 = self.addLink(r1, r3, igp_metric=w[0])
+        lr1r3 = self.addLink(r1, r3, igp_metric=self.lr1r3_cost)
         lr1r3[r1].addParams(ip="2042:13::1/64")
         lr1r3[r3].addParams(ip="2042:13::3/64")
-        lr1r5 = self.addLink(r1, r5, igp_metric=w[6])
+        lr1r5 = self.addLink(r1, r5, igp_metric=self.lr1r5_cost)
         lr1r5[r1].addParams(ip="2042:15::1/64")
         lr1r5[r5].addParams(ip="2042:15::5/64")
-        lr2r3 = self.addLink(r2, r3, igp_metric=w[1])
+        lr2r3 = self.addLink(r2, r3, igp_metric=self.lr2r3_cost)
         lr2r3[r2].addParams(ip="2042:23::2/64")
         lr2r3[r3].addParams(ip="2042:23::3/64")
-        lr2r4 = self.addLink(r2, r4, igp_metric=w[2])
+        lr2r4 = self.addLink(r2, r4, igp_metric=self.lr2r4_cost)
         lr2r4[r2].addParams(ip="2042:24::2/64")
         lr2r4[r4].addParams(ip="2042:24::4/64")
-        lr2r5 = self.addLink(r2, r5, igp_metric=w[5])
+        lr2r5 = self.addLink(r2, r5, igp_metric=self.lr2r5_cost)
         lr2r5[r2].addParams(ip="2042:25::2/64")
         lr2r5[r5].addParams(ip="2042:25::5/64")
-        lr4r5 = self.addLink(r4, r5, igp_metric=w[3])
+        lr4r5 = self.addLink(r4, r5, igp_metric=self.lr4r5_cost)
         lr4r5[r4].addParams(ip="2042:45::4/64")
         lr4r5[r5].addParams(ip="2042:45::5/64")
 
@@ -96,18 +105,3 @@ class RIPngNetworkAdjust(IPTopo):
 
     def addRouter_v6(self, name):
         return self.addRouter(name, use_v4=False, use_v6=True, config=RouterConfig)
-    
-    def check_correct_weights(self, w):
-        weights = w.split()
-        if len(weights) != 7:
-            raise IndexError('You did not enter a valid number of weights: {}'.format(len(weights)))
-        try:
-            wint = list(map(int, weights))
-        except ValueError:
-            raise ValueError('You did not enter integers')
-        for i in wint:
-            if i < 1 or i > 16:
-                raise ValueError('You did not enter a valid weight: {}'.format(i))
-        return wint
-        
-

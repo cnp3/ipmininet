@@ -147,6 +147,30 @@ You can try to connect by reusing the per-router ssh config, e.g.:
 r1 ssh -o IdentityFile=/tmp/__ipmininet_temp_key r2
 ```
 
+## RIPngNetwork
+
+_topo name_ : ripng_network
+_args_ : n/a
+
+This network uses the RIPng daemon to ensure connectivity between hosts.
+Like all FRRouting daemons, you can access the routers vtysh using, from the mininet CLI:
+```bash
+[noecho rx] telnet localhost 2603
+```
+
+## RIPngNetworkAdjust
+
+_topo name_ : ripng_network_adjust
+_args_ : lr1r2_cost, lr1r3_cost, lr1r5_cost, lr2r3_cost, lr2r4_cost, lr2r5_cost, lr4r5_cost
+
+This network also uses the RIPng daemon to ensure connectivity between hosts.
+Moreover, the IGP metric on each link can be customized.
+For instance, the following command changes IGP cost of both the link between r1 and r2
+and the link between r1 and r3 to 2:
+```bash
+python -m ipmininet.examples --topo=ripng_network_adjust --args lr1r2_cost=2,lr1r3_cost=2
+```
+
 ## RouterAdvNetwork
 
 _topo name_ : router_adv_network

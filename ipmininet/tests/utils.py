@@ -12,7 +12,7 @@ import signal
 import time
 
 import mininet.log
-from ipaddress import ip_address
+from ipaddress import ip_address, ip_network
 
 
 def traceroute(net, src, dst_ip, timeout=300):
@@ -108,14 +108,6 @@ def assert_connectivity(net, v6=False, timeout=300):
     assert host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
 
-def assert_no_connectivity(net, v6=False, timeout=300):
-    t = 0
-    while t != timeout / 5. and host_connected(net, v6=v6):
-        t += 1
-        time.sleep(5)
-    assert not host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
-
-
 def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=300):
     server_ip = server.defaultIntf().ip6 if v6 else server.defaultIntf().ip
     server_cmd = "nc %s -l %d" % ("-6" if v6 else "-4", server_port)
@@ -174,6 +166,29 @@ def assert_stp_state(switch, expected_states, timeout=60):
         assert state_map[itf] == expected_states[itf],\
             "The state of port %s of switch %s wasn't correct: excepted '%s' got '%s'"\
             % (itf, switch.name, expected_states[itf], state_map[itf])
+
+
+def assert_routing_table(router, expected_prefixes, timeout=120):
+    """
+    :param router: The router to test
+    :param expected_prefixes: The list of prefixes to be in the routing table
+    :param timeout: Time to wait for the routing convergence
+    :return:
+    """
+
+    cmd = "ip -%d route" % ip_network(str(expected_prefixes[0])).version
+    out = router.cmd(cmd)
+    prefixes = re.findall(r"|".join(expected_prefixes), out)
+    count = 0
+    while any(item in prefixes for item in expected_prefixes):
+        if count == timeout:
+            pytest.fail("Cannot get all expected prefixes (%s) from routing table (%s)"
+                        % (expected_prefixes, prefixes))
+        time.sleep(1)
+        count += 1
+        out = router.cmd(cmd)
+        prefixes = re.findall(r"|".join(expected_prefixes), out)
+    assert len(prefixes) == 0
 
 
 class CLICapture(object):

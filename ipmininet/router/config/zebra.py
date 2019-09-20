@@ -58,6 +58,7 @@ class Zebra(QuaggaDaemon):
 
     def __init__(self, *args, **kwargs):
         super(Zebra, self).__init__(*args, **kwargs)
+        self.files.append(self.zebra_socket)
 
     def build(self):
         cfg = super(Zebra, self).build()

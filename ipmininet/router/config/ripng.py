@@ -5,6 +5,10 @@ from ipmininet.utils import otherIntf, L3Router, realIntfList
 from .utils import ConfigDict
 from .zebra import QuaggaDaemon, Zebra
 
+UPDATE_TIMER = 30
+TIMEOUT_TIMER = 180
+GARBAGE_TIMER = 120
+
 
 class RIPng(QuaggaDaemon):
     """This class provides a simple configuration for an RIP daemon.
@@ -19,8 +23,9 @@ class RIPng(QuaggaDaemon):
         cfg.redistribute = self.options.redistribute
         cfg.split_horizon = self.options.split_horizon
         cfg.split_horizon_with_poison = self.options.split_horizon_with_poison
-        cfg.timers = self._build_timers(self.options.update_timer, self.options.timeout_timer,
-                                        self.options.garbage_timer)
+        cfg.update_timer = self.options.update_timer
+        cfg.timeout_timer = self.options.timeout_timer
+        cfg.garbage_timer = self.options.garbage_timer
         interfaces = [itf
                       for itf in realIntfList(self._node)]
         cfg.interfaces = self._build_interfaces(interfaces)
@@ -44,21 +49,23 @@ class RIPng(QuaggaDaemon):
                            domain=ip_interface(u'%s/%s' % (i.ip6, i.prefixLen6)))
                 for i in interfaces]
 
-    def _build_timers(self, update, timeout, garbage):
-        """Return a list of timer values for RIP for the router
-        :param update: routing table timer value in second (default value:30)
-        :param timeout: routing information timeout timer (default value:180)
-        :param garbage: garbage collection timer (default value:120)"""
-        t = []
-        t.append(update) if update else t.append(30)
-        t.append(timeout) if timeout else t.append(180)
-        t.append(garbage) if garbage else t.append(120)
-        return ' '.join([str(e) for e in t])
-
     def set_defaults(self, defaults):
-        """:param debug: the set of debug events that should be logged
-        :param redistribute: set of RIPngRedistributedRoute sources"""
+        """:param debug: the set of debug events that should be logged (default: []).
+        :param redistribute: set of RIPngRedistributedRoute sources (default: []).
+        :param split_horizon: the daemon uses the split-horizon method (default: False).
+        :param split_horizon_with_poison: the daemon uses the split-horizon.
+         with reversed poison method. If both split_horizon_with_poison and split_horizon
+         are set to True, RIPng will use the split-horizon with reversed poison method
+         (default: True).
+        :param update_timer: routing table timer value in second (default value:30).
+        :param timeout_timer: routing information timeout timer (default value:180).
+        :param garbage_timer: garbage collection timer (default value:120)."""
         defaults.redistribute = []
+        defaults.split_horizon = False
+        defaults.split_horizon_with_poison = True
+        defaults.update_timer = UPDATE_TIMER
+        defaults.timeout_timer = TIMEOUT_TIMER
+        defaults.garbage_timer = GARBAGE_TIMER
         super(RIPng, self).set_defaults(defaults)
 
     def is_active_interface(self, itf):
@@ -76,7 +83,6 @@ class RIPNetwork(object):
 class RIPRedistributedRoute(object):
     """A class representing a redistributed route type in RIP"""
 
-    def __init__(self, subtype, metric_type=1, metric=1000):
+    def __init__(self, subtype, metric=1000):
         self.subtype = subtype
-        self.metric_type = metric_type
         self.metric = metric

@@ -344,45 +344,33 @@ of the interface. You can also give the name of the DNS server (instead of an IP
 RIPng
 -----
 
-The RIPNG daemon
+When adding RIPng to a router with ``router.addDaemon(RIPng, **kargs)``, we can give the following parameters:
 
-RIPng uses 5 parameters at the initialization:
-
-* split_horizon: the router uses the split-horizon method
-* split_horizon_with_poison: the router uses the split-horizon with reversed poison method
-* update_timer: routing table timer value in second (default value:30)
-* timeout_timer: routing information timeout timer (default value:180)
-* garbage_timer: garbage collection timer (default value:120)
+.. automethod:: ipmininet.router.config.ripng.RIPng.set_defaults
+    :noindex:
 
 RIPng uses one link parameter:
 
-* igp_metric: the metric of the link (default value:1)
+- igp_metric: the metric of the link (default value: 1)
 
-We can pass parameters to links and interfaces when calling addLink():
+We can pass parameters to links when calling addLink():
 
 .. testcode:: ripng
 
-
     from ipmininet.iptopo import IPTopo
-    from ipmininet.router.config import RIPng
+    from ipmininet.router.config import RIPng, RouterConfig
 
     class MyTopology(IPTopo):
 
         def build(self, *args, **kwargs):
-            r1 = self.addRouter("r1", use_v4=False, use_v6=True)
-            r2 = self.addRouter("r2", use_v4=False, use_v6=True)
+            r1 = self.addRouter("r1", config=RouterConfig)  # We use RouterConfig to prevent OSPF6 to be run
+            r2 = self.addRouter("r2", config=RouterConfig)
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
-            lr1r2 = self.addLink(r1, r2, igp_metric=10)
-            lr1r2[r1].addParams(ip=("2042:12::1/64"))
-            lr1r2[r2].addParams(ip=("2042:12::2/64"))
-
-            lr1h1 = self.addLink(r1, h1)
-            lr2h2 = self.addLink(r2, h2)
-
-            self.addSubnet(nodes=[r1, h1], subnets=["2042:11::/64"])
-            self.addSubnet(nodes=[r2, h2], subnets=["2042:22::/64"])
+            self.addLink(r1, r2, igp_metric=10)  # The IGP metric is set to 10
+            self.addLink(r1, h1)
+            self.addLink(r2, h2)
 
             r1.addDaemon(RIPng)
             r2.addDaemon(RIPng)

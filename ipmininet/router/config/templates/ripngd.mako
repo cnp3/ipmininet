@@ -22,15 +22,16 @@ ipv6 ripng split-horizon
 % endif
 !
 router ripng
-  timers basic ${node.ripngd.timers}
+  timers basic ${node.ripngd.update_timer} ${node.ripngd.timeout_timer} ${node.ripngd.garbage_timer}
   % for intf in node.ripngd.interfaces:
   network ${intf.name}
   offset-list ${intf.name} out ${intf.cost} ${intf.name}
   offset-list ${intf.name} in ${intf.cost} ${intf.name}
   % endfor
+  % for r in node.ripngd.redistribute:
+  redistribute ${r.subtype} metric ${r.metric}
+  % endfor
   <%block name="router"/>
-!
-ipv6 access-list ac-all permit any
 !
 % for intf in node.ripngd.interfaces:
 ipv6 access-list ${intf.name} permit ::/0

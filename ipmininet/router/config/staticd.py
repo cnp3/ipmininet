@@ -26,7 +26,7 @@ class STATIC(QuaggaDaemon):
 class StaticRoute(object):
     """A class representing a static route"""
 
-    def __init__(self, prefix, nexthop, distance=10):
+    def __init__(self, prefix, nexthop, distance=1):
         """:param prefix: The prefix for this static route
         :param nexthop: The nexthop for this prefix, one of: <IP address,
                         interface name, null0, blackhole, reject>

@@ -80,7 +80,8 @@ class StaticRoutingNetBasic(IPTopo):
         # Add static routes
         r1.addDaemon(STATIC, static_routes=[
             StaticRoute(prefix="2042:2b::/64", nexthop="2042:12::2"),  # h2->r2
-            StaticRoute(prefix="2042::/16", nexthop="2042:13::3"),  # /->r3
+            StaticRoute(prefix="2042:3c::/64", nexthop="2042:13::3"),  # h3->r3
+            StaticRoute(prefix="2042:4d::/64", nexthop="2042:13::3"),  # h4->r3
         ])
         r2.addDaemon(STATIC, static_routes=[
             StaticRoute(prefix="2042:1a::/64", nexthop="2042:12::1"),  # h1->r1

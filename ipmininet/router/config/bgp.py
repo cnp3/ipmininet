@@ -1,4 +1,6 @@
 """Base classes to configure a BGP daemon"""
+import heapq
+
 from builtins import str
 
 import itertools
@@ -453,13 +455,16 @@ class Peer(object):
         """Return the IP address that base should try to contact to establish
         a peering"""
         visited = set()
-        to_visit = realIntfList(base)
+        to_visit = {i.name: i for i in realIntfList(base)}
+        prio_queue = [(0, i) for i in to_visit.keys()]
+        heapq.heapify(prio_queue)
         # Explore all interfaces in base ASN recursively, until we find one
         # connected to the peer
         while to_visit:
-            i = to_visit.pop()
+            path_cost, i = heapq.heappop(prio_queue)
             if i in visited:
                 continue
+            i = to_visit.pop(i)
             visited.add(i)
             for n in i.broadcast_domain.routers:
                 if n.node.name == peer:
@@ -470,5 +475,7 @@ class Peer(object):
                     else:
                         return None, None
                 elif n.node.asn == base.asn or not n.node.asn:
-                    to_visit.extend(realIntfList(n.node))
+                    for i in realIntfList(n.node):
+                        to_visit[i.name] = i
+                        heapq.heappush(prio_queue, (path_cost + i.igp_metric, i.name))
         return None, None

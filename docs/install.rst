@@ -46,21 +46,22 @@ following command in the same directory as the two previous one:
 .. _Vagrant: https://www.vagrantup.com/downloads.html
 .. _Virtualbox: https://www.virtualbox.org/wiki/Downloads
 
-Manual installation from PyPI
------------------------------
+Manual installation
+-------------------
 
 You can download and install IPMininet.
+You can change the installed version by replacing "0.7" in the following commands.
 If you have pip above **18.1**, execute:
 
 .. code-block:: bash
 
-    $ sudo pip install ipmininet
+    $ sudo pip install --upgrade git+https://github.com/cnp3/ipmininet.git@0.7
 
 If you have an older version of pip, use:
 
 .. code-block:: bash
 
-    $ sudo pip install --process-dependency-links ipmininet
+    $ sudo pip install --process-dependency-links --upgrade git+https://github.com/cnp3/ipmininet.git@0.7
 
 Then, you can install all the daemons:
 
@@ -73,39 +74,3 @@ by changing the options on the installation script.
 For the option documentations, use the ``-h`` option.
 
 .. _documentation: http://mininet.org/download/
-
-.. _install_manual:
-
-Manual installation from sources
---------------------------------
-
-To manually install IPMininet from source, first get the source code:
-
-.. code-block:: bash
-
-    $ git clone https://github.com/cnp3/ipmininet.git
-    $ cd ipmininet
-    $ git checkout <version>
-
-Then, install IPMininet.
-If you have pip above **18.1**, execute:
-
-.. code-block:: bash
-
-    $ sudo pip install .
-
-If you have an older version of pip, use:
-
-.. code-block:: bash
-
-    $ sudo pip install --process-dependency-links .
-
-Finally, you can install all the daemons:
-
-.. code-block:: bash
-
-    $ sudo python -m ipmininet.install -af
-
-You can choose to install only a subset of the daemons
-by changing the options on the installation script.
-For the option documentations, use the ``-h`` option.

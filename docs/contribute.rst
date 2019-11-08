@@ -7,10 +7,34 @@ Don't hesitate to ask for advice by opening an issue on Github.
 Setting up the development environment
 --------------------------------------
 
-To develop a new feature, you have to install ipmininet from source
-in development mode. Therefore, you can follow the instructions
-at :ref:`install_manual`
-by adding the ``-e`` option when calling ``pip``.
+To develop a new feature, you have to install IPMininet from source
+in development mode.
+
+First get the source code of your fork:
+
+.. code-block:: bash
+
+    $ git clone <your-fork-url>
+    $ cd ipmininet
+
+Then, install your version of IPMininet in development mode.
+If you have pip above **18.1**, execute:
+
+.. code-block:: bash
+
+    $ sudo pip -e install .
+
+If you have an older version of pip, use:
+
+.. code-block:: bash
+
+    $ sudo pip -e install --process-dependency-links .
+
+Finally, you can install all the daemons:
+
+.. code-block:: bash
+
+    $ sudo python -m ipmininet.install -af
 
 Running the tests
 -----------------

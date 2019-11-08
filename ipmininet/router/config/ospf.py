@@ -2,7 +2,7 @@
 from ipaddress import ip_interface
 
 from ipmininet.overlay import Overlay
-from ipmininet.utils import otherIntf, L3Router, realIntfList
+from ipmininet.utils import otherIntf, L3Router
 from .utils import ConfigDict
 from .zebra import QuaggaDaemon, Zebra
 
@@ -52,7 +52,7 @@ class OSPF(QuaggaDaemon):
         cfg = super(OSPF, self).build()
         cfg.redistribute = self.options.redistribute
         interfaces = [itf
-                      for itf in realIntfList(self._node)]
+                      for itf in self._node.intfList()]
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         return cfg

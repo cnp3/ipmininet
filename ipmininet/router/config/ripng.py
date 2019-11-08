@@ -1,7 +1,7 @@
 """Base classes to configure a RIP daemon"""
 from ipaddress import ip_interface
 
-from ipmininet.utils import otherIntf, L3Router, realIntfList
+from ipmininet.utils import otherIntf, L3Router
 from .utils import ConfigDict
 from .zebra import QuaggaDaemon, Zebra
 
@@ -27,7 +27,7 @@ class RIPng(QuaggaDaemon):
         cfg.timeout_timer = self.options.timeout_timer
         cfg.garbage_timer = self.options.garbage_timer
         interfaces = [itf
-                      for itf in realIntfList(self._node)]
+                      for itf in self._node.intfList()]
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         return cfg

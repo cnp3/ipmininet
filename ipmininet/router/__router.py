@@ -101,7 +101,7 @@ class Router(Node, L3Router):
 
         # This interface already exists in the router,
         # so no need to move it
-        IPIntf('lo', node=self, moveIntfFn=lambda x, y: None)
+        IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None)
 
     def start(self):
         """Start the router: Configure the daemons, set the relevant sysctls,

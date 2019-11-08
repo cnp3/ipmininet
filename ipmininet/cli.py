@@ -57,11 +57,12 @@ class IPCLI(CLI):
         """ips n1 n2 ...: return the ips associated to the given node name"""
         for n in line.split(' '):
             try:
-                l = [itf.ip for itf in self.mn[n].intfList()]
+                ips = [ip.ip.compressed for itf in self.mn[n].intfList()
+                       for ip in list(itf.ips()) + list(itf.ip6s(exclude_lls=True))]
             except KeyError:
-                l = 'unknown node'
+                ips = 'unknown node'
             finally:
-                lg.output(n, '|', l, "\n")
+                lg.output(n, '|', ips, "\n")
 
     def do_ping4all(self, line):
         """Ping (IPv4-only) between all hosts."""

@@ -26,10 +26,12 @@ def test_iptables_example():
         p = net["r1"].popen(cmd.split(" "))
         assert p.wait() != 0, "Pings over IPv6 should be blocked"
 
-        code, _, _ = check_tcp_connectivity(net["r1"], net["r2"], server_port=80, timeout=.5)
+        code, _, _ = check_tcp_connectivity(net["r1"], net["r2"], server_port=80,
+                                            server_itf=net["r2"].intf("r2-eth0"), timeout=.5)
         assert code != 0, "TCP over port 80 should be blocked over IPv4"
 
-        code, out, err = check_tcp_connectivity(net["r1"], net["r2"], v6=True, server_port=80)
+        code, out, err = check_tcp_connectivity(net["r1"], net["r2"], v6=True, server_port=80,
+                                                server_itf=net["r2"].intf("r2-eth0"))
         assert code == 0, "TCP over port 80 should not be blocked over IPv6.\n" \
                           "[stdout]\n%s\n[stderr]\n%s" % (out, err)
 

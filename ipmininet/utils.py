@@ -54,9 +54,11 @@ def address_pair(n, use_v4=True, use_v6=True):
     """Returns a tuple (ip, ip6) with ip/ip6 being one of the IPv4/IPv6
        addresses of the node n"""
     v4 = v6 = None
-    for itf in realIntfList(n):
+    for itf in n.intfList():
         if use_v4 and v4 is None:
-            v4 = itf.updateIP()
+            itf.updateIP()
+            v4 = next(itf.ips(), None)
+            v4 = v4.ip.compressed if v4 is not None else v4
         if use_v6 and v6 is None:
             itf.updateIP6()
             v6 = next(itf.ip6s(exclude_lls=True), None)
@@ -93,7 +95,7 @@ class L3Router(object):
         """Returns whether an interface belongs to an L3Router
         (in the Mininet meaning: an intf with an associated node)"""
         try:
-            return isinstance(itf.node, L3Router)
+            return itf is not None and isinstance(itf.node, L3Router)
         except AttributeError:
             return False
 

@@ -101,8 +101,10 @@ def assert_connectivity(net, v6=False, timeout=300):
     assert host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
 
-def check_tcp_connectivity(client, server, v6=False, server_port=80, timeout=300):
-    server_ip = server.defaultIntf().ip6 if v6 else server.defaultIntf().ip
+def check_tcp_connectivity(client, server, v6=False, server_port=80, server_itf=None, timeout=300):
+    if server_itf is None:
+        server_itf = server.defaultIntf()
+    server_ip = server_itf.ip6 if v6 else server_itf.ip
     server_cmd = "nc %s -l %d" % ("-6" if v6 else "-4", server_port)
     server_p = server.popen(server_cmd.split(" "))
 

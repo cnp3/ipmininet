@@ -154,7 +154,7 @@ class RouterConfig(object):
 
         # Check that the most-visible IPv4 address is not in conflict
         # with the current router id
-        ip_list = sorted((ip for itf in realIntfList(n)
+        ip_list = sorted((ip for itf in n.intfList()
                           for ip in itf.ips()),
                          key=OrderedAddress)
         if len(ip_list) != 0 \
@@ -174,7 +174,7 @@ class RouterConfig(object):
             if d.options.routerid:
                 return d.options.routerid
 
-        ip_list = sorted((ip for itf in realIntfList(self._node)
+        ip_list = sorted((ip for itf in self._node.intfList()
                           for ip in itf.ips()),
                          key=OrderedAddress)
         if len(ip_list) == 0:

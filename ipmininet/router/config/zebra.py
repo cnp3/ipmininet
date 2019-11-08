@@ -1,7 +1,6 @@
 import os
 import socket
 
-from ipmininet.utils import realIntfList
 from .base import Daemon
 from .utils import ConfigDict
 
@@ -67,7 +66,7 @@ class Zebra(QuaggaDaemon):
         # Track interfaces
         cfg.interfaces = (ConfigDict(name=itf.name,
                                      description=itf.describe)
-                          for itf in realIntfList(self._node))
+                          for itf in self._node.intfList())
         return cfg
 
     def set_defaults(self, defaults):

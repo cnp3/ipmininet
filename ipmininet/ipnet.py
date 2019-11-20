@@ -385,9 +385,9 @@ class IPNet(Mininet):
                       if BroadcastDomain.is_domain_boundary(n)
                       for intf in realIntfList(n)}
         interfaces.update({r.intf('lo'): False for r in self.routers})
-        for intf, explored in interfaces.items():
+        for intf in interfaces.keys():
             # the interface already belongs to a broadcast domain
-            if explored:
+            if interfaces[intf]:
                 continue
             # create a new domain and explore the interface
             bd = BroadcastDomain(intf)

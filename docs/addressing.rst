@@ -159,7 +159,8 @@ Static addressing
 
 Addresses are allocated dynamically by default
 but you can set your own addresses if you disable auto-allocation
-when creating the IPNet object.
+when creating the IPNet object. You can do so for both for router loopbacks
+and for real interfaces of all the nodes.
 
 .. testcode:: static addressing
 
@@ -171,8 +172,8 @@ when creating the IPNet object.
 
         def build(self, *args, **kwargs):
 
-            r1 = self.addRouter("r1")
-            r2 = self.addRouter("r2")
+            r1 = self.addRouter("r1", lo_addresses=["2042:1::1/64", "10.1.0.1/24"])
+            r2 = self.addRouter("r2", lo_addresses=["2042:2::1/64", "10.2.0.1/24"])
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
@@ -209,8 +210,8 @@ You can also declare your subnets by declaring a Subnet overlay.
 
         def build(self, *args, **kwargs):
 
-            r1 = self.addRouter("r1")
-            r2 = self.addRouter("r2")
+            r1 = self.addRouter("r1", lo_addresses=["2042:1::1/64", "10.1.0.1/24"])
+            r2 = self.addRouter("r2", lo_addresses=["2042:2::1/64", "10.2.0.1/24"])
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
@@ -253,8 +254,8 @@ You can change it when adding a new router to your topology.
 
             # Change the config object for RouterConfig
             # because it does not add by default OSPF or OSPF6
-            r1 = self.addRouter("r1", config=RouterConfig)
-            r2 = self.addRouter("r2", config=RouterConfig)
+            r1 = self.addRouter("r1", config=RouterConfig, lo_addresses=["2042:1::1/64", "10.1.0.1/24"])
+            r2 = self.addRouter("r2", config=RouterConfig, lo_addresses=["2042:2::1/64", "10.2.0.1/24"])
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
@@ -299,8 +300,8 @@ You can also add routes manually when the network has started since you can run 
 
         def build(self, *args, **kwargs):
 
-            r1 = self.addRouter("r1", config=RouterConfig)
-            r2 = self.addRouter("r2", config=RouterConfig)
+            r1 = self.addRouter("r1", config=RouterConfig, lo_addresses=["2042:1::1/64", "10.1.0.1/24"])
+            r2 = self.addRouter("r2", config=RouterConfig, lo_addresses=["2042:2::1/64", "10.2.0.1/24"])
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 

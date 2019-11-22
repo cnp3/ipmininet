@@ -19,8 +19,8 @@ class StaticAddressNet(IPTopo):
                                          +---------+ h4 |
                                                    +----+
         """
-        r1 = self.addRouter('r1')
-        r2 = self.addRouter('r2')
+        r1 = self.addRouter('r1', lo_addresses=["2042:1::1/64", "10.1.1.1/24"])
+        r2 = self.addRouter('r2', lo_addresses=["2042:2::1/64", "10.2.2.1/24"])
 
         s1 = self.addSwitch('s1')
         s2 = self.addSwitch('s2')

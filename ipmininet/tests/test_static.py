@@ -32,6 +32,8 @@ def test_static_example():
         assert net["h4"].intf("h4-eth0").ip == "10.2.0.3"
         assert net["h4"].intf("h4-eth0").ip6 == "2001:12b::3"
 
+        assert net["r1"].intf("lo").ip == "10.1.1.1"
+        assert net["r1"].intf("lo").ip6 == "2042:1::1"
         assert net["r1"].intf("r1-eth0").ip == "10.0.0.1"
         assert net["r1"].intf("r1-eth0").ip6 == "2001:1a::1"
         assert net["r1"].intf("r1-eth1").ip == "10.1.0.1"
@@ -39,6 +41,8 @@ def test_static_example():
         assert net["r1"].intf("r1-eth2").ip == "10.2.0.1"
         assert net["r1"].intf("r1-eth2").ip6 == "2001:12b::1"
 
+        assert net["r2"].intf("lo").ip == "10.2.2.1"
+        assert net["r2"].intf("lo").ip6 == "2042:2::1"
         assert net["r2"].intf("r2-eth0").ip == "10.1.0.2"
         assert net["r2"].intf("r2-eth0").ip6 == "2001:12::2"
         assert net["r2"].intf("r2-eth1").ip == "10.0.3.1"
@@ -63,6 +67,7 @@ def test_partial_static_example():
         assert net["h3"].intf("h3-eth0").ip == "192.168.1.2"
         assert net["h3"].intf("h3-eth0").ip6 == "fc00:1::2"
 
+        assert net["r1"].intf("lo").ip6 == "2042:1::1"
         assert net["r1"].intf("r1-eth1").ip == "192.168.0.1"
         assert net["r1"].intf("r1-eth1").ip6 == "fc00::1"
 

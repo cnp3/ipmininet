@@ -8,8 +8,8 @@ class StaticRoutingNet(IPTopo):
 
         # Change the config object for RouterConfig
         # because it does not add by default OSPF or OSPF6
-        r1 = self.addRouter("r1", config=RouterConfig)
-        r2 = self.addRouter("r2", config=RouterConfig)
+        r1 = self.addRouter("r1", config=RouterConfig, lo_addresses=["2042:1::1/64", "10.1.1.1/24"])
+        r2 = self.addRouter("r2", config=RouterConfig, lo_addresses=["2042:2::1/64", "10.2.2.1/24"])
         h1 = self.addHost("h1")
         h2 = self.addHost("h2")
 

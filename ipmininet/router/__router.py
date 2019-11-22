@@ -159,14 +159,17 @@ class Router(IPNode, L3Router):
     def __init__(self, name,
                  config=BasicRouterConfig,
                  password='zebra',
+                 lo_addresses=(),
                  *args, **kwargs):
-        """:param password: The password for the routing daemons vtysh access"""
+        """:param password: The password for the routing daemons vtysh access
+           :param lo_addresses: The list of addresses to set on the loopback interface"""
         super(Router, self).__init__(name, config=config, *args, **kwargs)
         self.password = password
 
         # This interface already exists in the node,
         # so no need to move it
-        IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None)
+        lo = IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None)
+        lo.ip = lo_addresses
 
     @property
     def asn(self):

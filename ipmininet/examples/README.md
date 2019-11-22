@@ -37,6 +37,7 @@ The following sections will detail the topologies.
    - [SpanningTreeAdjust](#spanningtreeadjust)
    - [SpanningTreeCost](#spanningtreecost)
    - [DNSNetwork](#dnsnetwork)
+   - [IPv6SegmentRouting](#ipv6segmentrouting)
 
 
 ## SimpleOSPFNetwork
@@ -426,3 +427,19 @@ master dig @locahost -t AAAA server.mydomain.org
 slave dig @locahost -t NS mydomain.org
 slave dig @locahost -t AAAA server.mydomain.org
 ```
+
+## IPv6SegmentRouting
+
+_topo name_ : ipv6_segment_routing
+_args_ : n/a
+
+This networks uses [IPv6 Segment Routing](https://segment-routing.org)
+to reroute traffic from h1 to h4.
+You can observe that a ping and some tcpdumps or tshark that traffic
+will go through r1, r6, r5, r2, r3 and r4 instead of going
+through r1, r2, r5 and r4 which is the shortest path.
+
+Note that if you cannot use tcpdump to poke behind the Segment Routing
+extension headers. Hence, if you use the capture filter 'icmp6', if the
+ICMPv6 header is after the SRH, you won't see capture the packet.
+tshark does not have this problem.

@@ -40,6 +40,7 @@ from .bgp_policies_3 import BGPPoliciesTopo3
 from .bgp_policies_adjust import BGPPoliciesAdjustTopo
 from .bgp_policies_5 import BGPPoliciesTopo5
 from .dns_network import DNSNetwork
+from .srv6 import SRv6Topo
 
 from mininet.log import lg, LEVELS
 
@@ -77,7 +78,8 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'bgp_policies_4': BGPPoliciesTopo4,
          'bgp_policies_adjust': BGPPoliciesAdjustTopo,
          'bgp_policies_5': BGPPoliciesTopo5,
-         'dns_network': DNSNetwork}
+         'dns_network': DNSNetwork,
+         'ipv6_segment_routing': SRv6Topo}
 
 NET_ARGS = {'router_adv_network': {'use_v4': False,
                                    'use_v6': True,

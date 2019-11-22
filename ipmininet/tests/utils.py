@@ -46,7 +46,7 @@ def traceroute(net: IPNet, src: str, dst_ip: str, timeout=300) -> List[str]:
 
 
 def assert_path(net: IPNet, expected_path: List[str], v6=False, retry=5,
-                timeout=300):
+                timeout=300, traceroute_fun=traceroute, **kwargs):
     src = expected_path[0]
     dst = expected_path[-1]
     dst_ip = net[dst].defaultIntf().ip6 if v6 else net[dst].defaultIntf().ip
@@ -54,7 +54,7 @@ def assert_path(net: IPNet, expected_path: List[str], v6=False, retry=5,
     path = []  # type: List[str]
     i = 0
     while path != expected_path and i < retry:
-        path_ips = traceroute(net, src, dst_ip, timeout=timeout)
+        path_ips = traceroute_fun(net, src, dst_ip, timeout=timeout, **kwargs)
 
         path = [src]
         for path_ip in path_ips:

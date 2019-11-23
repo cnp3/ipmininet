@@ -355,13 +355,14 @@ class BGP(QuaggaDaemon):
         node_community_lists = self._node.get('bgp_community_lists')
         community_lists = []
         if node_community_lists:
-            for list in node_community_lists:
+            for node_cl in node_community_lists:
                 # If community is an int change it to the right format
                 # asn:community by adding node asn
-                cl = CommunityList(name=list.name, community=list.community,
-                                   action=list.action)
+                cl = CommunityList(name=node_cl.name,
+                                   community=node_cl.community,
+                                   action=node_cl.action)
                 community_lists.append(cl)
-                if isinstance(list.community, int):
+                if isinstance(node_cl.community, int):
                     cl.community = '%s:%d' % (self._node.asn, cl.community)
         return community_lists
 
@@ -423,7 +424,8 @@ class BGP(QuaggaDaemon):
                     neighbors.append(peer)
         return neighbors
 
-    def _address_families(self, af, nei):
+    @staticmethod
+    def _address_families(af, nei):
         """Complete the address families: add extra networks, or activate
         neighbors. The default is to activate all given neighbors"""
         for a in af:
@@ -438,8 +440,7 @@ class BGP(QuaggaDaemon):
 class AddressFamily(object):
     """An address family that is exchanged through BGP"""
 
-    def __init__(self, af_name, redistribute=(), networks=(),
-                 *args, **kwargs):
+    def __init__(self, af_name, redistribute=(), networks=()):
         self.name = af_name
         self.networks = [ip_network(str(n)) for n in networks]
         self.redistribute = redistribute
@@ -499,11 +500,10 @@ class Peer(object):
                 if n.node.name == peer:
                     if not v6:
                         return n.ip, n.node
-                    elif n.ip6 and not ip_address(n.ip6).is_link_local:
+                    if n.ip6 and not ip_address(n.ip6).is_link_local:
                         return n.ip6, n.node
-                    else:
-                        return None, None
-                elif n.node.asn == base.asn or not n.node.asn:
+                    return None, None
+                if n.node.asn == base.asn or not n.node.asn:
                     for i in realIntfList(n.node):
                         to_visit[i.name] = i
                         heapq.heappush(prio_queue, (path_cost + i.igp_metric,

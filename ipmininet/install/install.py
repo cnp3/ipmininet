@@ -31,7 +31,7 @@ def parse_args():
                         action="store_true")
     parser.add_argument("-q", "--install-frrouting",
                         help="Install FRRouting (version %s) daemons"
-                             % FRRoutingVersion,
+                        % FRRoutingVersion,
                         action="store_true")
     parser.add_argument("-r", "--install-radvd",
                         help="Install the RADVD daemon", action="store_true")

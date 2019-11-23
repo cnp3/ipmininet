@@ -135,7 +135,7 @@ class Named(HostDaemon):
         :param records: The list of PTR records to place a new reverse zone
         """
         if len(records) == 0:
-            return None
+            return
 
         # Find common prefix between all records
         common = records[0].domain_name.split(".")

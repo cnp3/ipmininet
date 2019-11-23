@@ -1,5 +1,7 @@
-from .install import *
+import os
 
+from .install import parse_args, dist, install_mininet, install_frrouting, \
+    enable_ipv6, install_openr
 
 if __name__ == "__main__":
 

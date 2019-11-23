@@ -51,13 +51,13 @@ class OSPF(QuaggaDaemon):
     def build(self):
         cfg = super(OSPF, self).build()
         cfg.redistribute = self.options.redistribute
-        interfaces = [itf
-                      for itf in self._node.intfList()]
+        interfaces = self._node.intfList()
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         return cfg
 
-    def _build_networks(self, interfaces):
+    @staticmethod
+    def _build_networks(interfaces):
         """Return the list of OSPF networks to advertize from the list of
         active OSPF interfaces"""
         # Check that we have at least one IPv4 network on that interface ...
@@ -95,7 +95,8 @@ class OSPF(QuaggaDaemon):
         defaults.redistribute = []
         super(OSPF, self).set_defaults(defaults)
 
-    def is_active_interface(self, itf):
+    @staticmethod
+    def is_active_interface(itf):
         """Return whether an interface is active or not for the OSPF daemon"""
         return L3Router.is_l3router_intf(otherIntf(itf))
 

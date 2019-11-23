@@ -21,11 +21,11 @@ class OpenrDomain(Overlay):
 
     @property
     def domain(self):
-        return self.link_properties['openr_domain']
+        return self.links_properties['openr_domain']
 
     @domain.setter
     def domain(self, x):
-        self.link_properties['openr_domain'] = x
+        self.links_properties['openr_domain'] = x
 
     def apply(self, topo):
         # Add all links for the routers
@@ -50,14 +50,14 @@ class Openr(OpenrDaemon):
         cfg = super(Openr, self).build()
         cfg.update(self.options)
         cfg.node_name = self._node.name
-        interfaces = [itf
-                      for itf in realIntfList(self._node)]
+        interfaces = realIntfList(self._node)
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         cfg.prefixes = self._build_prefixes(interfaces)
         return cfg
 
-    def _build_networks(self, interfaces):
+    @staticmethod
+    def _build_networks(interfaces):
         """Return the list of OpenR networks to advertize from the list of
         active OpenR interfaces"""
         # Check that we have at least one IPv4 network on that interface ...
@@ -73,7 +73,8 @@ class Openr(OpenrDaemon):
                            active=self.is_active_interface(i),
                            ) for i in interfaces]
 
-    def _build_prefixes(self, interfaces):
+    @staticmethod
+    def _build_prefixes(interfaces):
         ipv6_addresses = []
         for itf in interfaces:
             ipv6_addresses += itf.addresses[6]
@@ -89,7 +90,8 @@ class Openr(OpenrDaemon):
         defaults.log_dir = "/var/log"
         super(Openr, self).set_defaults(defaults)
 
-    def is_active_interface(self, itf):
+    @staticmethod
+    def is_active_interface(itf):
         """Return whether an interface is active or not for the OpenR daemon"""
         return L3Router.is_l3router_intf(otherIntf(itf))
 

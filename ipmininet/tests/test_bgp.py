@@ -127,7 +127,7 @@ def test_bgp_daemon_params(bgp_params, expected_cfg):
         with open("/tmp/bgpd_as2r1.cfg") as fileobj:
             cfg = fileobj.readlines()
             for line in expected_cfg:
-                assert (line + "\n") in cfg,\
+                assert line + "\n" in cfg,\
                     "Cannot find the line '%s' in the generated " \
                     "configuration:\n%s" % (line, "".join(cfg))
 

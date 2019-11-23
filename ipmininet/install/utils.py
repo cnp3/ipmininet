@@ -66,8 +66,7 @@ class Distribution(object):
 
             if parse_version(v) >= parse_version(self.SpinPipVersion):
                 return ""
-            else:
-                return "--process-dependency-links"
+            return "--process-dependency-links"
         except (ValueError, IndexError):
             print("Cannot retrieve version number of %s" % pip)
             sys.exit(1)

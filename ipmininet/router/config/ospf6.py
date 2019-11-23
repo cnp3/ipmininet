@@ -54,4 +54,3 @@ class OSPF6(OSPF):
 
 class OSPF6RedistributedRoute(OSPFRedistributedRoute):
     """A class representing a redistributed route type in OSPF6"""
-    pass

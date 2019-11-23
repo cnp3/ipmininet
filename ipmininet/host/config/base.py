@@ -13,11 +13,11 @@ from ipmininet.router.config.base import NodeConfig, Daemon
 
 
 __TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
-template_lookup = TemplateLookup(directories=[__TEMPLATES_DIR])
+host_template_lookup = TemplateLookup(directories=[__TEMPLATES_DIR])
 
 
 class HostDaemon(with_metaclass(abc.ABCMeta, Daemon)):
-    def __init__(self, node, template_lookup=template_lookup, **kwargs):
+    def __init__(self, node, template_lookup=host_template_lookup, **kwargs):
         super(HostDaemon, self).__init__(node, template_lookup=template_lookup,
                                          **kwargs)
 

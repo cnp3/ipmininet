@@ -255,17 +255,17 @@ class LinkDescription(object):
         if isinstance(item, int):
             if item == 0:
                 return self.src_intf
-            elif item == 1:
+            if item == 1:
                 return self.dst_intf
-            elif item == 3:
+            if item == 3:
                 return self.key
             raise IndexError("Links have only two nodes and one key")
-        else:
-            if item == self.src:
-                return self.src_intf
-            elif item == self.dst:
-                return self.dst_intf
-            raise KeyError("Node '%s' is not on this link" % item)
+
+        if item == self.src:
+            return self.src_intf
+        if item == self.dst:
+            return self.dst_intf
+        raise KeyError("Node '%s' is not on this link" % item)
 
     # The following methods allow this object to behave like an edge key
     # for mininet.topo.MultiGraph

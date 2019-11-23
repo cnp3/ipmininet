@@ -66,13 +66,13 @@ def test_dns_network(named_cfg, zone_args, exp_named_cfg, exp_zone_cfg):
         with open("/tmp/named_master2.cfg") as fileobj:
             cfg = fileobj.readlines()
             for line in exp_named_cfg:
-                assert (line + "\n") in cfg,\
+                assert line + "\n" in cfg,\
                     "Cannot find the line '%s' in the generated " \
                     "main configuration:\n%s" % (line, "".join(cfg))
         with open("/tmp/named_master2.test.org.cfg") as fileobj:
             cfg = fileobj.readlines()
             for line in exp_zone_cfg:
-                assert (line + "\n") in cfg,\
+                assert line + "\n" in cfg,\
                     "Cannot find the line '%s' in the generated zone " \
                     "configuration:\n%s" % (line, "".join(cfg))
 

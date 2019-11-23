@@ -12,10 +12,6 @@ import functools
 from . import OSPF_DEFAULT_AREA, MIN_IGP_METRIC
 from .utils import otherIntf, is_container
 
-# Apparently there is a circular import between mininet.link and mininet.node,
-# break it by importing node first
-# FIXME wait for upstream PR to be accepted ... then remove the first include
-import mininet.node  # noqa
 import mininet.link as _m
 from mininet.log import lg as log
 
@@ -145,7 +141,7 @@ class IPIntf(_m.Intf):
                           the addresses is given as a string without a given
                           prefix."""
         if not ip:
-            return
+            return None
         setv4 = setv6 = False
         lb_v4_update = lb_v6_update = False
         # Make sure we have an up-to-date view of our addresses
@@ -181,8 +177,8 @@ class IPIntf(_m.Intf):
         if setv6:
             cleanup.append(self.ip6s(exclude_lls=True,
                                      exclude_lbs=not lb_v6_update))
-        for ip in chain.from_iterable(cleanup):
-            self._del_ip(ip)
+        for old_ip in chain.from_iterable(cleanup):
+            self._del_ip(old_ip)
         # Assign IP
         rval = [self.cmd(cmd) for cmd in cmds]
         self._refresh_addresses()
@@ -199,8 +195,8 @@ class IPIntf(_m.Intf):
 
     def _refresh_addresses(self):
         """Request and parse the addresses of this interface"""
-        self.mac, self.addresses[4], self.addresses[6] = _addresses_of(
-                                                               self.name, self)
+        self.mac, self.addresses[4], self.addresses[6] = \
+            _addresses_of(self.name, self)
 
     def updateIP(self):
         self._refresh_addresses()

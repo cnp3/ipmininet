@@ -14,10 +14,10 @@ from .host import IPHost
 from .router import Router
 from .router.config import BasicRouterConfig
 from .link import IPIntf, IPLink, PhysicalInterface
+from .ipswitch import IPSwitch
 
 from mininet.net import Mininet
 from mininet.node import Host
-from ipmininet.ipswitch import IPSwitch
 from mininet.log import lg as log
 
 # ping6 is not provided by default on newer systems
@@ -209,7 +209,7 @@ class IPNet(Mininet):
         log.info('\n')
 
     def stop(self):
-        log.info('*** Stopping', len(self.routers),  'routers\n')
+        log.info('*** Stopping', len(self.routers), 'routers\n')
         for router in self.routers:
             log.info(router.name + ' ')
             router.terminate()
@@ -587,12 +587,12 @@ class BroadcastDomain(object):
     def len_v4(self):
         """The number of IPv4 addresses in this broadcast domain"""
         return sum(map(lambda x: x.interface_width[0]
-                       if len(list(x.ips())) else 0, self.interfaces))
+                       if len(list(x.ips())) > 0 else 0, self.interfaces))
 
     def len_v6(self):
         """The number of IPv6 addresses in this broadcast domain"""
         return sum(map(lambda x: x.interface_width[1]
-                       if len(list(x.ip6s(exclude_lls=True))) else 0,
+                       if len(list(x.ip6s(exclude_lls=True))) > 0 else 0,
                        self.interfaces))
 
     def explore(self, itfs):
@@ -625,14 +625,14 @@ class BroadcastDomain(object):
     def max_v4prefixlen(self):
         """Return the maximal IPv4 prefix suitable for this domain"""
         # IPv4 reserves 2 addresses for broadcast/subnet addresses
-        return (32 - math.ceil(math.log(2 + self.len_v4(), 2)))
+        return 32 - math.ceil(math.log(2 + self.len_v4(), 2))
 
     @property
     def max_v6prefixlen(self):
         """Return the maximal IPv6 prefix suitable for this domain"""
         # IPv6 should use whole subnet space for addressing
         # But see FIXME in constructor
-        return (128 - math.ceil(math.log(1 + self.len_v6(), 2)))
+        return 128 - math.ceil(math.log(1 + self.len_v6(), 2))
 
     @property
     def routers(self):

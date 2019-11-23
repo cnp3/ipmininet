@@ -1,12 +1,11 @@
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import BGP, ebgp_session, set_rr, AccessList, \
-    CommunityList, AF_INET6
+    AF_INET6
 
 
 class BGPTopoFull(IPTopo):
     """This topology is composed of two AS connected in dual homing
-     with different local pref, MED and communities. AS1 has one route
-     reflector: as1r3."""
+     with different local pref and MED. AS1 has one route reflector: as1r3."""
 
     def build(self, *args, **kwargs):
         """
@@ -63,7 +62,6 @@ class BGPTopoFull(IPTopo):
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
         al = AccessList(name='all', entries=('any',))
-        cl = CommunityList(name='loc-pref', community='1:80')
 
         as1r6.get_config(BGP)\
             .set_local_pref(99, from_peer=as4r1, matching=(al,))\

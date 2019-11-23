@@ -132,7 +132,7 @@ def test_ospf_daemon_params(ospf_params, link_params, exp_cfg, exp_paths):
         with open("/tmp/ospfd_r1.cfg") as fileobj:
             cfg = fileobj.readlines()
             for line in exp_cfg:
-                assert (line + "\n") in cfg,\
+                assert line + "\n" in cfg,\
                     "Cannot find the line '%s' in the generated " \
                     "configuration:\n%s" % (line, "".join(cfg))
 

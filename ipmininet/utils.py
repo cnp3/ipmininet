@@ -135,6 +135,6 @@ def find_node(start, node_name):
         for n in i.broadcast_domain.interfaces:
             if n.node.name == node_name:
                 return n
-            elif L3Router.is_l3router_intf(n):
+            if L3Router.is_l3router_intf(n):
                 to_visit.extend(realIntfList(n.node))
     return None

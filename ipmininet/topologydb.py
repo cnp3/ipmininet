@@ -25,9 +25,9 @@ class TopologyDB(object):
                     useful properties
         """
         super(TopologyDB, self).__init__(*args, **kwargs)
-        """dict keyed by node name ->
-            dict keyed by - properties -> val
-                          - neighbor   -> interface properties"""
+        # dict keyed by node name ->
+        #     dict keyed by - properties -> val
+        #                   - neighbor   -> interface properties"""
         self._network = {}
         if db:
             self.load(db)

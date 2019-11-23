@@ -3,9 +3,9 @@ to support emulation of (complex) IP networks. As such it provides new classes,
 such as Routers, auto-configures all properties not set by the user, such as
 IP addresses or router configuration files, ..."""
 
-"""This module has a hard dependency against mininet, check here that it is
-actually installed. This will yield a better (?) error message than just a raw
-ImportError nested somewhere ..."""
+# This module has a hard dependency against mininet, check here that it is
+# actually installed. This will yield a better (?) error message than just a raw
+# ImportError nested somewhere ...
 try:
     import mininet  # noqa
 except ImportError as e:

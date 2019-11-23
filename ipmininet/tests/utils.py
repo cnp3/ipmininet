@@ -158,7 +158,7 @@ def assert_stp_state(switch, expected_states, timeout=60):
 
     interfaces = re.findall(switch.name + r"-eth[0-9]+", out)
     state_map = {interfaces[i]: states[i] for i in range(len(states))}
-    for itf, state in expected_states.items():
+    for itf, _ in expected_states.items():
         assert itf in state_map,\
             "The port %s of switch %s was not mentioned in the output of " \
             "'brctl showstp':\n%s" % (itf, switch.name, out)
@@ -240,6 +240,9 @@ class CLICapture(object):
 
     def __init__(self, loglevel):
         self.loglevel = loglevel
+        self.stream = None
+        self.handler = None
+        self.out = []
 
     def __enter__(self):
         self.stream = StringIO()

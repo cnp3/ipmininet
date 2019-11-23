@@ -68,7 +68,7 @@ def test_radvd_daemon_params(link_params, expected_cfg):
         with open("/tmp/radvd_r.cfg") as fileobj:
             cfg = fileobj.readlines()
             for line in expected_cfg:
-                assert (line + "\n") in cfg,\
+                assert line + "\n" in cfg,\
                     "Cannot find the line '%s' in the generated" \
                     " configuration:\n%s" % (line, "".join(cfg))
 

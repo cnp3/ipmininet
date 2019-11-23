@@ -17,10 +17,11 @@ class PIMD(QuaggaDaemon):
     def build(self):
         cfg = super(PIMD, self).build()
         cfg.update(self.options)
-        cfg.interfaces = [ConfigDict(
-            name=itf.name,
-            ssm=itf.get('multicast_ssm', self.options.multicast_ssm),
-            igmp=itf.get('multicast_igmp', self.options.multicast_igmp))
+        cfg.interfaces = [
+            ConfigDict(name=itf.name,
+                       ssm=itf.get('multicast_ssm', self.options.multicast_ssm),
+                       igmp=itf.get('multicast_igmp',
+                                    self.options.multicast_igmp))
             for itf in realIntfList(self._node) if itf.enable_multicast]
         return cfg
 

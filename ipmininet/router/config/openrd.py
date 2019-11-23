@@ -236,7 +236,7 @@ class OpenrDaemon(RouterDaemon):
         the openr.mako template and passed to the daemon as argument."""
         cfg = ConfigDict()
         cfg[self.NAME] = self.build()
-        return self.template_lookup.get_template(self.template_filename)\
+        return self.template_lookup.get_template(self.template_filenames[0])\
                                    .render(node=cfg)
 
     @property

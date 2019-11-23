@@ -23,7 +23,7 @@ from mininet.log import lg as log
 last_routerid = ip_address(u'0.0.0.1')
 
 __TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
-template_lookup = TemplateLookup(directories=[__TEMPLATES_DIR])
+router_template_lookup = TemplateLookup(directories=[__TEMPLATES_DIR])
 
 
 class NodeConfig(object):
@@ -215,9 +215,7 @@ class RouterConfig(NodeConfig):
                         to_visit.extend(realIntfList(n.node))
                 to_visit = realIntfList(self._node) if to_visit else []
             return last_routerid.compressed
-        else:
-            id = ip_list.pop().ip.compressed
-            return id
+        return ip_list.pop().ip.compressed
 
 
 class Daemon(with_metaclass(abc.ABCMeta, object)):
@@ -232,8 +230,10 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
     # The kill patterns to cleanup any processes started by this daemon
     KILL_PATTERNS = ()
 
-    def __init__(self, node, template_lookup=template_lookup, **kwargs):
+    def __init__(self, node, template_lookup=router_template_lookup, **kwargs):
         """:param node: The node for which we build the config
+        :param template_lookup: The TemplateLookup object of the template
+                                directory
         :param kwargs: Pre-set options for the daemon, see defaults()"""
         self._node = node
         self._startup_line = None

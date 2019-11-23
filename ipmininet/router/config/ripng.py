@@ -26,13 +26,13 @@ class RIPng(QuaggaDaemon):
         cfg.update_timer = self.options.update_timer
         cfg.timeout_timer = self.options.timeout_timer
         cfg.garbage_timer = self.options.garbage_timer
-        interfaces = [itf
-                      for itf in self._node.intfList()]
+        interfaces = self._node.intfList()
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         return cfg
 
-    def _build_networks(self, interfaces):
+    @staticmethod
+    def _build_networks(interfaces):
         """Return the list of RIP networks to advertize from the list of
         active RIP interfaces"""
         return [RIPNetwork(domain=ip_interface(
@@ -75,7 +75,8 @@ class RIPng(QuaggaDaemon):
         defaults.garbage_timer = GARBAGE_TIMER
         super(RIPng, self).set_defaults(defaults)
 
-    def is_active_interface(self, itf):
+    @staticmethod
+    def is_active_interface(itf):
         """Return whether an interface is active or not for the OSPF daemon"""
         return L3Router.is_l3router_intf(otherIntf(itf))
 

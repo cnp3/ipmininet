@@ -35,7 +35,8 @@ class DNSNetwork(IPTopo):
 
         server = self.addHost('server')
         lr1server = self.addLink(r1, server)
-        self.addSubnet(links=[lr1server], subnets=["192.168.0.0/24", "fc00::/64"])
+        self.addSubnet(links=[lr1server],
+                       subnets=["192.168.0.0/24", "fc00::/64"])
 
         master = self.addHost('master')
         master.addDaemon(Named)
@@ -50,16 +51,19 @@ class DNSNetwork(IPTopo):
         # By default all the NS, A and AAAA records are generated
         # but you can add them explicitly to change their TTL
         records = [ARecord(server, "fc00::2", ttl=120)]
-        self.addDNSZone(name="mydomain.org", dns_master=master, dns_slaves=[slave], nodes=[server],
-                        records=records)
+        self.addDNSZone(name="mydomain.org", dns_master=master,
+                        dns_slaves=[slave], nodes=[server], records=records)
 
-        # By default IPMininet creates the reverse DNS zones for the addresses of the other zones
-        # but if you want to change the default values of the zone or of the PTR records,
-        # you can declare them explicitly. The missing PTR records will be placed in this zone
-        # if their prefix match or another reverse zone will be created.
+        # By default IPMininet creates the reverse DNS zones for the addresses
+        # of the other zones but if you want to change the default values of
+        # the zone or of the PTR records, you can declare them explicitly.
+        # The missing PTR records will be placed in this zone if their prefix
+        # match or another reverse zone will be created.
         ptr_record = PTRRecord("fc00::2", server + ".mydomain.org", ttl=120)
-        reverse_domain_name = ip_address(u"fc00::").reverse_pointer[-10:]  # keeps "f.ip6.arpa"
-        self.addDNSZone(name=reverse_domain_name, dns_master=master, dns_slaves=[slave],
-                        records=[ptr_record], ns_domain_name="mydomain.org", retry_time=8200)
+        # reverse_domain_name is "f.ip6.arpa"
+        reverse_domain_name = ip_address(u"fc00::").reverse_pointer[-10:]
+        self.addDNSZone(name=reverse_domain_name, dns_master=master,
+                        dns_slaves=[slave], records=[ptr_record],
+                        ns_domain_name="mydomain.org", retry_time=8200)
 
         super(DNSNetwork, self).build(*args, **kwargs)

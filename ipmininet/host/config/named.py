@@ -59,13 +59,15 @@ class Named(HostDaemon):
             for itf in realIntfList(server):
                 for ip in itf.ips():
                     if ".arpa" not in zone.name:  # Not a Reverse zone
-                        zone.soa_record.add_record(ARecord(s_name, ip.ip.compressed))
+                        zone.soa_record.add_record(ARecord(s_name,
+                                                           ip.ip.compressed))
                     if s_name == zone.dns_master:
                         master_ips.append(ip.ip.compressed)
 
                 for ip in itf.ip6s(exclude_lls=True):
                     if ".arpa" not in zone.name:  # Not a Reverse zone
-                        zone.soa_record.add_record(AAAARecord(s_name, ip.ip.compressed))
+                        zone.soa_record.add_record(AAAARecord(s_name,
+                                                              ip.ip.compressed))
                     if s_name == zone.dns_master:
                         master_ips.append(ip.ip.compressed)
 
@@ -77,9 +79,9 @@ class Named(HostDaemon):
 
     def build_reverse_zone(self, cfg_zones):
         """
-        Build non-existing PTR records. Then, adds them to an existing reverse zone
-        if any. The remaining ones are inserted in a new reverse zone that is added to
-        cfg_zones dictionary.
+        Build non-existing PTR records. Then, adds them to an existing reverse
+        zone if any. The remaining ones are inserted in a new reverse zone
+        that is added to cfg_zones dictionary.
         """
         # Build PTR records
         ptr_records = []
@@ -151,12 +153,13 @@ class Named(HostDaemon):
             if "arpa" in zone.name:
                 continue
             for record in zone.soa_record.records:
-                if record.rtype == "NS" and self._node.name in record.name_server:
+                if record.rtype == "NS" \
+                        and self._node.name in record.name_server:
                     ns_record = NSRecord(record.domain_name, self._node.name)
                     ns_record.domain_name = domain_name
         if ns_record is None:
-            lg.warning("Cannot forge a DNS reverse zone because there is no NS Record"
-                       " for this node in regular zones.\n")
+            lg.warning("Cannot forge a DNS reverse zone because there is no"
+                       " NS Record for this node in regular zones.\n")
             return
         records.append(ns_record)
 
@@ -172,10 +175,11 @@ class Named(HostDaemon):
         cfg_zones[self.zone_filename(reverse_zone.name)] = reverse_zone
 
     def set_defaults(self, defaults):
-        """:param log_severity: It controls the logging levels and may take the values defined.
-              Logging will occur for any message equal to or higher than the level specified (=>)
-              lower levels will not be logged. These levels are 'critical', 'error', 'warning',
-              'notice', 'info', 'debug' and 'dynamic'.
+        """:param log_severity: It controls the logging levels and may take the
+               values defined. Logging will occur for any message equal to or
+               higher than the level specified (=>) lower levels will not be
+               logged. These levels are 'critical', 'error', 'warning',
+               'notice', 'info', 'debug' and 'dynamic'.
         :param dns_server_port: The port number of the dns server"""
         defaults.log_severity = "warning"
         defaults.dns_server_port = 53
@@ -187,12 +191,14 @@ class Named(HostDaemon):
     @property
     def cfg_filenames(self):
         return super(Named, self).cfg_filenames + \
-               [self.zone_filename(z.name) for z in self._node.get('dns_zones', [])]
+               [self.zone_filename(z.name)
+                for z in self._node.get('dns_zones', [])]
 
     @property
     def template_filenames(self):
         return super(Named, self).template_filenames + \
-               ["%s-zone.mako" % self.NAME for _ in self._node.get('dns_zones', [])]
+               ["%s-zone.mako" % self.NAME
+                for _ in self._node.get('dns_zones', [])]
 
 
 class DNSRecord(object):
@@ -215,7 +221,8 @@ class DNSRecord(object):
         return "." in self.domain_name
 
     def __eq__(self, other):
-        return self.rtype == other.rtype and self.domain_name == other.domain_name \
+        return self.rtype == other.rtype \
+               and self.domain_name == other.domain_name \
                and self.rdata == other.rdata
 
 
@@ -224,7 +231,8 @@ class ARecord(DNSRecord):
     def __init__(self, domain_name, address, ttl=60):
         self.address = ipaddress.ip_address(str(address))
         rtype = "A" if self.address.version == 4 else "AAAA"
-        super(ARecord, self).__init__(rtype=rtype, domain_name=domain_name, ttl=ttl)
+        super(ARecord, self).__init__(rtype=rtype, domain_name=domain_name,
+                                      ttl=ttl)
 
     @property
     def rdata(self):
@@ -240,10 +248,11 @@ class PTRRecord(DNSRecord):
     def __init__(self, address, domain_name, ttl=60):
         self.address = ipaddress.ip_address(str(address))
         self.mapped_domain_name = domain_name
-        if self.mapped_domain_name[-1] != "." and "." in self.mapped_domain_name:
+        if self.mapped_domain_name[-1] != "." \
+                and "." in self.mapped_domain_name:
             # Full DNS names should be ended by a dot in the config
             self.mapped_domain_name = self.mapped_domain_name + "."
-        super(PTRRecord, self).__init__(rtype="PTR", domain_name=self.address.reverse_pointer,
+        super(PTRRecord, self).__init__("PTR", self.address.reverse_pointer,
                                         ttl=ttl)
 
     @property
@@ -258,7 +267,8 @@ class PTRRecord(DNSRecord):
 class NSRecord(DNSRecord):
 
     def __init__(self, domain_name, name_server, ttl=60):
-        super(NSRecord, self).__init__(rtype="NS", domain_name=domain_name, ttl=ttl)
+        super(NSRecord, self).__init__(rtype="NS", domain_name=domain_name,
+                                       ttl=ttl)
         self.name_server = name_server
         if "." not in self.name_server:
             self.name_server = self.name_server + "." + self.domain_name
@@ -274,9 +284,11 @@ class NSRecord(DNSRecord):
 
 class SOARecord(DNSRecord):
 
-    def __init__(self, domain_name, refresh_time=DNS_REFRESH, retry_time=DNS_RETRY,
-                 expire_time=DNS_EXPIRE, min_ttl=DNS_MIN_TTL, records=()):
-        super(SOARecord, self).__init__(rtype="SOA", domain_name=domain_name, ttl=min_ttl)
+    def __init__(self, domain_name, refresh_time=DNS_REFRESH,
+                 retry_time=DNS_RETRY, expire_time=DNS_EXPIRE,
+                 min_ttl=DNS_MIN_TTL, records=()):
+        super(SOARecord, self).__init__(rtype="SOA", domain_name=domain_name,
+                                        ttl=min_ttl)
         self.refresh_time = refresh_time
         self.retry_time = retry_time
         self.expire_time = expire_time
@@ -284,10 +296,12 @@ class SOARecord(DNSRecord):
 
     @property
     def rdata(self):
-        return "{domain_name} sysadmin.{domain_name} (\n1 ; serial\n{refresh} ; refresh timer" \
-               "\n{retry} ; retry timer\n{expire} ; retry timer\n{min_ttl} ; minimum ttl\n)"\
+        return "{domain_name} sysadmin.{domain_name} (\n1 ; serial\n{refresh}" \
+               " ; refresh timer\n{retry} ; retry timer\n{expire}" \
+               " ; retry timer\n{min_ttl} ; minimum ttl\n)"\
             .format(domain_name=self.domain_name, refresh=self.refresh_time,
-                    retry=self.retry_time, expire=self.expire_time, min_ttl=self.ttl)
+                    retry=self.retry_time, expire=self.expire_time,
+                    min_ttl=self.ttl)
 
     @property
     def records(self):
@@ -301,39 +315,48 @@ class SOARecord(DNSRecord):
 class DNSZone(Overlay):
 
     def __init__(self, name, dns_master, dns_slaves=(), records=(), nodes=(),
-                 refresh_time=DNS_REFRESH, retry_time=DNS_RETRY, expire_time=DNS_EXPIRE,
-                 min_ttl=DNS_MIN_TTL, ns_domain_name=None):
+                 refresh_time=DNS_REFRESH, retry_time=DNS_RETRY,
+                 expire_time=DNS_EXPIRE, min_ttl=DNS_MIN_TTL,
+                 ns_domain_name=None):
         """
         :param name: The domain name of the zone
         :param dns_master: The name of the master DNS server
         :param dns_slaves: The list of names of DNS slaves
         :param records: The list of DNS Records to be included in the zone
-        :param nodes: The list of nodes for which one A/AAAA record has to be created
-                        for each of their IPv4/IPv6 addresses
-        :param refresh_time: The number of seconds before the zone should be refreshed
-        :param retry_time: The number of seconds before a failed refresh should be retried
-        :param expire_time: The upper limit in seconds before a zone is considered no longer authoritative
+        :param nodes: The list of nodes for which one A/AAAA record has to be
+                      created for each of their IPv4/IPv6 addresses
+        :param refresh_time: The number of seconds before the zone should be
+                             refreshed
+        :param retry_time: The number of seconds before a failed refresh should
+                           be retried
+        :param expire_time: The upper limit in seconds before a zone is
+                            considered no longer authoritative
         :param min_ttl: The negative result TTL
-        :param ns_domain_name: If it is defined, it is the suffix of the domain of the name servers,
-                                 otherwise, parameter 'name' is used.
+        :param ns_domain_name: If it is defined, it is the suffix of the domain
+                               of the name servers, otherwise, parameter 'name'
+                               is used.
         """
         self.name = name
         self.dns_master = dns_master
         self.dns_slaves = list(dns_slaves)
         self.records = records
         self.servers = list(nodes)
-        self.soa_record = SOARecord(name, refresh_time=refresh_time, retry_time=retry_time,
-                                    expire_time=expire_time, min_ttl=min_ttl, records=records)
+        self.soa_record = SOARecord(name, refresh_time=refresh_time,
+                                    retry_time=retry_time,
+                                    expire_time=expire_time, min_ttl=min_ttl,
+                                    records=records)
         super(DNSZone, self).__init__(nodes=[dns_master] + list(dns_slaves))
 
         self.consistent = True
         for node_name in [dns_master] + self.dns_slaves + self.servers:
             if "." in node_name:
-                lg.error("Cannot create zone {name} because the node name {node_name} contains a '.'"
+                lg.error("Cannot create zone {name} because the node name"
+                         " {node_name} contains a '.'"
                          .format(name=name, node_name=node_name))
                 self.consistent = False
 
-        self.ns_domain_name = ns_domain_name if ns_domain_name is not None else self.name
+        self.ns_domain_name = ns_domain_name if ns_domain_name is not None \
+            else self.name
 
     def check_consistency(self, topo):
         return super(DNSZone, self).check_consistency(topo) and self.consistent
@@ -345,7 +368,8 @@ class DNSZone(Overlay):
 
         # Add NS Records (if not already present)
         for n in self.nodes:
-            self.soa_record.add_record(NSRecord(self.name, n + "." + self.ns_domain_name))
+            self.soa_record.add_record(NSRecord(self.name,
+                                                n + "." + self.ns_domain_name))
 
         for n in self.nodes:
             topo.nodeInfo(n).setdefault("dns_zones", []).append(self)

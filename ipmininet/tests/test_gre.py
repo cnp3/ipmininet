@@ -21,8 +21,8 @@ def test_gre_example():
         p = net["h1"].popen(cmd)
         code = p.wait()
         out, err = p.communicate()
-        assert code == 0, "Cannot use GRE tunnel.\n" \
-                          "The command '%s' printed: [stdout]\n%s\n[stderr]\n%s" % (cmd, out, err)
+        assert code == 0, "Cannot use GRE tunnel.\nThe command '%s' printed:" \
+                          " [stdout]\n%s\n[stderr]\n%s" % (cmd, out, err)
 
         net.stop()
     finally:

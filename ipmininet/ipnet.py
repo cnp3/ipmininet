@@ -75,8 +75,8 @@ class IPNet(Mininet):
         self.igp_area = igp_area
         self.allocate_IPs = allocate_IPs
         self.physical_interface = {}  # itf: node
-        super(IPNet, self).__init__(ipBase=ipBase, host=host, switch=switch, link=link,
-                                    intf=intf, controller=controller,
+        super(IPNet, self).__init__(ipBase=ipBase, host=host, switch=switch,
+                                    link=link, intf=intf, controller=controller,
                                     *args, **kwargs)
 
     def addRouter(self, name, cls=None, **params):
@@ -359,12 +359,15 @@ class IPNet(Mininet):
                     # expanded subnets as it is bigger wrt. prefixlen
                     net, next_net = tuple(net.subnets(prefixlen_diff=1))
                     # If not a subnet of an allocated subnet
-                    if len(list(filter(lambda y: next_net in y, allocated_subnets))) == 0:
+                    if len(list(filter(lambda y: next_net in y,
+                                       allocated_subnets))) == 0:
                         nets.append(next_net)
                 # Check if we have an appropriately-sized subnet
                 if plen == net.prefixlen:
-                    # If the network overlaps with an allocated subnet, we pass it
-                    if len(list(filter(lambda y: net in y or y in net, allocated_subnets))) == 0:
+                    # If the network overlaps with an allocated subnet,
+                    # we pass it
+                    if len(list(filter(lambda y: net in y or y in net,
+                                       allocated_subnets))) == 0:
                         # Register the allocation
                         setattr(d, net_key, net)
                     # Delete the expanded/used subnet
@@ -589,7 +592,8 @@ class BroadcastDomain(object):
     def len_v6(self):
         """The number of IPv6 addresses in this broadcast domain"""
         return sum(map(lambda x: x.interface_width[1]
-                       if len(list(x.ip6s(exclude_lls=True))) else 0, self.interfaces))
+                       if len(list(x.ip6s(exclude_lls=True))) else 0,
+                       self.interfaces))
 
     def explore(self, itfs):
         """Explore a new list of interfaces and add them and their neightbors
@@ -670,9 +674,11 @@ class BroadcastDomain(object):
         to a single host.
 
         :param ip_version: either 4 or 6
-        :return: True iif there is more than one interface on the domain enabling this IP version
+        :return: True iif there is more than one interface on the domain
+                 enabling this IP version
         """
         for i in self.routers:
-            if i.node.use_v4 and ip_version == 4 or i.node.use_v6 and ip_version == 6:
+            if i.node.use_v4 and ip_version == 4 \
+                    or i.node.use_v6 and ip_version == 6:
                 return True
         return len(self.interfaces) - len(self.routers) > 1

@@ -79,7 +79,7 @@ high_igp_cost_paths = [
 
 
 @require_root
-@pytest.mark.parametrize("ospf6_params,link_params,expected_cfg,expected_paths", [
+@pytest.mark.parametrize("ospf6_params,link_params,exp_cfg,exp_paths", [
     ({},
      {},
      ["  interface r1-eth0 area 0.0.0.0"],
@@ -100,13 +100,14 @@ high_igp_cost_paths = [
      {"params1": {"ospf_dead_int": "minimal hello-multiplier 2"}},
      ["  ipv6 ospf6 dead-interval %d" % OSPF6.DEAD_INT],
      unit_igp_cost_paths),
-    ({"redistribute": [OSPF6RedistributedRoute("connected"), OSPF6RedistributedRoute("static")]},
+    ({"redistribute": [OSPF6RedistributedRoute("connected"),
+                       OSPF6RedistributedRoute("static")]},
      {},
      ["  redistribute connected",
       "  redistribute static"],
      unit_igp_cost_paths),
 ])
-def test_ospf6_daemon_params(ospf6_params, link_params, expected_cfg, expected_paths):
+def test_ospf6_daemon_params(ospf6_params, link_params, exp_cfg, exp_paths):
     try:
         net = IPNet(topo=MinimalOSPFv3Net(ospf6_params, link_params))
         net.start()
@@ -114,13 +115,14 @@ def test_ospf6_daemon_params(ospf6_params, link_params, expected_cfg, expected_p
         # Check generated configuration
         with open("/tmp/ospf6d_r1.cfg") as fileobj:
             cfg = fileobj.readlines()
-            for line in expected_cfg:
-                assert (line + "\n") in cfg, "Cannot find the line '%s' in the generated configuration:\n%s"\
-                                             % (line, "".join(cfg))
+            for line in exp_cfg:
+                assert (line + "\n") in cfg,\
+                    "Cannot find the line '%s' in the generated" \
+                    " configuration:\n%s" % (line, "".join(cfg))
 
         # Check reachability
         assert_connectivity(net, v6=True)
-        for path in expected_paths:
+        for path in exp_paths:
             assert_path(net, path, v6=True)
 
         net.stop()

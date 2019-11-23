@@ -62,9 +62,10 @@ def perm(*args):
      ["2001:1a::1/64 | r1 ", "2001:1a::1 | r1 ",
       "10.2.0.3/24 | h4 ", "10.2.0.3 | h4 ",
       "2001::3/64 | unknown IP ", "invalid | unknown IP "]),
-    ("ips h1 h4 invalid", [re.compile(r"h1 \| \[u?'10\.0\.0\.2', u?'2001:1a::2'\] "),
-                           re.compile(r"h4 \| \[u?'10\.2\.0\.3', u?'2001:12b::3'\] "),
-                           "invalid | unknown node "]),
+    ("ips h1 h4 invalid",
+     [re.compile(r"h1 \| \[u?'10\.0\.0\.2', u?'2001:1a::2'\] "),
+      re.compile(r"h4 \| \[u?'10\.2\.0\.3', u?'2001:12b::3'\] "),
+      "invalid | unknown node "]),
     ("pingall", [re.compile(r"h1 --IPv4--> %s" % perm("h2 ", "h3 ", "h4 ")),
                  re.compile(r"h1 --IPv6--> %s" % perm("h2 ", "h3 ", "h4 ")),
                  re.compile(r"h2 --IPv4--> %s" % perm("h1 ", "h3 ", "h4 ")),
@@ -108,7 +109,8 @@ def test_cli(tmp, net, input_line, expected_lines):
     pattern = re.compile("")
     for l in expected_lines:
         if isinstance(l, type(pattern)):
-            assert len([x for x in capture.out if l.match(x) is not None]) > 0, \
+            assert len([x for x in capture.out
+                        if l.match(x) is not None]) > 0, \
                 "Regex '%s' does not match the output of '%s':\n%s" \
                 % (l, input_line, "\n".join(capture.out))
         else:

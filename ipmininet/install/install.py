@@ -16,23 +16,36 @@ os.environ["PATH"] = "%s:/sbin:/usr/sbin/:/usr/local/sbin" % os.environ["PATH"]
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Install IPMininet with its dependencies")
-    parser.add_argument("-o", "--output-dir", help="Path to the directory that will store the dependencies",
-                        default=os.environ["HOME"])
-    parser.add_argument("-i", "--install-ipmininet", help="Install IPMininet", action="store_true")
-    parser.add_argument("-m", "--install-mininet", help="Install the last version of mininet and its dependencies",
+    parser = argparse.ArgumentParser(description="Install IPMininet with"
+                                                 " its dependencies")
+    parser.add_argument("-o", "--output-dir",
+                        help="Path to the directory that will store the"
+                             " dependencies", default=os.environ["HOME"])
+    parser.add_argument("-i", "--install-ipmininet", help="Install IPMininet",
                         action="store_true")
-    parser.add_argument("-a", "--all", help="Install all daemons", action="store_true")
-    parser.add_argument("-q", "--install-frrouting", help="Install FRRouting (version %s) daemons" % FRRoutingVersion,
+    parser.add_argument("-m", "--install-mininet",
+                        help="Install the last version of mininet"
+                             " and its dependencies",
                         action="store_true")
-    parser.add_argument("-r", "--install-radvd", help="Install the RADVD daemon",
+    parser.add_argument("-a", "--all", help="Install all daemons",
                         action="store_true")
-    parser.add_argument("-s", "--install-sshd", help="Install the OpenSSH server", action="store_true")
-    parser.add_argument("-n", "--install-named", help="Install the Named daemon", action="store_true")
-    parser.add_argument("-6", "--enable-ipv6", help="Enable IPv6", action="store_true")
+    parser.add_argument("-q", "--install-frrouting",
+                        help="Install FRRouting (version %s) daemons"
+                             % FRRoutingVersion,
+                        action="store_true")
+    parser.add_argument("-r", "--install-radvd",
+                        help="Install the RADVD daemon", action="store_true")
+    parser.add_argument("-s", "--install-sshd",
+                        help="Install the OpenSSH server", action="store_true")
+    parser.add_argument("-n", "--install-named",
+                        help="Install the Named daemon", action="store_true")
+    parser.add_argument("-6", "--enable-ipv6", help="Enable IPv6",
+                        action="store_true")
     parser.add_argument("-f", "--install-openr",
-                        help="Install OpenR. OpenR is not installed with '-a' option since the build takes quite long.\
-                        We also experienced that the build requires a substantial amount of memory (~4GB).",
+                        help="Install OpenR. OpenR is not installed with '-a'"
+                             " option since the build takes quite long. We"
+                             " also experienced that the build requires a"
+                             " substantial amount of memory (~4GB).",
                         action="store_true")
     return parser.parse_args()
 
@@ -49,7 +62,8 @@ def install_mininet(output_dir, pip_install=True):
         mininet_opts = "-a"
 
     sh("git clone https://github.com/mininet/mininet.git", cwd=output_dir)
-    sh("git checkout %s" % MininetVersion, cwd=os.path.join(output_dir, "mininet"))
+    sh("git checkout %s" % MininetVersion,
+       cwd=os.path.join(output_dir, "mininet"))
     sh("mininet/util/install.sh %s -s ." % mininet_opts,
        cwd=output_dir)
 
@@ -63,7 +77,8 @@ def install_libyang(output_dir):
     packages = []
 
     if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
-        dist.install("libpcre16-3", "libpcre3-dev", "libpcre32-3", "libpcrecpp0v5")
+        dist.install("libpcre16-3", "libpcre3-dev", "libpcre32-3",
+                     "libpcrecpp0v5")
         cmd = "dpkg -i"
         libyang_url = "https://ci1.netdef.org/artifact/LIBYANG-YANGRELEASE" \
                       "/shared/build-10/Debian-AMD64-Packages"
@@ -104,7 +119,8 @@ def install_frrouting(output_dir):
 
     frrouting_src = os.path.join(output_dir, "frr-%s" % FRRoutingVersion)
     frrouting_tar = frrouting_src + ".tar.gz"
-    sh("wget https://github.com/FRRouting/frr/releases/download/frr-{v}/frr-{v}.tar.gz".format(v=FRRoutingVersion),
+    sh("wget https://github.com/FRRouting/frr/releases/download/frr-{v}/"
+       "frr-{v}.tar.gz".format(v=FRRoutingVersion),
        "tar -zxvf '%s'" % frrouting_tar,
        cwd=output_dir)
 
@@ -202,6 +218,7 @@ if os.getuid() != 0:
 
 dist = identify_distribution()
 if dist is None:
-    print("The installation script only supports %s" % ", ".join([d.NAME for d in supported_distributions()]))
+    supported = ", ".join([d.NAME for d in supported_distributions()])
+    print("The installation script only supports %s" % supported)
     sys.exit(1)
 dist.update()

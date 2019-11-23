@@ -59,7 +59,8 @@ def test_ip_address_format():
     """
     # We force up status so we parse at least one IP of each family
     subprocess.call(['ip', 'link', 'set', 'dev', 'lo', 'up'])
-    out = subprocess.check_output(['ip', 'address', 'show', 'dev', 'lo']).decode("utf-8")
+    out = subprocess.check_output(['ip', 'address', 'show', 'dev', 'lo'])\
+        .decode("utf-8")
     mac, v4, v6 = _parse_addresses(out)
     assert mac is not None
     assert len(mac.split(':')) == 6
@@ -124,10 +125,13 @@ def test_find_node(start, node, present):
         net.start()
         i = utils.find_node(net[start], node)
         if present:
-            assert i is not None, "Node %s not found from node %s" % (node, start)
-            assert i.node.name == node, "Node %s was found while we expected %s" % (i.node.name, node)
+            assert i is not None,\
+                "Node %s not found from node %s" % (node, start)
+            assert i.node.name == node,\
+                "Node %s was found while we expected %s" % (i.node.name, node)
         else:
-            assert i is None, "Node %s should not be found from node %s" % (node, start)
+            assert i is None,\
+                "Node %s should not be found from node %s" % (node, start)
         net.stop()
     finally:
         cleanup()

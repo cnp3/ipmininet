@@ -1,5 +1,5 @@
-"""This file contains a topology with statically assigned addresses on two of the LANs.
-   The remaining addresses will be dynamically allocated."""
+"""This file contains a topology with statically assigned addresses on two of
+   the LANs. The remaining addresses will be dynamically allocated."""
 
 from ipmininet.iptopo import IPTopo
 

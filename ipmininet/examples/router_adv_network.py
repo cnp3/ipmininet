@@ -2,7 +2,8 @@
 addresses and to advertise DNS server's addresses"""
 
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import RouterConfig, RADVD, AdvConnectedPrefix, AdvRDNSS
+from ipmininet.router.config import RouterConfig, RADVD, AdvConnectedPrefix,\
+    AdvRDNSS
 
 
 class RouterAdvNet(IPTopo):
@@ -34,4 +35,5 @@ class RouterAdvNet(IPTopo):
         super(RouterAdvNet, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name, **kwargs):
-        return self.addRouter(name, config=RouterConfig, use_v4=False, use_v6=True, **kwargs)
+        return self.addRouter(name, config=RouterConfig, use_v4=False,
+                              use_v6=True, **kwargs)

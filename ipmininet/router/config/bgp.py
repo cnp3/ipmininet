@@ -9,8 +9,8 @@ from ipaddress import ip_network, ip_address
 
 from ipmininet.overlay import Overlay
 from ipmininet.utils import realIntfList
-from .zebra import QuaggaDaemon, Zebra, RouteMap, AccessList, RouteMapMatchCond, CommunityList, \
-    RouteMapSetAction, PERMIT, DENY
+from .zebra import QuaggaDaemon, Zebra, RouteMap, AccessList, \
+    RouteMapMatchCond, CommunityList, RouteMapSetAction, PERMIT, DENY
 
 BGP_DEFAULT_PORT = 179
 SHARE = "Share"
@@ -78,13 +78,15 @@ def ebgp_session(topo, a, b, link_type=None):
     :param topo: The current topology
     :param a: Local router
     :param b: Peer router
-    :param link_type: Can be set to SHARE or CLIENT_PROVIDER. In this case ebgp_session will create import and export
-      filter and set local pref based on the link type
+    :param link_type: Can be set to SHARE or CLIENT_PROVIDER. In this case
+                      ebgp_session will create import and export
+                      filter and set local pref based on the link type
     """
     if link_type:
         all_al = AccessList('All', ('any',))
         # Create the community filter for the export policy
-        peers_link = CommunityList(name='from-peers', community=1, action=PERMIT)
+        peers_link = CommunityList(name='from-peers', community=1,
+                                   action=PERMIT)
         up_link = CommunityList(name='from-up', community=3, action=PERMIT)
 
         if link_type == SHARE:
@@ -98,13 +100,17 @@ def ebgp_session(topo, a, b, link_type=None):
 
             # Create route maps to filter exported route
             a.get_config(BGP)\
-                .deny('export-to-peer-' + b, to_peer=b, matching=(up_link,), order=10)\
-                .deny('export-to-peer-' + b, to_peer=b, matching=(peers_link,), order=15)\
+                .deny('export-to-peer-' + b, to_peer=b, matching=(up_link,),
+                      order=10)\
+                .deny('export-to-peer-' + b, to_peer=b, matching=(peers_link,),
+                      order=15)\
                 .permit('export-to-peer-' + b, to_peer=b, order=20)
 
             b.get_config(BGP)\
-                .deny('export-to-peer-' + a, to_peer=a, matching=(up_link,), order=10)\
-                .deny('export-to-peer-' + a, to_peer=a, matching=(peers_link,), order=15)\
+                .deny('export-to-peer-' + a, to_peer=a, matching=(up_link,),
+                      order=10)\
+                .deny('export-to-peer-' + a, to_peer=a, matching=(peers_link,),
+                      order=15)\
                 .permit('export-to-peer-' + a, to_peer=a, order=20)
 
         elif link_type == CLIENT_PROVIDER:
@@ -118,8 +124,10 @@ def ebgp_session(topo, a, b, link_type=None):
 
             # Create route maps to filter exported route
             a.get_config(BGP)\
-                .deny('export-to-up-' + b, to_peer=b, matching=(up_link,), order=10)\
-                .deny('export-to-up-' + b, to_peer=b, matching=(peers_link,), order=15)\
+                .deny('export-to-up-' + b, to_peer=b, matching=(up_link,),
+                      order=10)\
+                .deny('export-to-up-' + b, to_peer=b, matching=(peers_link,),
+                      order=15)\
                 .permit('export-to-up-' + b, to_peer=b, order=20)
 
     bgp_peering(topo, a, b)
@@ -142,7 +150,8 @@ class BGPConfig(object):
         :return: self
         """
         self.add_set_action(peer=from_peer,
-                            set_action=RouteMapSetAction('local-preference', local_pref),
+                            set_action=RouteMapSetAction('local-preference',
+                                                         local_pref),
                             matching=matching, direction='in')
         return self
 
@@ -155,37 +164,46 @@ class BGPConfig(object):
         :param matching: A list of AccessList and/or CommunityList
         :return: self
         """
-        self.add_set_action(peer=to_peer, set_action=RouteMapSetAction('metric', med),
+        self.add_set_action(peer=to_peer,
+                            set_action=RouteMapSetAction('metric', med),
                             matching=matching, direction='out')
         return self
 
-    def set_community(self, community, from_peer=None, to_peer=None, matching=()):
+    def set_community(self, community, from_peer=None, to_peer=None,
+                      matching=()):
         """Set community on a routes received from 'from_peer'
          and routes sent to 'to_peer' on routes matching
          all of the access and community lists in 'matching'
 
         :param community: The community value to set
-        :param from_peer: The peer on which received routes have to have the community
+        :param from_peer: The peer on which received routes have to have
+                          the community
         :param to_peer: The peer on which sent routes have to have the community
         :param matching: A list of AccessList and/or CommunityList
         :return: self
         """
         if to_peer is not None:
-            self.add_set_action(peer=to_peer, set_action=RouteMapSetAction('community', community),
+            self.add_set_action(peer=to_peer,
+                                set_action=RouteMapSetAction('community',
+                                                             community),
                                 matching=matching, direction='out')
         if from_peer is not None:
-            self.add_set_action(peer=from_peer, set_action=RouteMapSetAction('community', community),
+            self.add_set_action(peer=from_peer,
+                                set_action=RouteMapSetAction('community',
+                                                             community),
                                 matching=matching, direction='in')
         return self
 
-    def filter(self, name=None, policy=DENY, from_peer=None, to_peer=None, matching=(), order=10):
+    def filter(self, name=None, policy=DENY, from_peer=None, to_peer=None,
+               matching=(), order=10):
         """Either accept or deny all routes received from 'from_peer'
          and routes sent to 'to_peer' matching
          all of the access and community lists in 'matching'
 
         :param name: The name of the route-map
         :param policy: Either 'deny' or 'permit'
-        :param from_peer: The peer on which received routes have to have the community
+        :param from_peer: The peer on which received routes have to have
+                          the community
         :param to_peer: The peer on which sent routes have to have the community
         :param matching: A list of AccessList and/or CommunityList
         :param order: The order in which route-maps are applied,
@@ -213,42 +231,48 @@ class BGPConfig(object):
             })
         return self
 
-    def deny(self, name=None, from_peer=None, to_peer=None, matching=(), order=10):
+    def deny(self, name=None, from_peer=None, to_peer=None, matching=(),
+             order=10):
         """Deny all routes received from 'from_peer'
          and routes sent to 'to_peer' matching
          all of the access and community lists in 'matching'
 
         :param name: The name of the route-map
-        :param from_peer: The peer on which received routes have to have the community
+        :param from_peer: The peer on which received routes have to have
+                          the community
         :param to_peer: The peer on which sent routes have to have the community
         :param matching: A list of AccessList and/or CommunityList
         :param order: The order in which route-maps are applied,
          i.e., lower order means applied before
         :return: self
         """
-        return self.filter(name, policy=DENY, from_peer=from_peer, to_peer=to_peer,
-                           matching=matching, order=order)
+        return self.filter(name, policy=DENY, from_peer=from_peer,
+                           to_peer=to_peer, matching=matching, order=order)
 
-    def permit(self, name=None, from_peer=None, to_peer=None, matching=(), order=10):
+    def permit(self, name=None, from_peer=None, to_peer=None, matching=(),
+               order=10):
         """Accept all routes received from 'from_peer'
          and routes sent to 'to_peer' matching
          all of the access and community lists in 'matching'
 
         :param name: The name of the route-map
-        :param from_peer: The peer on which received routes have to have the community
+        :param from_peer: The peer on which received routes have to have
+                          the community
         :param to_peer: The peer on which sent routes have to have the community
         :param matching: A list of AccessList and/or CommunityList
         :param order: The order in which route-maps are applied,
          i.e., lower order means applied before
         :return: self
         """
-        return self.filter(name, policy=PERMIT, from_peer=from_peer, to_peer=to_peer,
-                           matching=matching, order=order)
+        return self.filter(name, policy=PERMIT, from_peer=from_peer,
+                           to_peer=to_peer, matching=matching, order=order)
 
     def filters_to_match_cond(self, filter_list):
         match_cond = []
-        access_lists = self.topo.getNodeInfo(self.router, 'bgp_access_lists', list)
-        community_list = self.topo.getNodeInfo(self.router, 'bgp_community_lists', list)
+        access_lists = self.topo.getNodeInfo(self.router, 'bgp_access_lists',
+                                             list)
+        community_list = self.topo.getNodeInfo(self.router,
+                                               'bgp_community_lists', list)
 
         # Create match_conditions based on the provided filters
         for f in filter_list:
@@ -276,7 +300,8 @@ class BGPConfig(object):
         match_cond = self.filters_to_match_cond(matching)
         route_maps = self.topo.getNodeInfo(self.router, 'bgp_route_maps', list)
         route_maps.append(
-            {'peer': peer, 'match_cond': match_cond, 'set_actions': [set_action], 'direction': direction})
+            {'peer': peer, 'match_cond': match_cond,
+             'set_actions': [set_action], 'direction': direction})
         return self
 
 
@@ -331,8 +356,10 @@ class BGP(QuaggaDaemon):
         community_lists = []
         if node_community_lists:
             for list in node_community_lists:
-                # If community is an int change it to the right format asn:community by adding node asn
-                cl = CommunityList(name=list.name, community=list.community, action=list.action)
+                # If community is an int change it to the right format
+                # asn:community by adding node asn
+                cl = CommunityList(name=list.name, community=list.community,
+                                   action=list.action)
                 community_lists.append(cl)
                 if isinstance(list.community, int):
                     cl.community = '%s:%d' % (self._node.asn, cl.community)
@@ -347,7 +374,8 @@ class BGP(QuaggaDaemon):
         access_lists = []
         if node_access_lists is not None:
             for acl_entries in node_access_lists:
-                access_lists.append(AccessList(name=acl_entries.name, entries=acl_entries.entries))
+                access_lists.append(AccessList(name=acl_entries.name,
+                                               entries=acl_entries.entries))
         return access_lists
 
     def build_route_map(self, neigbors):
@@ -366,7 +394,8 @@ class BGP(QuaggaDaemon):
                 for peer in peers:
                     kwargs['neighbor'] = peer
                     rm = RouteMap(**kwargs)
-                    # If route map already exist, add conditions and actions to it
+                    # If route map already exist, add conditions and actions
+                    # to it
                     try:
                         index = route_maps.index(rm)
                         tmp_rm = route_maps.pop(index)
@@ -477,5 +506,6 @@ class Peer(object):
                 elif n.node.asn == base.asn or not n.node.asn:
                     for i in realIntfList(n.node):
                         to_visit[i.name] = i
-                        heapq.heappush(prio_queue, (path_cost + i.igp_metric, i.name))
+                        heapq.heappush(prio_queue, (path_cost + i.igp_metric,
+                                                    i.name))
         return None, None

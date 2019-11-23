@@ -46,20 +46,27 @@ class RIPng(QuaggaDaemon):
                            # Is the interface between two routers?
                            active=self.is_active_interface(i),
                            cost=i.igp_metric - 1,
-                           domain=ip_interface(u'%s/%s' % (i.ip6, i.prefixLen6)))
+                           domain=ip_interface(u'%s/%s'
+                                               % (i.ip6, i.prefixLen6)))
                 for i in interfaces]
 
     def set_defaults(self, defaults):
-        """:param debug: the set of debug events that should be logged (default: []).
-        :param redistribute: set of RIPngRedistributedRoute sources (default: []).
-        :param split_horizon: the daemon uses the split-horizon method (default: False).
+        """:param debug: the set of debug events that should be logged
+                         (default: []).
+        :param redistribute: set of RIPngRedistributedRoute sources
+                             (default: []).
+        :param split_horizon: the daemon uses the split-horizon method
+                              (default: False).
         :param split_horizon_with_poison: the daemon uses the split-horizon.
-         with reversed poison method. If both split_horizon_with_poison and split_horizon
-         are set to True, RIPng will use the split-horizon with reversed poison method
-         (default: True).
-        :param update_timer: routing table timer value in second (default value:30).
-        :param timeout_timer: routing information timeout timer (default value:180).
-        :param garbage_timer: garbage collection timer (default value:120)."""
+         with reversed poison method. If both split_horizon_with_poison
+         and split_horizon are set to True, RIPng will use the split-horizon
+         with reversed poison method (default: True).
+        :param update_timer: routing table timer value in second
+                             (default value:30).
+        :param timeout_timer: routing information timeout timer
+                              (default value:180).
+        :param garbage_timer: garbage collection timer
+                              (default value:120)."""
         defaults.redistribute = []
         defaults.split_horizon = False
         defaults.split_horizon_with_poison = True

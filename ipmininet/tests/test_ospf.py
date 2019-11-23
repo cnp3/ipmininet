@@ -27,8 +27,10 @@ class MinimalOSPFNet(IPTopo):
         :param link_params: Parameters to set on the link between r1 and r2"""
         self.ospf_params_r1 = ospf_params_r1
         self.link_params = link_params
-        self.link_params.setdefault("params1", {}).setdefault("ip", "10.0.0.1/24")
-        self.link_params.setdefault("params2", {}).setdefault("ip", "10.0.0.2/24")
+        self.link_params.setdefault("params1", {})\
+            .setdefault("ip", "10.0.0.1/24")
+        self.link_params.setdefault("params2", {})\
+            .setdefault("ip", "10.0.0.2/24")
         super(MinimalOSPFNet, self).__init__(*args, **kwargs)
 
     def build(self, *args, **kwargs):
@@ -39,15 +41,20 @@ class MinimalOSPFNet(IPTopo):
         r3 = self.addRouter("r3", config=RouterConfig)
         r3.addDaemon(OSPF)
         self.addLink(r1, r2, **self.link_params)
-        self.addLink(r1, r3, params1={"ip": "10.0.4.1/24"}, params2={"ip": "10.0.4.2/24"})
-        self.addLink(r2, r3, params1={"ip": "10.0.5.1/24"}, params2={"ip": "10.0.5.2/24"})
+        self.addLink(r1, r3, params1={"ip": "10.0.4.1/24"},
+                     params2={"ip": "10.0.4.2/24"})
+        self.addLink(r2, r3, params1={"ip": "10.0.5.1/24"},
+                     params2={"ip": "10.0.5.2/24"})
 
         h1 = self.addHost("h1")
-        self.addLink(r1, h1, params1={"ip": "10.0.1.1/24"}, params2={"ip": "10.0.1.2/24"})
+        self.addLink(r1, h1, params1={"ip": "10.0.1.1/24"},
+                     params2={"ip": "10.0.1.2/24"})
         h2 = self.addHost("h2")
-        self.addLink(r2, h2, params1={"ip": "10.0.2.1/24"}, params2={"ip": "10.0.2.2/24"})
+        self.addLink(r2, h2, params1={"ip": "10.0.2.1/24"},
+                     params2={"ip": "10.0.2.2/24"})
         h3 = self.addHost("h3")
-        self.addLink(r3, h3, params1={"ip": "10.0.3.1/24"}, params2={"ip": "10.0.3.2/24"})
+        self.addLink(r3, h3, params1={"ip": "10.0.3.1/24"},
+                     params2={"ip": "10.0.3.2/24"})
         super(MinimalOSPFNet, self).build(*args, **kwargs)
 
 
@@ -82,7 +89,7 @@ detour_paths = [
 
 
 @require_root
-@pytest.mark.parametrize("ospf_params,link_params,expected_cfg,expected_paths", [
+@pytest.mark.parametrize("ospf_params,link_params,exp_cfg,exp_paths", [
     ({},
      {},
      ["  network 10.0.0.1/24 area 0.0.0.0",
@@ -108,27 +115,30 @@ detour_paths = [
      {"params1": {"ospf_dead_int": "minimal hello-multiplier 2"}},
      ["  ip ospf dead-interval minimal hello-multiplier 2"],
      unit_igp_cost_paths),
-    ({"redistribute": [OSPFRedistributedRoute("connected", 1, 15), OSPFRedistributedRoute("static", 2, 50)]},
+    ({"redistribute": [OSPFRedistributedRoute("connected", 1, 15),
+                       OSPFRedistributedRoute("static", 2, 50)]},
      {},
      ["  redistribute connected metric-type 1 metric 15",
       "  redistribute static metric-type 2 metric 50"],
      unit_igp_cost_paths),
 ])
-def test_ospf_daemon_params(ospf_params, link_params, expected_cfg, expected_paths):
+def test_ospf_daemon_params(ospf_params, link_params, exp_cfg, exp_paths):
     try:
-        net = IPNet(topo=MinimalOSPFNet(ospf_params, link_params), allocate_IPs=False)
+        net = IPNet(topo=MinimalOSPFNet(ospf_params, link_params),
+                    allocate_IPs=False)
         net.start()
 
         # Check generated configuration
         with open("/tmp/ospfd_r1.cfg") as fileobj:
             cfg = fileobj.readlines()
-            for line in expected_cfg:
-                assert (line + "\n") in cfg, "Cannot find the line '%s' in the generated configuration:\n%s"\
-                                             % (line, "".join(cfg))
+            for line in exp_cfg:
+                assert (line + "\n") in cfg,\
+                    "Cannot find the line '%s' in the generated " \
+                    "configuration:\n%s" % (line, "".join(cfg))
 
         # Check reachability and paths
         assert_connectivity(net)
-        for path in expected_paths:
+        for path in exp_paths:
             assert_path(net, path)
 
         net.stop()

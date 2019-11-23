@@ -5,10 +5,11 @@ from ipmininet.router.config import BGP, ebgp_session, CLIENT_PROVIDER, SHARE
 
 class BGPPoliciesTopo1(IPTopo):
     """This topology builds a 5-AS network exchanging BGP reachability
-    information. Peering between AS1, AS2, AS3 and AS4 are declared as 'shared-cost'
-    while AS5 is declared as their provider. ASes always favor routes received
-    from clients, then routes from shared-cost peering, and finally, routes received from providers.
-    This is not influenced by the AS path length."""
+    information. Peering between AS1, AS2, AS3 and AS4 are declared as
+    'shared-cost' while AS5 is declared as their provider. ASes always favor
+    routes received from clients, then routes from shared-cost peering,
+    and finally, routes received from providers. This is not influenced by
+    the AS path length."""
     def build(self, *args, **kwargs):
         """
               +-------+      $

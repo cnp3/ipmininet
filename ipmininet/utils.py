@@ -41,8 +41,8 @@ def require_cmd(cmd, help_str=None):
 
 def otherIntf(intf):
     """"Get the interface on the other side of a link"""
-    l = intf.link
-    return (l.intf1 if l.intf2 == intf else l.intf2) if l else None
+    link = intf.link
+    return (link.intf1 if link.intf2 == intf else link.intf2) if link else None
 
 
 def realIntfList(n):
@@ -79,11 +79,11 @@ def prefix_for_netmask(mask):
     Will return garbage if the netmask is unproperly formatted!"""
     ip = ip_address(str(mask))
     v = ~int(ip) & ~(1 - (1 << ip.max_prefixlen))
-    l = 0
+    length = 0
     while v > 0:
         v >>= 1
-        l += 1
-    return ip.max_prefixlen - l
+        length += 1
+    return ip.max_prefixlen - length
 
 
 class L3Router(object):

@@ -36,8 +36,10 @@ class BGPTopoMed(IPTopo):
         as1r2 = self.bgp('as1r2')
         as1r3 = self.bgp('as1r3')
         as1r4 = self.bgp('as1r4')
-        as1r5 = self.bgp('as1r5', family=AF_INET6(redistribute=('ospf6', 'connected')))
-        as1r6 = self.bgp('as1r6', family=AF_INET6(redistribute=('ospf6', 'connected')))
+        as1r5 = self.bgp('as1r5',
+                         family=AF_INET6(redistribute=('ospf6', 'connected')))
+        as1r6 = self.bgp('as1r6',
+                         family=AF_INET6(redistribute=('ospf6', 'connected')))
         as4r1 = self.bgp('as4r1', family=AF_INET6(networks=('dead:beef::/32',)))
         as4r2 = self.bgp('as4r2', family=AF_INET6(networks=('dead:beef::/32',)))
 

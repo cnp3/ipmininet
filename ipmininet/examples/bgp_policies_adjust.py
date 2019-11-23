@@ -1,27 +1,32 @@
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import BGP, ebgp_session, AF_INET6, CLIENT_PROVIDER, SHARE
+from ipmininet.router.config import BGP, ebgp_session, AF_INET6,\
+    CLIENT_PROVIDER, SHARE
 
 
 class BGPPoliciesAdjustTopo(IPTopo):
-    """This topology builds a 5-AS network exchanging BGP reachability as shown in the figure below
-    Shared cost are described with ' = ', client - provider with ' $ '.
+    """This topology builds a 5-AS network exchanging BGP reachability as shown
+    in the figure below. Shared cost are described with ' = ',
+    client - provider with ' $ '.
 
-    ASes always favor routes received from clients, then routes from shared-cost peering,
-    and finally, routes received from providers.
+    ASes always favor routes received from clients, then routes from shared-cost
+    peering, and finally, routes received from providers.
     This is not influenced by the AS path length.
 
-    The user can add another peering between 2 ASes with the constructor arguments
-    or to let the network as it is.
+    The user can add another peering between 2 ASes with the constructor
+    arguments or to let the network as it is.
 
-    This topology is taken from https://www.computer-networking.info/exercises/html/ex-routing-policies.html
+    This topology is taken from
+    https://www.computer-networking.info/exercises/html/ex-routing-policies.html
     """
 
-    def __init__(self, as_start=None, as_end=None, bgp_policy=SHARE, *args, **kwargs):
+    def __init__(self, as_start=None, as_end=None, bgp_policy=SHARE,
+                 *args, **kwargs):
         """:param as_start: The AS router at one end of the extra link.
            If the link type is 'Client-Provider', this AS will be the client.
         :param as_end: The AS router at other end of the extra link.
            If the link type is 'Client-Provider', this AS will be the provider.
-        :param bgp_policy: The type of peering (either 'Share' or 'Client-Provider')"""
+        :param bgp_policy: The type of peering (either 'Share' or
+           'Client-Provider')"""
         self.as_start = as_start
         self.as_end = as_end
         self.bgp_policy = bgp_policy
@@ -60,12 +65,18 @@ class BGPPoliciesAdjustTopo(IPTopo):
         as5r = self.addRouter('as5r')
 
         routers = self.routers()
-        prefix = {routers[i]: '2001:db:%04x::/48' % i for i in range(len(routers))}
-        as1r.addDaemon(BGP, address_families=(AF_INET6(networks=(prefix[as1r],)),))
-        as2r.addDaemon(BGP, address_families=(AF_INET6(networks=(prefix[as2r],)),))
-        as3r.addDaemon(BGP, address_families=(AF_INET6(networks=(prefix[as3r],)),))
-        as4r.addDaemon(BGP, address_families=(AF_INET6(networks=(prefix[as4r],)),))
-        as5r.addDaemon(BGP, address_families=(AF_INET6(networks=(prefix[as5r],)),))
+        prefix = {routers[i]: '2001:db:%04x::/48' % i
+                  for i in range(len(routers))}
+        as1r.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[as1r],)),))
+        as2r.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[as2r],)),))
+        as3r.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[as3r],)),))
+        as4r.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[as4r],)),))
+        as5r.addDaemon(BGP,
+                       address_families=(AF_INET6(networks=(prefix[as5r],)),))
 
         # Add links
         self.addLink(as1r, as2r)
@@ -98,7 +109,8 @@ class BGPPoliciesAdjustTopo(IPTopo):
         # Add custom link
         if self.as_start is not None:
             self.addLink(self.as_start, self.as_end)
-            ebgp_session(self, self.as_start, self.as_end, link_type=self.bgp_policy)
+            ebgp_session(self, self.as_start, self.as_end,
+                         link_type=self.bgp_policy)
 
         # Add test hosts
         for r in self.routers():
@@ -121,7 +133,8 @@ class BGPPoliciesAdjustTopo(IPTopo):
                              % (self.as_end, ", ".join(routers)))
         if self.bgp_policy not in [CLIENT_PROVIDER, SHARE]:
             raise ValueError("bgp_policy '%s' is not a BGP policy among %s"
-                             % (self.bgp_policy, ", ".join([CLIENT_PROVIDER, SHARE])))
+                             % (self.bgp_policy, ", ".join([CLIENT_PROVIDER,
+                                                            SHARE])))
 
         self.as_start = [r for r in routers if r == self.as_start][0]
         self.as_end = [r for r in routers if r == self.as_end][0]

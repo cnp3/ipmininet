@@ -55,7 +55,8 @@ def test_addr_intf():
             "Cannot update an IPv6 address"
         assert itf.prefixLen6 == 64
         itf.prefixLen6 = 48
-        assert itf.prefixLen6 == 48, "Cannot update prefix len of an IPv6 address"
+        assert itf.prefixLen6 == 48,\
+            "Cannot update prefix len of an IPv6 address"
 
         # Check IP update
         itf.ip = "10.1.2.1"
@@ -64,7 +65,8 @@ def test_addr_intf():
             "Cannot update an IPv4 address"
         assert itf.prefixLen == 24
         itf.prefixLen = 28
-        assert itf.prefixLen == 28, "Cannot update prefix len of an IPv4 address"
+        assert itf.prefixLen == 28,\
+            "Cannot update prefix len of an IPv4 address"
 
         # Check MAC getters
         assert itf.updateMAC() == itf.updateAddr()[1],\

@@ -20,7 +20,7 @@ class ConfigDict(dict):
         try:
             # But preserve i.e. methods
             return super(ConfigDict, self).__getattr__(item)
-        except:
+        except Exception:
             try:
                 return self[item]
             except KeyError:

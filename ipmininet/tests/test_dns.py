@@ -5,7 +5,8 @@ import time
 from ipmininet.clean import cleanup
 from ipmininet.examples.dns_network import DNSNetwork
 from ipmininet.ipnet import IPNet
-from ipmininet.host.config import Named, ARecord, AAAARecord, NSRecord, PTRRecord
+from ipmininet.host.config import Named, ARecord, AAAARecord, NSRecord,\
+    PTRRecord
 from ipmininet.tests.utils import assert_connectivity, assert_dns_record
 from . import require_root
 
@@ -32,7 +33,7 @@ class CustomDNSNetwork(DNSNetwork):
 
 
 @require_root
-@pytest.mark.parametrize("named_cfg,zone_args,expected_named_cfg,expected_zone_cfg", [
+@pytest.mark.parametrize("named_cfg,zone_args,exp_named_cfg,exp_zone_cfg", [
     ({}, {}, [], []),
     ({"log_severity": "info"},
      {},
@@ -45,7 +46,8 @@ class CustomDNSNetwork(DNSNetwork):
     ({},
      {"refresh_time": 20, "retry_time": 30, "expire_time": 40, "min_ttl": 50},
      [],
-     ["20 ; refresh timer", "30 ; retry timer", "40 ; retry timer", "50 ; minimum ttl"]),
+     ["20 ; refresh timer", "30 ; retry timer", "40 ; retry timer",
+      "50 ; minimum ttl"]),
     ({},
      {"records": [AAAARecord("new", "fc00::2", ttl=100),
                   ARecord("new", "192.0.0.1", ttl=300),
@@ -55,7 +57,7 @@ class CustomDNSNetwork(DNSNetwork):
       "new   300\tIN\tA\t192.0.0.1",
       "test.org.   10\tIN\tNS\tnew.test.org."]),
 ])
-def test_dns_network(named_cfg, zone_args, expected_named_cfg, expected_zone_cfg):
+def test_dns_network(named_cfg, zone_args, exp_named_cfg, exp_zone_cfg):
     try:
         net = IPNet(topo=CustomDNSNetwork(named_cfg, zone_args))
         net.start()
@@ -63,19 +65,22 @@ def test_dns_network(named_cfg, zone_args, expected_named_cfg, expected_zone_cfg
         # Check generated configurations
         with open("/tmp/named_master2.cfg") as fileobj:
             cfg = fileobj.readlines()
-            for line in expected_named_cfg:
-                assert (line + "\n") in cfg, "Cannot find the line '%s' in the generated main configuration:\n%s" \
-                                             % (line, "".join(cfg))
+            for line in exp_named_cfg:
+                assert (line + "\n") in cfg,\
+                    "Cannot find the line '%s' in the generated " \
+                    "main configuration:\n%s" % (line, "".join(cfg))
         with open("/tmp/named_master2.test.org.cfg") as fileobj:
             cfg = fileobj.readlines()
-            for line in expected_zone_cfg:
-                assert (line + "\n") in cfg, "Cannot find the line '%s' in the generated zone configuration:\n%s" \
-                                             % (line, "".join(cfg))
+            for line in exp_zone_cfg:
+                assert (line + "\n") in cfg,\
+                    "Cannot find the line '%s' in the generated zone " \
+                    "configuration:\n%s" % (line, "".join(cfg))
 
         # Check port number configuration
         dns_server_port = named_cfg.get("dns_server_port", 53)
         assert_dns_record(net["master2"], "localhost",
-                          ARecord("master2.test.org", net["master2"].defaultIntf().ip6),
+                          ARecord("master2.test.org",
+                                  net["master2"].defaultIntf().ip6),
                           port=dns_server_port)
 
         # Check connectivity
@@ -91,13 +96,15 @@ def test_dns_network(named_cfg, zone_args, expected_named_cfg, expected_zone_cfg
             ARecord("slave.mydomain.org", net["slave"].defaultIntf().ip),
             AAAARecord("slave.mydomain.org", net["slave"].defaultIntf().ip6),
             ARecord("server.mydomain.org", net["server"].defaultIntf().ip),
-            AAAARecord("server.mydomain.org", net["server"].defaultIntf().ip6, ttl=120),
+            AAAARecord("server.mydomain.org", net["server"].defaultIntf().ip6,
+                       ttl=120),
             PTRRecord(net["master"].defaultIntf().ip, "master.mydomain.org"),
             PTRRecord(net["master"].defaultIntf().ip6, "master.mydomain.org"),
             PTRRecord(net["slave"].defaultIntf().ip, "slave.mydomain.org"),
             PTRRecord(net["slave"].defaultIntf().ip6, "slave.mydomain.org"),
             PTRRecord(net["server"].defaultIntf().ip, "server.mydomain.org"),
-            PTRRecord(net["server"].defaultIntf().ip6, "server.mydomain.org", ttl=120)
+            PTRRecord(net["server"].defaultIntf().ip6, "server.mydomain.org",
+                      ttl=120)
         ]
         for node in [net["master"], net["slave"]]:
             for record in records:

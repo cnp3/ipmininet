@@ -1,11 +1,13 @@
-"""This file contains a simple switch topology using the spanning tree protocol"""
+"""This file contains a simple switch topology using the spanning tree protocol
+"""
 
 from ipmininet.iptopo import IPTopo
 
 
 class SpanningTreeNet(IPTopo):
     """This simple network has a LAN with redundant links.
-       The IPSwitch class enables the spanning tree protocol by default to prevent loops."""
+       The IPSwitch class enables the spanning tree protocol by default
+       to prevent loops."""
 
     def build(self, *args, **kwargs):
         """

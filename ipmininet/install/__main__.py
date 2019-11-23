@@ -33,9 +33,9 @@ if __name__ == "__main__":
 
     if args.install_ipmininet:
         dist.install("git")
-        ipmininet_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        dist.pip_install(2, ipmininet_folder)
-        dist.pip_install(3, ipmininet_folder)
+        source_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        dist.pip_install(2, source_dir)
+        dist.pip_install(3, source_dir)
 
     # Enable IPv6 (disabled by mininet installation)
 
@@ -59,4 +59,5 @@ if __name__ == "__main__":
         if dist.NAME == "Ubuntu":
             install_openr(args.output_dir)
         else:
-            print("OpenR build currently only available on Ubuntu. Skipping installing OpenR.")
+            print("OpenR build currently only available on Ubuntu."
+                  " Skipping installing OpenR.")

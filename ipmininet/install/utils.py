@@ -7,9 +7,9 @@ from distutils.spawn import find_executable
 
 
 def sh(*cmds, **kwargs):
-    if not 'stdout' in kwargs:
+    if 'stdout' not in kwargs:
         kwargs['stdout'] = subprocess.PIPE
-    if not 'stderr' in kwargs:
+    if 'stderr' not in kwargs:
         kwargs['stderr'] = subprocess.STDOUT
     may_fail = kwargs.pop("may_fail", False)
     output_stdout = kwargs.pop("output_stdout", True)

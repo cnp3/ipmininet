@@ -45,10 +45,11 @@ class StaticAddressNet(IPTopo):
         ls2h3[h3].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
 
         # We can also declare the subnets on each LAN
-        # We can use nodes and/or links to specify the host and router interfaces
-        # requiring an address for each subnet
-        self.addSubnet(nodes=[r1, h1],     subnets=["10.0.0.0/24", "2001:1a::/64"])
-        self.addSubnet(links=[lr1r2],      subnets=["10.1.0.0/24", "2001:12::/64"])
-        self.addSubnet(nodes=[r1, h2, h4], subnets=["10.2.0.0/24", "2001:12b::/64"])
+        # We can use nodes and/or links to specify the host and router
+        # interfaces requiring an address for each subnet
+        self.addSubnet(nodes=[r1, h1], subnets=["10.0.0.0/24", "2001:1a::/64"])
+        self.addSubnet(links=[lr1r2],  subnets=["10.1.0.0/24", "2001:12::/64"])
+        self.addSubnet(nodes=[r1, h2, h4],
+                       subnets=["10.2.0.0/24", "2001:12b::/64"])
 
         super(StaticAddressNet, self).build(*args, **kwargs)

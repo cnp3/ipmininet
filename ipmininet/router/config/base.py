@@ -20,7 +20,6 @@ import mako.exceptions
 
 from mininet.log import lg as log
 
-
 last_routerid = ip_address(u'0.0.0.1')
 
 __TEMPLATES_DIR = os.path.join(os.path.dirname(__file__), 'templates')
@@ -142,7 +141,8 @@ class RouterConfig(NodeConfig):
                         'net.ipv6.conf.all.forwarding': 1}
         if sysctl:
             self._sysctl.update(sysctl)
-        super(RouterConfig, self).__init__(node, sysctl=self._sysctl, *args, **kwargs)
+        super(RouterConfig, self).__init__(node, sysctl=self._sysctl, *args,
+                                           **kwargs)
         self.routerid = None
 
     def post_register_daemons(self):
@@ -184,8 +184,10 @@ class RouterConfig(NodeConfig):
     def compute_routerid(self):
         """Computes the default router id for all daemons.
         If a router ids were explicitly set for some of its daemons,
-        the router id set to the daemon with the highest priority is chosen as the global router id.
-        Otherwise if it has IPv4 addresses, it returns the most-visible one among its router interfaces.
+        the router id set to the daemon with the highest priority is chosen
+        as the global router id.
+        Otherwise if it has IPv4 addresses, it returns the most-visible one
+        among its router interfaces.
         If both conditions are wrong, it generates a unique router id."""
 
         for d in self.daemons:
@@ -274,11 +276,12 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
             log.debug('Generating %s\n' % filename)
             try:
                 cfg.current_filename = filename
-                cfg_content[filename] = self.template_lookup.get_template(self.template_filenames[i])\
-                                            .render(node=cfg,
-                                                    ip_statement=ip_statement,
-                                                    **kwargs)
-            except:
+                kwargs["node"] = cfg
+                kwargs["ip_statement"] = ip_statement
+                template = self.template_lookup.get_template(
+                    self.template_filenames[i])
+                cfg_content[filename] = template.render(**kwargs)
+            except Exception:
                 # Display template errors in a less cryptic way
                 log.error('Couldn''t render a config file(',
                           self.template_filenames[i], ')')
@@ -319,12 +322,14 @@ class Daemon(with_metaclass(abc.ABCMeta, object)):
 
     @property
     def cfg_filename(self):
-        """Return the main filename in which this daemon config should be stored"""
+        """Return the main filename in which this daemon config should be
+           stored"""
         return self.cfg_filenames[0]
 
     @property
     def cfg_filenames(self):
-        """Return the list of filenames in which this daemon config should be stored"""
+        """Return the list of filenames in which this daemon config should be
+           stored"""
         return [self._file(suffix='cfg')]
 
     @property
@@ -362,7 +367,7 @@ class RouterDaemon(with_metaclass(abc.ABCMeta, Daemon)):
     def build(self):
         cfg = super(RouterDaemon, self).build()
         cfg.routerid = self._options.routerid if self._options.routerid \
-                                              else self._node.nconfig.routerid
+            else self._node.nconfig.routerid
         return cfg
 
     @abc.abstractmethod
@@ -374,17 +379,18 @@ class RouterDaemon(with_metaclass(abc.ABCMeta, Daemon)):
 class BasicRouterConfig(RouterConfig):
     """A basic router that will run an OSPF daemon"""
 
-    def __init__(self, node, daemons=(), additional_daemons=(), *args, **kwargs):
+    def __init__(self, node, daemons=(), additional_daemons=(),
+                 *args, **kwargs):
         """A simple router made of at least an OSPF daemon
 
         :param additional_daemons: Other daemons that should be used"""
         # Importing here to avoid circular import
         from .ospf import OSPF
         from .ospf6 import OSPF6
-        # We don't want any zebra-specific settings, so we rely on the OSPF/OSPF6
-        # DEPENDS list for that daemon to run it with default settings
-        # We also don't want specific settings beside the defaults, so we don't
-        # provide an instance but the class instead
+        # We don't want any zebra-specific settings, so we rely on the
+        # OSPF/OSPF6 DEPENDS list for that daemon to run it with default
+        # settings. We also don't want specific settings beside the defaults,
+        # so we don't provide an instance but the class instead
         d = list(daemons)
         if node.use_v4:
             d.append(OSPF)

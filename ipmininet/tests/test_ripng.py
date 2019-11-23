@@ -10,7 +10,8 @@ from ipmininet.ipnet import IPNet
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config import RIPng
 from ipmininet.router.config.base import RouterConfig
-from ipmininet.tests.utils import assert_connectivity, assert_path, assert_routing_table
+from ipmininet.tests.utils import assert_connectivity, assert_path,\
+    assert_routing_table
 from . import require_root
 
 
@@ -56,7 +57,8 @@ class MinimalRIPngNet(IPTopo):
         self.addSubnet(nodes=[r3, h3], subnets=["2042:33::/64"])
         if self.is_test_flush:
             for i in (r1, r2, r3):
-                i.addDaemon(RIPng, update_timer=self.args_test_2[0], timeout_timer=self.args_test_2[1],
+                i.addDaemon(RIPng, update_timer=self.args_test_2[0],
+                            timeout_timer=self.args_test_2[1],
                             garbage_timer=self.args_test_2[2])
         else:
             r1.addDaemon(RIPng)
@@ -66,7 +68,8 @@ class MinimalRIPngNet(IPTopo):
         super(MinimalRIPngNet, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True, config=RouterConfig)
+        return self.addRouter(name, use_v4=False, use_v6=True,
+                              config=RouterConfig)
 
 
 expected_paths = {

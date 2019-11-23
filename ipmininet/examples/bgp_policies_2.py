@@ -4,14 +4,17 @@ from ipmininet.router.config import BGP, ebgp_session, CLIENT_PROVIDER, SHARE
 
 
 class BGPPoliciesTopo2(IPTopo):
-    """This topology builds a 4-AS network exchanging BGP reachability as shown in the figure below
-    Shared cost are described with ' = ', client - provider with ' $ '.
+    """This topology builds a 4-AS network exchanging BGP reachability as shown
+    in the figure below. Shared cost are described with ' = ',
+    client - provider with ' $ '.
 
-    ASes always favor routes received from clients, then routes from shared-cost peering,
-    and finally, routes received from providers.
+    ASes always favor routes received from clients, then routes from shared-cost
+    peering, and finally, routes received from providers.
     This is not influenced by the AS path length.
 
-    This topology is taken from https://www.computer-networking.info/exercises/html/ex-routing-policies.html"""
+    This topology is taken from
+    https://www.computer-networking.info/exercises/html/ex-routing-policies.html
+    """
     def build(self, *args, **kwargs):
         """
                       =

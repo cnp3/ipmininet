@@ -162,7 +162,8 @@ class Router(IPNode, L3Router):
                  lo_addresses=(),
                  *args, **kwargs):
         """:param password: The password for the routing daemons vtysh access
-           :param lo_addresses: The list of addresses to set on the loopback interface"""
+           :param lo_addresses: The list of addresses to set on the loopback
+                                interface"""
         super(Router, self).__init__(name, config=config, *args, **kwargs)
         self.password = password
 

@@ -110,4 +110,5 @@ class StaticRoutingNetFailure(IPTopo):
         super(StaticRoutingNetFailure, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True, config=RouterConfig)
+        return self.addRouter(name, use_v4=False, use_v6=True,
+                              config=RouterConfig)

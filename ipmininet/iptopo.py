@@ -17,7 +17,8 @@ class IPTopo(Topo):
     """A topology that supports L3 routers"""
 
     OVERLAYS = {cls.__name__: cls
-                for cls in (AS, iBGPFullMesh, OpenrDomain, OSPFArea, Subnet, DNSZone)}
+                for cls in (AS, iBGPFullMesh, OpenrDomain, OSPFArea, Subnet,
+                            DNSZone)}
 
     def __init__(self, *args, **kwargs):
         self.overlays = []
@@ -53,13 +54,15 @@ class IPTopo(Topo):
         """Add a host to the topology
 
            :param name: the name of the node"""
-        return HostDescription(super(IPTopo, self).addHost(str(name), **kwargs), self)
+        return HostDescription(super(IPTopo, self).addHost(str(name), **kwargs),
+                               self)
 
     def addRouter(self, name, **kwargs):
         """Add a router to the topology
 
         :param name: the name of the node"""
-        return RouterDescription(self.addNode(str(name), isRouter=True, **kwargs), self)
+        return RouterDescription(self.addNode(str(name), isRouter=True,
+                                              **kwargs), self)
 
     def addLink(self, node1, node2, port1=None, port2=None,
                 key=None, **opts):
@@ -82,7 +85,8 @@ class IPTopo(Topo):
         key = self.g.add_edge(node1, node2, key, opts)
 
         # Create an abstraction to allow additional calls
-        link_description = LinkDescription(self, node1, node2, key, self.linkInfo(node1, node2, key))
+        link_description = LinkDescription(self, node1, node2, key,
+                                           self.linkInfo(node1, node2, key))
         return link_description
 
     def addDaemon(self, node, daemon, default_cfg_class=BasicRouterConfig,
@@ -139,7 +143,8 @@ class IPTopo(Topo):
 
     def routers(self, sort=True):
         """Return a list of router node names"""
-        return [RouterDescription(n, self) for n in self.nodes(sort) if self.isRouter(n)]
+        return [RouterDescription(n, self)
+                for n in self.nodes(sort) if self.isRouter(n)]
 
     def hubs(self, sort=True):
         """Return a list of hub node names"""
@@ -219,15 +224,15 @@ class NodeDescription(str):
 
 class RouterDescription(NodeDescription):
     def addDaemon(self, daemon, default_cfg_class=BasicRouterConfig, **kwargs):
-        super(RouterDescription, self).addDaemon(daemon, default_cfg_class=default_cfg_class,
-                                                 **kwargs)
+        super(RouterDescription, self)\
+            .addDaemon(daemon, default_cfg_class=default_cfg_class, **kwargs)
 
 
 class HostDescription(NodeDescription):
 
     def addDaemon(self, daemon, default_cfg_class=HostConfig, **kwargs):
-        super(HostDescription, self).addDaemon(daemon, default_cfg_class=default_cfg_class,
-                                               **kwargs)
+        super(HostDescription, self)\
+            .addDaemon(daemon, default_cfg_class=default_cfg_class, **kwargs)
 
 
 @functools.total_ordering
@@ -239,9 +244,11 @@ class LinkDescription(object):
         self.key = key
         self.link_attrs = link_attrs
         self.src_intf = IntfDescription(self.src, topo, self,
-                                        self.link_attrs.setdefault("params1", {}))
+                                        self.link_attrs.setdefault("params1",
+                                                                   {}))
         self.dst_intf = IntfDescription(self.dst, topo, self,
-                                        self.link_attrs.setdefault("params2", {}))
+                                        self.link_attrs.setdefault("params2",
+                                                                   {}))
         super(LinkDescription, self).__init__()
 
     def __getitem__(self, item):

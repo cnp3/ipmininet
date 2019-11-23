@@ -84,9 +84,9 @@ class Openr(OpenrDaemon):
         """Updates some options of the OpenR daemon to run a network of
         routers in mininet. For a full list of parameters see
         OpenrDaemon:_defaults in openrd.py"""
-        defaults.ifname_prefix="r"
-        defaults.iface_regex_include="r.*"
-        defaults.log_dir="/var/log"
+        defaults.ifname_prefix = "r"
+        defaults.iface_regex_include = "r.*"
+        defaults.log_dir = "/var/log"
         super(Openr, self).set_defaults(defaults)
 
     def is_active_interface(self, itf):

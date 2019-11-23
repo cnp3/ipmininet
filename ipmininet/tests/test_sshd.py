@@ -19,12 +19,13 @@ def test_sshd_example():
             for line in fileobj:
                 if "AuthorizedKeysFile" in line:
                     ssh_key = line.split(" ")[1].split(".")[0]
-        assert ssh_key is not None, "No authorized SSH key found in the configuration"
+        assert ssh_key is not None,\
+            "No authorized SSH key found in the configuration"
         assert os.path.isfile(ssh_key), "Cannot find key file at %s" % ssh_key
 
         ip = net["r2"].intf("r2-eth0").ip
-        cmd = "ssh -oStrictHostKeyChecking=no -oConnectTimeout=1 -oPasswordAuthentication=no" \
-              " -i %s %s ls" % (ssh_key, ip)
+        cmd = "ssh -oStrictHostKeyChecking=no -oConnectTimeout=1" \
+              " -oPasswordAuthentication=no -i %s %s ls" % (ssh_key, ip)
         t = 0
         while t < 60 and net["r1"].popen(cmd.split(" ")).wait() != 0:
             time.sleep(0.5)

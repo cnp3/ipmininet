@@ -6,11 +6,15 @@ class SpanningTreeAdjust(IPTopo):
     def __init__(self, l1_start=None, l1_end=None, l1_cost=1,
                  l2_start=None, l2_end=None, l2_cost=1, *args, **kwargs):
         """
-        :param l1_start: Endpoint interface of the 1st link on which we want to change the cost
-        :param l1_end: Endpoint interface of the 1st link on which we want to change the cost
+        :param l1_start: Endpoint interface of the 1st link
+                         on which we want to change the cost
+        :param l1_end: Endpoint interface of the 1st link
+                       on which we want to change the cost
         :param l1_cost: Cost to set on the first link
-        :param l2_start: Endpoint interface of the 2nd link on which we want to change the cost
-        :param l2_end: Endpoint interface of the 2nd link on which we want to change the cost
+        :param l2_start: Endpoint interface of the 2nd link
+                         on which we want to change the cost
+        :param l2_end: Endpoint interface of the 2nd link
+                       on which we want to change the cost
         :param l2_cost: Cost to set on the second link
         """
 
@@ -132,7 +136,8 @@ class SpanningTreeAdjust(IPTopo):
     def addLink(self, node1, node2, port1=None, port2=None,
                 key=None, **opts):
 
-        link = super(SpanningTreeAdjust, self).addLink(node1, node2, port1=port1, port2=port2,
+        link = super(SpanningTreeAdjust, self).addLink(node1, node2,
+                                                       port1=port1, port2=port2,
                                                        key=key, **opts)
 
         # Adjust STP cost if the link was in the parameters

@@ -38,8 +38,9 @@ class AdvConnectedPrefix(AdvPrefix):
                                   in radvd.conf(5) for this prefix
            :param preferred_lifetime: corresponds to the AdvPreferredLifetime
                                       in radvd.conf(5) for this prefix"""
-        super(AdvConnectedPrefix, self).__init__(valid_lifetime=valid_lifetime,
-                                                 preferred_lifetime=preferred_lifetime)
+        super(AdvConnectedPrefix, self).\
+            __init__(valid_lifetime=valid_lifetime,
+                     preferred_lifetime=preferred_lifetime)
 
 
 class AdvRDNSS(ConfigDict):
@@ -47,7 +48,8 @@ class AdvRDNSS(ConfigDict):
     Router Advertisement"""
 
     def __init__(self, node, max_lifetime=DEFAULT_ADV_RDNSS_LIFETIME):
-        """:param node: Either the IPv6 address of the DNS server or the node name
+        """:param node: Either the IPv6 address of the DNS server
+                        or the node name
            :param max_lifetime: corresponds to the AdvValidLifetime
                                 in radvd.conf(5) for this dns server address"""
         super(AdvRDNSS, self).__init__()
@@ -130,4 +132,3 @@ class RADVD(RouterDaemon):
         except (IOError, OSError):
             pass
         super(RADVD, self).cleanup()
-

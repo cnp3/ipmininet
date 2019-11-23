@@ -157,14 +157,17 @@ class RouteMapMatchCond(object):
 
     def __init__(self, cond_type, condition):
         """
-        :param condition: Can be an ip address, the id of an accesss or prefix list
-        :param cond_type: The type of condition access list, prefix list, peer ...
+        :param condition: Can be an ip address, the id of an access
+                          or prefix list
+        :param cond_type: The type of condition access list, prefix list,
+                          peer ...
         """
         self.condition = condition
         self.cond_type = cond_type
 
     def __eq__(self, other):
-        return self.condition == other.condition and self.cond_type == other.cond_type
+        return self.condition == other.condition \
+               and self.cond_type == other.cond_type
 
 
 class RouteMapSetAction(object):
@@ -181,7 +184,8 @@ class RouteMapSetAction(object):
         self.value = value
 
     def __eq__(self, other):
-        return self.action_type == other.action_type and self.value == other.value
+        return self.action_type == other.action_type \
+               and self.value == other.value
 
 
 class RouteMap(object):
@@ -190,18 +194,21 @@ class RouteMap(object):
     # Number of route maps
     count = 0
 
-    def __init__(self, name=None, match_policy=PERMIT, match_cond=(), set_actions=(), call_action=None,
-                 exit_policy=None,
+    def __init__(self, name=None, match_policy=PERMIT, match_cond=(),
+                 set_actions=(), call_action=None, exit_policy=None,
                  order=10, proto=(), neighbor=(), direction='in'):
         """
         :param name: The name of the route-map, defaulting to rm##
-        :param match_policy: Deny or permit the actions if the route match the condition
-        :param match_cond: Specify one or more conditions which must be matched if the entry is to be considered further
-        :param set_actions: Specify one or more actions to do if there is a match
+        :param match_policy: Deny or permit the actions if the route match
+                             the condition
+        :param match_cond: Specify one or more conditions which must be matched
+                           if the entry is to be considered further
+        :param set_actions: Specify one or more actions to do
+                            if there is a match
         :param call_action: call to an other route map
-        :param exit_policy: An entry may, optionally specify an alternative exit policy if the entry matched
-                     or of (action, [acl, acl, ...]) tuples that will compose
-                     the route map
+        :param exit_policy: An entry may, optionally specify an alternative exit
+                            policy if the entry matched or of (action, [acl,
+                            acl, ...]) tuples that will compose the route map
         :param order: Priority of the route map compare to others
         :param proto: The set of protocols to which this route-map applies
         :param neighbor: List of peers this route map is applied to
@@ -211,7 +218,8 @@ class RouteMap(object):
         self.name = name if name else 'rm%d' % RouteMap.count
         self.match_policy = match_policy
         self.match_cond = [e if isinstance(e, RouteMapMatchCond)
-                           else RouteMapMatchCond(cond_type=e[0], condition=e[1])
+                           else RouteMapMatchCond(cond_type=e[0],
+                                                  condition=e[1])
                            for e in match_cond]
         self.set_actions = [e if isinstance(e, RouteMapSetAction)
                             else RouteMapSetAction(action_type=e[0], value=e[1])
@@ -224,7 +232,10 @@ class RouteMap(object):
         self.proto = proto
 
     def __eq__(self, other):
-        return self.neighbor == other.neighbor and self.direction == other.direction and self.exit_policy == other.exit_policy and self.order == other.order
+        return self.neighbor == other.neighbor \
+               and self.direction == other.direction \
+               and self.exit_policy == other.exit_policy \
+               and self.order == other.order
 
     def append_match_cond(self, match_conditions):
         """

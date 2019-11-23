@@ -26,7 +26,8 @@ def traceroute(net, src, dst_ip, timeout=300):
         lines = out.split("\n")[1:-1]
         if "*" not in out and "!" not in out and "unreachable" not in out:
             path_ips = [str(white_space.split(line)[2]) for line in lines]
-            if len(path_ips) > 0 and path_ips[-1] == str(dst_ip) and old_path_ips == path_ips:
+            if len(path_ips) > 0 and path_ips[-1] == str(dst_ip) \
+                    and old_path_ips == path_ips:
                 same_path_count += 1
                 if same_path_count > 2:
                     # Network has converged
@@ -97,10 +98,12 @@ def assert_connectivity(net, v6=False, timeout=300):
     while t != timeout / 5. and not host_connected(net, v6=v6):
         t += 1
         time.sleep(5)
-    assert host_connected(net, v6=v6), "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
+    assert host_connected(net, v6=v6),\
+        "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
 
-def check_tcp_connectivity(client, server, v6=False, server_port=80, server_itf=None, timeout=300):
+def check_tcp_connectivity(client, server, v6=False, server_port=80,
+                           server_itf=None, timeout=300):
     if server_itf is None:
         server_itf = server.defaultIntf()
     server_ip = server_itf.ip6 if v6 else server_itf.ip
@@ -116,8 +119,8 @@ def check_tcp_connectivity(client, server, v6=False, server_port=80, server_itf=
         if server_p.poll() is not None:
             out, err = server_p.communicate()
             assert False, \
-                "The netcat server used to check TCP connectivity failed with the output:" \
-                "\n[stdout]\n%s\n[stderr]\n%s" % (out, err)
+                "The netcat server used to check TCP connectivity failed" \
+                " with the output:\n[stdout]\n%s\n[stderr]\n%s" % (out, err)
         time.sleep(.5)
         client_p = client.popen(client_cmd.split(" "))
     out, err = client_p.communicate()
@@ -130,13 +133,15 @@ def check_tcp_connectivity(client, server, v6=False, server_port=80, server_itf=
 def assert_stp_state(switch, expected_states, timeout=60):
     """
     :param switch: The switch to test
-    :param expected_states: Dictionary mapping an interface name to its expected state
+    :param expected_states: Dictionary mapping an interface name to
+                            its expected state
     :param timeout: Time to wait for the stp convergence
     :return:
     """
     partial_cmd = "brctl showstp"
     possible_states = "listening|learning|forwarding|blocking"
-    ignore_state = "listening", "learning"  # In these states the STP has not converged
+    # In these states the STP has not converged
+    ignore_state = "listening", "learning"
     cmd = ("%s %s" % (partial_cmd, switch.name))
     out = switch.cmd(cmd)
     states = re.findall(possible_states, out)
@@ -144,8 +149,8 @@ def assert_stp_state(switch, expected_states, timeout=60):
     count = 0
     while any(item in states for item in ignore_state):
         if count == timeout:
-            pytest.fail("Timeout of %d seconds"
-                        " while waiting for the spanning tree to be computed" % timeout)
+            pytest.fail("Timeout of %d seconds while waiting for the spanning"
+                        " tree to be computed" % timeout)
         time.sleep(1)
         count += 1
         out = switch.cmd(cmd)
@@ -155,10 +160,11 @@ def assert_stp_state(switch, expected_states, timeout=60):
     state_map = {interfaces[i]: states[i] for i in range(len(states))}
     for itf, state in expected_states.items():
         assert itf in state_map,\
-            "The port %s of switch %s was not mentioned in the output of 'brctl showstp':\n%s"\
-            % (itf, switch.name, out)
+            "The port %s of switch %s was not mentioned in the output of " \
+            "'brctl showstp':\n%s" % (itf, switch.name, out)
         assert state_map[itf] == expected_states[itf],\
-            "The state of port %s of switch %s wasn't correct: excepted '%s' got '%s'"\
+            "The state of port %s of switch %s wasn't correct: excepted '%s' " \
+            "got '%s'"\
             % (itf, switch.name, expected_states[itf], state_map[itf])
 
 
@@ -176,8 +182,8 @@ def assert_routing_table(router, expected_prefixes, timeout=120):
     count = 0
     while any(item in prefixes for item in expected_prefixes):
         if count == timeout:
-            pytest.fail("Cannot get all expected prefixes (%s) from routing table (%s)"
-                        % (expected_prefixes, prefixes))
+            pytest.fail("Cannot get all expected prefixes (%s) from routing "
+                        "table (%s)" % (expected_prefixes, prefixes))
         time.sleep(1)
         count += 1
         out = router.cmd(cmd)
@@ -205,8 +211,10 @@ def assert_dns_record(node, dns_server_address, record, port=53, timeout=60):
     server_cmd = "dig @{address} -p {port} -t {rtype} {domain_name}"\
         .format(address=dns_server_address, rtype=record.rtype,
                 domain_name=record.domain_name, port=port)
-    out_regex = re.compile(r" *{name}[ \t]+{ttl}[ \t]+IN[ \t]+{rtype}[ \t]+{rdata}"
-                           .format(rtype=record.rtype, ttl=record.ttl, name=record.domain_name,
+    out_regex = re.compile(r" *{name}[ \t]+{ttl}[ \t]+IN[ \t]+{rtype}[ \t]+"
+                           r"{rdata}"
+                           .format(rtype=record.rtype, ttl=record.ttl,
+                                   name=record.domain_name,
                                    rdata=record.rdata))
 
     t = 0
@@ -223,9 +231,9 @@ def assert_dns_record(node, dns_server_address, record, port=53, timeout=60):
                        % (node.name, dns_server_address, server_cmd, out)
 
     assert match is not None, "The expected data '%s' cannot be found " \
-                              "in the DNS reply of '%s' received by %s from %s:\n%s" \
-                              % (out_regex.pattern, server_cmd, node.name,
-                                 dns_server_address, out)
+                              "in the DNS reply of '%s' received by %s from " \
+                              "%s:\n%s" % (out_regex.pattern, server_cmd,
+                                           node.name, dns_server_address, out)
 
 
 class CLICapture(object):

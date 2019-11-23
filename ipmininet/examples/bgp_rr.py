@@ -46,13 +46,20 @@ class BGPTopoRR(IPTopo):
         as1r2 = self.bgp('as1r2')
         as1r3 = self.bgp('as1r3')
         as1r4 = self.bgp('as1r4')
-        as1r5 = self.bgp('as1r5', family=AF_INET6(redistribute=('ospf6', 'connected')))
-        as1r6 = self.bgp('as1r6', family=AF_INET6(redistribute=('ospf6', 'connected')))
-        as4r1 = self.bgp('as4r1', family=AF_INET6(redistribute=('ospf6', 'connected')))
-        as4r2 = self.bgp('as4r2', family=AF_INET6(redistribute=('ospf6', 'connected')))
-        as5r1 = self.bgp('as5r1', family=AF_INET6(redistribute=('connected',)))
-        as3r1 = self.bgp('as3r1', family=AF_INET6(redistribute=('connected',)))
-        as2r1 = self.bgp('as2r1', family=AF_INET6(networks=('dead:beef::/32',)))
+        as1r5 = self.bgp('as1r5',
+                         family=AF_INET6(redistribute=('ospf6', 'connected')))
+        as1r6 = self.bgp('as1r6',
+                         family=AF_INET6(redistribute=('ospf6', 'connected')))
+        as4r1 = self.bgp('as4r1',
+                         family=AF_INET6(redistribute=('ospf6', 'connected')))
+        as4r2 = self.bgp('as4r2',
+                         family=AF_INET6(redistribute=('ospf6', 'connected')))
+        as5r1 = self.bgp('as5r1',
+                         family=AF_INET6(redistribute=('connected',)))
+        as3r1 = self.bgp('as3r1',
+                         family=AF_INET6(redistribute=('connected',)))
+        as2r1 = self.bgp('as2r1',
+                         family=AF_INET6(networks=('dead:beef::/32',)))
 
         # Add host
         as2h1 = self.addHost('as2h1')

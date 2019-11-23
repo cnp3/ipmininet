@@ -2,12 +2,15 @@
 import pytest
 
 from ipmininet.clean import cleanup
-from ipmininet.examples.partial_static_address_network import PartialStaticAddressNet
+from ipmininet.examples.partial_static_address_network import \
+    PartialStaticAddressNet
 from ipmininet.examples.static_address_network import StaticAddressNet
 from ipmininet.examples.static_routing import StaticRoutingNet
 from ipmininet.examples.static_routing_failure import StaticRoutingNetFailure
-from ipmininet.examples.static_routing_network_basic import StaticRoutingNetBasic
-from ipmininet.examples.static_routing_network_complex import StaticRoutingNetComplex
+from ipmininet.examples.static_routing_network_basic import \
+    StaticRoutingNetBasic
+from ipmininet.examples.static_routing_network_complex import \
+    StaticRoutingNetComplex
 from ipmininet.ipnet import IPNet
 from ipmininet.tests.utils import assert_connectivity, assert_path
 from . import require_root

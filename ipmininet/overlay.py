@@ -69,16 +69,19 @@ class Overlay(object):
 
 class Subnet(Overlay):
     """This overlay simply defines groups of routers and hosts that share
-    a common set of subnets. These routers and hosts have to be on the same LAN."""
+    a common set of subnets. These routers and hosts have to be on the same LAN.
+    """
 
     def __init__(self, nodes=(), links=(), subnets=()):
         """
-        :param nodes: The routers and hosts that needs an address on their common LAN
-        :param links: The links that has to be in the LAN. This parameter is useful
-            to identify LANs if there is more than one common LAN between the nodes.
-            Routers and Hosts of the links will have an address assigned.
-        :param subnets: For each subnet, an address will be added to the interface of the
-            nodes in their common LAN
+        :param nodes: The routers and hosts that needs an address on their
+                      common LAN.
+        :param links: The links that has to be in the LAN. This parameter
+                      is useful to identify LANs if there is more than one
+                      common LAN between the nodes. Routers and Hosts of the
+                      links will have an address assigned.
+        :param subnets: For each subnet, an address will be added to the
+                        interface of the nodes in their common LAN.
         """
         self.subnets = subnets
         self.node_links = {}
@@ -99,7 +102,8 @@ class Subnet(Overlay):
             if not topo.isSwitch(y):
                 self.nodes.append(y)
 
-        if not self._check_subnets() or not self._find_nodes_in_lan(topo, self.nodes):
+        if not self._check_subnets() \
+                or not self._find_nodes_in_lan(topo, self.nodes):
             self.consistent = False
             return
 
@@ -122,7 +126,8 @@ class Subnet(Overlay):
             for subnet in self.subnets:
                 if ip_network(str(subnet)).num_addresses - 1 < len(self.nodes):
                     lg.error("The subnet %s does not contain enough addresses."
-                             " We need %s addresses\n" % (subnet, len(self.nodes)))
+                             " We need %s addresses\n"
+                             % (subnet, len(self.nodes)))
                     return False
         except ValueError as e:
             lg.error("One of the subnet is invalid: %s\n" % e.message)
@@ -133,13 +138,16 @@ class Subnet(Overlay):
     def _build_adjacency_list(topo):
         adjacencies = {}
         for src, dst, k, attrs in topo.iterLinks(withInfo=True, withKeys=True):
-            adjacencies.setdefault(src, []).append((src, dst, k, attrs.setdefault("params2", {})))
-            adjacencies.setdefault(dst, []).append((dst, src, k, attrs.setdefault("params1", {})))
+            adjacencies.setdefault(src, [])\
+                .append((src, dst, k, attrs.setdefault("params2", {})))
+            adjacencies.setdefault(dst, [])\
+                .append((dst, src, k, attrs.setdefault("params1", {})))
         return adjacencies
 
     def _find_nodes_in_lan(self, topo, nodes):
         """Checks that all nodes are in one same LAN.
-        It also fills a map for each node name, the link on which an address should be set
+        It also fills a map for each node name, the link on which an address
+        should be set
 
         :return: True if all nodes are in the same LAN"""
 
@@ -149,7 +157,8 @@ class Subnet(Overlay):
         # Build adjacency list for each node
         adjacencies = self._build_adjacency_list(topo)
 
-        # Try to identify a LAN that includes every node among the LANs attached to nodes[0]
+        # Try to identify a LAN that includes every node among the LANs
+        # attached to nodes[0]
 
         node_links = {}
         count_nodes = 0
@@ -161,8 +170,8 @@ class Subnet(Overlay):
             count_nodes = 1
 
             # to_visit is a list of tuples giving, in order, the previously
-            # visited node, the current node that we explore, the key of the link
-            # from which we are coming and the attributes of the interface.
+            # visited node, the current node that we explore, the key of the
+            # link from which we are coming and the attributes of the interface.
             # The first three values identify an interface in the topology.
             to_visit = [(previous, n_start, k_start, n_start_value)]
 
@@ -205,4 +214,5 @@ class Subnet(Overlay):
         return True
 
     def __str__(self):
-        return "<SubnetOverlay nodes=%s subnets=%s>" % (self.nodes, self.subnets)
+        return "<SubnetOverlay nodes=%s subnets=%s>" % (self.nodes,
+                                                        self.subnets)

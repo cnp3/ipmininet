@@ -15,7 +15,7 @@ from .utils import otherIntf, is_container
 # Apparently there is a circular import between mininet.link and mininet.node,
 # break it by importing node first
 # FIXME wait for upstream PR to be accepted ... then remove the first include
-import mininet.node # noqa
+import mininet.node  # noqa
 import mininet.link as _m
 from mininet.log import lg as log
 
@@ -88,7 +88,8 @@ class IPIntf(_m.Intf):
     def ips(self, exclude_lbs=True):
         """Return a generator over all IPv4 assigned to this interface
 
-        :param exclude_lbs: Whether Loopback addresses should be included or not"""
+        :param exclude_lbs: Whether Loopback addresses should be included or not
+        """
         for i in self.addresses[4]:
             if not exclude_lbs or not i.is_loopback:
                 yield i
@@ -114,7 +115,8 @@ class IPIntf(_m.Intf):
         """Return a generator over all IPv6 assigned to this interface
 
         :param exclude_lls: Whether Link-locals should be included or not
-        :param exclude_lbs: Whether Loopback addresses should be included or not"""
+        :param exclude_lbs: Whether Loopback addresses should be included or not
+        """
         for i in self.addresses[6]:
             if (not exclude_lls or not i.is_link_local) \
                     and (not exclude_lbs or not i.is_loopback):

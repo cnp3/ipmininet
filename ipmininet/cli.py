@@ -58,7 +58,8 @@ class IPCLI(CLI):
         for n in line.split(' '):
             try:
                 ips = [ip.ip.compressed for itf in self.mn[n].intfList()
-                       for ip in list(itf.ips()) + list(itf.ip6s(exclude_lls=True))]
+                       for ip in list(itf.ips())
+                       + list(itf.ip6s(exclude_lls=True))]
             except KeyError:
                 ips = 'unknown node'
             finally:

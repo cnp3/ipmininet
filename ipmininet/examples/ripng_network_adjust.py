@@ -1,4 +1,5 @@
-"""This file contains a topology controlled by RIPng daemons. The weight can be customized"""
+"""This file contains a topology controlled by RIPng daemons.
+   The weight can be customized."""
 
 from ipmininet.iptopo import IPTopo
 from ipmininet.router.config.ripng import RIPng
@@ -104,4 +105,5 @@ class RIPngNetworkAdjust(IPTopo):
         super(RIPngNetworkAdjust, self).build(*args, **kwargs)
 
     def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True, config=RouterConfig)
+        return self.addRouter(name, use_v4=False, use_v6=True,
+                              config=RouterConfig)

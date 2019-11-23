@@ -1,4 +1,5 @@
-"""This modules defines the IPSwitch class allowing to better support STP and to create hubs"""
+"""This modules defines the IPSwitch class allowing to better support STP
+   and to create hubs"""
 
 from mininet.nodelib import LinuxBridge
 
@@ -28,5 +29,7 @@ class IPSwitch(LinuxBridge):
         for i in self.intfList():
             if self.name in i.name:
                 self.cmd('brctl addif', self, i)
-                self.cmd('brctl setpathcost %s %s %d' % (self.name, i.name, i.params.get('stp_cost', 1)))
+                self.cmd('brctl setpathcost'
+                         ' %s %s %d' % (self.name, i.name,
+                                        i.params.get('stp_cost', 1)))
         self.cmd('ifconfig', self, 'up')

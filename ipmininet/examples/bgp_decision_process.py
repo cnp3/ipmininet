@@ -83,4 +83,6 @@ class BGPDecisionProcess(IPTopo):
         super(BGPDecisionProcess, self).build(*args, **kwargs)
 
     def addRouter(self, name, **kwargs):
-        return super(BGPDecisionProcess, self).addRouter(name, config=RouterConfig, **kwargs)
+        return super(BGPDecisionProcess, self).addRouter(name,
+                                                         config=RouterConfig,
+                                                         **kwargs)

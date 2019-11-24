@@ -53,8 +53,15 @@ def realIntfList(n):
 def address_pair(n, use_v4=True, use_v6=True):
     """Returns a tuple (ip, ip6) with ip/ip6 being one of the IPv4/IPv6
        addresses of the node n"""
+    from .link import IPIntf  # Prevent circular imports
     v4 = v6 = None
     for itf in n.intfList():
+        # Mininet switches have a loopback interface
+        # declared as an Intf.
+        # This object does not have ips() or ip6s() methods.
+        if not isinstance(itf, IPIntf):
+            continue
+
         if use_v4 and v4 is None:
             itf.updateIP()
             v4 = next(itf.ips(), None)

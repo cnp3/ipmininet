@@ -91,6 +91,7 @@ def perm(*args):
     ("ping6pair", ["h1 --IPv6--> h2 ",
                    "h2 --IPv6--> h1 "]),
     ("h1 echo h4", ["10.2.0.3"]),
+    ("s2 echo h4", ["h4"]),
     ("h1", ["*** Enter a command for node: h1 <cmd>"]),
     ("invalid_command", ["*** Unknown command: invalid_command"])
 ])

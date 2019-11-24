@@ -115,13 +115,6 @@ class IPCLI(CLI):
                     v6_map[hop] = ip6
             ip_map = v4_map if len(v4_map) >= len(v6_map) else v6_map
 
-            if len(ip_map) < len(hops):
-                missing = [h for h in hops if h not in ip_map]
-                version = 'IPv4' if v4_support else 'IPv6'
-                lg.error('*** Nodes', missing, 'have no', version,
-                         'address! Cannot execute the command.\n')
-                return
-
             node.sendCmd(' '.join([ip_map.get(r, r) for r in rest]))
             self.waitForNode(node)
         else:

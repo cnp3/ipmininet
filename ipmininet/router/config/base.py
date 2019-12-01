@@ -40,6 +40,7 @@ class NodeConfig(object):
                        By default, it enables IPv4/IPv6 forwarding on all
                        interfaces."""
         self._node = node  # The node for which we will build the configuration
+
         self._daemons = {}  # Active daemons
         for d in daemons:
             self.register_daemon(d)
@@ -50,6 +51,15 @@ class NodeConfig(object):
     def build(self):
         """Build the configuration for each daemon, then write the
         configuration files"""
+
+        # Mount a separate /etc/resolv.conf and /etc/hosts for the node
+        resolv_file_mount = os.path.join(self._node.cwd, 'resolv_%(name)s.conf')
+        open(resolv_file_mount % self._node.__dict__, "w").close()
+        host_file_mount = os.path.join(self._node.cwd, 'hosts_%(name)s')
+        self.build_host_file(host_file_mount % self._node.__dict__)
+        self.add_private_fs_path([('/etc/resolv.conf', resolv_file_mount),
+                                  ('/etc/hosts', host_file_mount)])
+
         self._cfg.clear()
         self._cfg.name = self._node.name
         # Check that all daemons have their dependencies satisfied
@@ -132,6 +142,29 @@ class NodeConfig(object):
         if not isinstance(key, basestring):
             key = key.NAME
         return self._daemons[key]
+
+    def add_private_fs_path(self, loc=()):
+        old_private_dirs = self._node.privateDirs
+        try:
+            self._node.privateDirs = loc
+            self._node.mountPrivateDirs()
+            old_private_dirs.extend(loc)
+        finally:
+            self._node.privateDirs = old_private_dirs
+
+    def build_host_file(self, filename):
+        # Copy the base file
+        lines = []
+        with open('/etc/hosts', 'r') as fileobj:
+            lines.extend(fileobj.readlines())
+
+        with open(filename, "w") as fileobj:
+            for node_name, ips in self._node.network_ips().items():
+                for ip in ips:
+                    fileobj.write("{ip}\t{name}\n"
+                                  .format(ip=ip, name=node_name))
+            fileobj.write("\n")
+            fileobj.write("".join(lines))
 
 
 class RouterConfig(NodeConfig):

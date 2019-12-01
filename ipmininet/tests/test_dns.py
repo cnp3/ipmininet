@@ -4,6 +4,8 @@ import time
 
 from ipmininet.clean import cleanup
 from ipmininet.examples.dns_network import DNSNetwork
+from ipmininet.examples.simple_bgp_network import SimpleBGPTopo
+from ipmininet.examples.static_routing import StaticRoutingNet
 from ipmininet.ipnet import IPNet
 from ipmininet.host.config import Named, ARecord, AAAARecord, NSRecord,\
     PTRRecord
@@ -110,6 +112,25 @@ def test_dns_network(named_cfg, zone_args, exp_named_cfg, exp_zone_cfg):
             for record in records:
                 assert_dns_record(node, "localhost", record)
             time.sleep(10)
+
+        net.stop()
+    finally:
+        cleanup()
+
+
+@require_root
+@pytest.mark.parametrize("topo", [
+    StaticRoutingNet,
+    DNSNetwork,
+    SimpleBGPTopo
+])
+def test_etc_hosts(topo):
+    try:
+        net = IPNet(topo=topo())
+        net.start()
+
+        assert_connectivity(net, v6=True, translate_address=False)
+        assert_connectivity(net, v6=False, translate_address=False)
 
         net.stop()
     finally:

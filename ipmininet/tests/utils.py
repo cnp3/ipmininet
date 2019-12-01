@@ -78,13 +78,17 @@ def assert_path(net, expected_path, v6=False, retry=5, timeout=300):
                                   % (src, dst, expected_path[1:-1], path[1:-1])
 
 
-def host_connected(net, v6=False, timeout=0.5):
+def host_connected(net, v6=False, timeout=0.5, translate_address=True):
     for src in net.hosts:
         for dst in net.hosts:
             if src != dst:
                 dst.defaultIntf().updateIP()
                 dst.defaultIntf().updateIP6()
-                dst_ip = dst.defaultIntf().ip6 if v6 else dst.defaultIntf().ip
+                if translate_address:
+                    dst_ip = dst.defaultIntf().ip6 if v6 \
+                        else dst.defaultIntf().ip
+                else:
+                    dst_ip = dst
                 cmd = "nmap%s -sn -n --max-retries 0 --max-rtt-timeout %dms %s"\
                       % (" -6" if v6 else "", int(timeout * 1000), dst_ip)
                 out = src.cmd(cmd.split(" "))
@@ -93,12 +97,14 @@ def host_connected(net, v6=False, timeout=0.5):
     return True
 
 
-def assert_connectivity(net, v6=False, timeout=300):
+def assert_connectivity(net, v6=False, timeout=300, translate_address=True):
     t = 0
-    while t != timeout / 5. and not host_connected(net, v6=v6):
+    while t != timeout / 5. \
+            and not host_connected(net, v6=v6,
+                                   translate_address=translate_address):
         t += 1
         time.sleep(5)
-    assert host_connected(net, v6=v6),\
+    assert host_connected(net, v6=v6, translate_address=translate_address),\
         "Cannot ping all hosts over %s" % ("IPv4" if not v6 else "IPv6")
 
 

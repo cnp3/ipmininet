@@ -6,12 +6,12 @@ import sys
 import time
 
 from ipmininet import DEBUG_FLAG
-from ipmininet.utils import L3Router
+from ipmininet.utils import L3Router, realIntfList, otherIntf
 from ipmininet.link import IPIntf
 from .config import BasicRouterConfig, NodeConfig
 
 import mininet.clean
-from mininet.node import Node
+from mininet.node import Node, Host
 from mininet.log import lg
 import shlex
 
@@ -151,6 +151,29 @@ class IPNode(Node):
     def get(self, key, val=None):
         """Check for a given key in the node parameters"""
         return self.params.get(key, val)
+
+    def network_ips(self):
+        """Return all the addresses of the nodes connected directly or not
+        to this node"""
+        ips = {}
+        visited = set()
+        to_visit = [self]
+        while to_visit:
+            node = to_visit.pop()
+            if node.name in visited:
+                continue
+            visited.add(node.name)
+            if isinstance(node, (Host, IPNode)):
+                for i in node.intfList():
+                    for ip in list(i.ips()) \
+                              + list(i.ip6s(exclude_lls=True)):
+                        ips.setdefault(node.name, []).append(ip.ip.compressed)
+
+            for i in realIntfList(node):
+                adj_i = otherIntf(i)
+                if adj_i is not None:
+                    to_visit.append(adj_i.node)
+        return ips
 
 
 class Router(IPNode, L3Router):

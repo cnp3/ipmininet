@@ -2,6 +2,7 @@
    and to create hubs"""
 
 from mininet.nodelib import LinuxBridge
+from ipmininet.utils import require_cmd
 
 
 class IPSwitch(LinuxBridge):
@@ -18,6 +19,9 @@ class IPSwitch(LinuxBridge):
 
     def start(self, _controllers):
         "Start Linux bridge"
+        require_cmd("brctl", help_str="You need brctl to use %s objects"
+                                      % self.__class__)
+
         self.cmd('ifconfig', self, 'down')
         self.cmd('brctl delbr', self)
         self.cmd('brctl addbr', self)

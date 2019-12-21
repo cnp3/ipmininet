@@ -13,9 +13,12 @@ import time
 
 import mininet.log
 from ipaddress import ip_address, ip_network
+from ipmininet.utils import require_cmd
 
 
 def traceroute(net, src, dst_ip, timeout=300):
+    require_cmd("traceroute", help_str="traceroute is required to run tests")
+
     t = 0
     old_path_ips = []
     same_path_count = 0
@@ -79,6 +82,8 @@ def assert_path(net, expected_path, v6=False, retry=5, timeout=300):
 
 
 def host_connected(net, v6=False, timeout=0.5, translate_address=True):
+    require_cmd("nmap", help_str="nmap is required to run tests")
+
     for src in net.hosts:
         for dst in net.hosts:
             if src != dst:
@@ -110,6 +115,8 @@ def assert_connectivity(net, v6=False, timeout=300, translate_address=True):
 
 def check_tcp_connectivity(client, server, v6=False, server_port=80,
                            server_itf=None, timeout=300):
+    require_cmd("nc", help_str="nc is required to run tests")
+
     if server_itf is None:
         server_itf = server.defaultIntf()
     server_ip = server_itf.ip6 if v6 else server_itf.ip
@@ -144,6 +151,8 @@ def assert_stp_state(switch, expected_states, timeout=60):
     :param timeout: Time to wait for the stp convergence
     :return:
     """
+    require_cmd("brctl", help_str="brctl is required to run tests")
+
     partial_cmd = "brctl showstp"
     possible_states = "listening|learning|forwarding|blocking"
     # In these states the STP has not converged
@@ -213,6 +222,7 @@ def search_dns_reply(reply, regex):
 
 
 def assert_dns_record(node, dns_server_address, record, port=53, timeout=60):
+    require_cmd("dig", help_str="dig is required to run tests")
 
     server_cmd = "dig @{address} -p {port} -t {rtype} {domain_name}"\
         .format(address=dns_server_address, rtype=record.rtype,

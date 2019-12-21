@@ -46,11 +46,11 @@ if __name__ == "__main__":
 
     # Install test dependencies
 
-    dist.install("bridge-utils", "traceroute")
+    dist.install("bridge-utils", "traceroute", "nmap")
     if dist.NAME == "Fedora":
-        dist.install("nc")
+        dist.install("nc", "bind-utils")
     else:
-        dist.install("netcat-openbsd")
+        dist.install("netcat-openbsd", "dnsutils")
 
     dist.pip_install(2, "pytest")
     dist.pip_install(3, "pytest")

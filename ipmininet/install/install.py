@@ -103,7 +103,7 @@ def install_libyang(output_dir):
 
 def install_frrouting(output_dir):
     dist.install("autoconf", "automake", "libtool", "make", "gcc", "groff",
-                 "patch", "make", "bison", "flex", "gawk",
+                 "patch", "make", "bison", "flex", "gawk", "texinfo",
                  "python3-pytest")
 
     if dist.NAME == "Ubuntu" or dist.NAME == "Debian":

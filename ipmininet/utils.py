@@ -6,7 +6,8 @@ from mininet.link import Intf
 from mininet.log import lg as log
 from mininet.node import Node
 
-from ipaddress import ip_address, IPv4Address, IPv6Address
+from ipaddress import ip_address, IPv4Address, IPv6Address, IPv4Network,\
+    IPv6Network
 
 from typing import Type, Dict, Optional, Union, Tuple, List, TYPE_CHECKING, Set
 if TYPE_CHECKING:
@@ -78,6 +79,24 @@ def address_pair(n: Node, use_v4=True, use_v6=True) \
                 and (not use_v6 or v6_str is not None):
             break
     return v4_str, v6_str
+
+
+def is_subnet_of(a: Union[IPv4Network, IPv6Network],
+                 b: Union[IPv4Network, IPv6Network]) -> bool:
+    """Return True if network a is a subnet of network b."""
+
+    # This code is copied from ipaddress module in Python 3.7 for
+    # compatibility with prior versions
+    try:
+        # Always false if one is v4 and the other is v6.
+        if a.version != b.version:
+            raise TypeError("{} and {} are not of the same version"
+                            .format(a, b))
+        return (b.network_address <= a.network_address and
+                b.broadcast_address >= a.broadcast_address)
+    except AttributeError:
+        raise TypeError("Unable to test subnet containment "
+                        "between {} and {}".format(a, b))
 
 
 def is_container(x) -> bool:

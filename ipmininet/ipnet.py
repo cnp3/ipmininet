@@ -10,7 +10,8 @@ from ipaddress import ip_network, ip_interface, IPv4Address, IPv6Address, \
     IPv4Network, IPv6Network, IPv4Interface, IPv6Interface
 
 from . import MIN_IGP_METRIC, OSPF_DEFAULT_AREA
-from .utils import otherIntf, realIntfList, L3Router, address_pair, has_cmd
+from .utils import otherIntf, realIntfList, L3Router, address_pair, has_cmd, \
+    is_subnet_of
 from .host import IPHost
 from .router import Router
 from .router.config import BasicRouterConfig, RouterConfig
@@ -368,14 +369,15 @@ class IPNet(Mininet):
                     # expanded subnets as it is bigger wrt. prefixlen
                     net, next_net = tuple(net.subnets(prefixlen_diff=1))
                     # If not a subnet of an allocated subnet
-                    if len(list(filter(lambda y: next_net in y,
+                    if len(list(filter(lambda y: is_subnet_of(next_net, y),
                                        allocated_subnets))) == 0:
                         nets.append(next_net)
                 # Check if we have an appropriately-sized subnet
                 if plen == net.prefixlen:
                     # If the network overlaps with an allocated subnet,
                     # we pass it
-                    if len(list(filter(lambda y: net in y or y in net,
+                    if len(list(filter(lambda y: is_subnet_of(net, y)
+                                                 or is_subnet_of(y, net),
                                        allocated_subnets))) == 0:
                         # Register the allocation
                         setattr(d, net_key, net)

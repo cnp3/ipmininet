@@ -46,9 +46,9 @@ if __name__ == "__main__":
 
     dist.install("bridge-utils", "traceroute", "nmap")
     if dist.NAME == "Fedora":
-        dist.install("nc", "bind-utils")
+        dist.install("nc", "bind-utils", "wireshark")
     else:
-        dist.install("netcat-openbsd", "dnsutils")
+        dist.install("netcat-openbsd", "dnsutils", "tshark")
 
     dist.pip_install("pytest")
 

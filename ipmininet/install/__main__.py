@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # Install test dependencies
 
-    dist.install("bridge-utils", "traceroute", "nmap")
+    dist.install("bridge-utils", "traceroute", "nmap", "iperf3")
     if dist.NAME == "Fedora":
         dist.install("nc", "bind-utils", "wireshark")
     else:

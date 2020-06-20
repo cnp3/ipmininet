@@ -4,6 +4,7 @@ import argparse
 import ipmininet
 from ipmininet.ipnet import IPNet
 from ipmininet.cli import IPCLI
+from ipmininet.link import TCIntf
 
 from .simple_ospf_network import SimpleOSPFNet
 from .simple_ospfv3_network import SimpleOSPFv3Net
@@ -41,6 +42,8 @@ from .bgp_policies_adjust import BGPPoliciesAdjustTopo
 from .bgp_policies_5 import BGPPoliciesTopo5
 from .dns_network import DNSNetwork
 from .srv6 import SRv6Topo
+from .tc_network import TCNet
+from .tc_advanced_network import TCAdvancedNet
 
 from mininet.log import lg, LEVELS
 
@@ -79,19 +82,23 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'bgp_policies_adjust': BGPPoliciesAdjustTopo,
          'bgp_policies_5': BGPPoliciesTopo5,
          'dns_network': DNSNetwork,
-         'ipv6_segment_routing': SRv6Topo}
+         'ipv6_segment_routing': SRv6Topo,
+         'tc_network': TCNet,
+         'tc_advanced_network': TCAdvancedNet}
 
-NET_ARGS = {'router_adv_network': {'use_v4': False,
-                                   'use_v6': True,
-                                   'allocate_IPs': False},
-            'bgp_full_config':    {'use_v4': False,
-                                   'use_v6': True},
-            'bgp_local_pref':     {'use_v4': False,
-                                   'use_v6': True},
-            'bgp_med':            {'use_v4': False,
-                                   'use_v6': True},
-            'bgp_rr':             {'use_v4': False,
-                                   'use_v6': True}}
+NET_ARGS = {'router_adv_network':  {'use_v4': False,
+                                    'use_v6': True,
+                                    'allocate_IPs': False},
+            'bgp_full_config':     {'use_v4': False,
+                                    'use_v6': True},
+            'bgp_local_pref':      {'use_v4': False,
+                                    'use_v6': True},
+            'bgp_med':             {'use_v4': False,
+                                    'use_v6': True},
+            'bgp_rr':              {'use_v4': False,
+                                    'use_v6': True},
+            'tc_network':          {'intf': TCIntf},
+            'tc_advanced_network': {'intf': TCIntf}}
 
 
 def parse_args():

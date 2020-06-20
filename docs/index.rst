@@ -20,6 +20,7 @@ such as IP addresses or router configuration files, ...
     daemons
     addressing
     switches
+    tc
     srv6
     contribute
     api/modules

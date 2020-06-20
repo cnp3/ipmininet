@@ -38,6 +38,8 @@ The following sections will detail the topologies.
    - [SpanningTreeCost](#spanningtreecost)
    - [DNSNetwork](#dnsnetwork)
    - [IPv6SegmentRouting](#ipv6segmentrouting)
+   - [TCNetwork](#tcnetwork)
+   - [TCAdvancedNetwork](#tcadvancednetwork)
 
 
 ## SimpleOSPFNetwork
@@ -443,3 +445,23 @@ Note that if you cannot use tcpdump to poke behind the Segment Routing
 extension headers. Hence, if you use the capture filter 'icmp6', if the
 ICMPv6 header is after the SRH, you won't see capture the packet.
 tshark does not have this problem.
+
+## TCNetwork
+
+_topo name_ : tc_network
+_args_ : n/a
+
+This network emulates delay and bandwidth constraints on the links.
+
+Pinging between two hosts will give a latency of around 32ms.
+If you use iperf3, you will notice that the bandwidth between both hosts is
+throttled to 100Mbps.
+
+## TCAdvancedNetwork
+
+_topo name_ : tc_advanced_network
+_args_ : n/a
+
+This network emulates delay and bandwidth constraints on the links.
+But it does so without falling into either tc or mininet pitfalls.
+Look at IPMininet documentation for more details.

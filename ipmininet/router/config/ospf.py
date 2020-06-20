@@ -4,7 +4,7 @@ from typing import Sequence, List
 
 from ipmininet.link import IPIntf
 from ipmininet.overlay import Overlay
-from ipmininet.utils import otherIntf, L3Router
+from ipmininet.utils import L3Router
 from .utils import ConfigDict
 from .zebra import QuaggaDaemon, Zebra
 
@@ -99,7 +99,10 @@ class OSPF(QuaggaDaemon):
     @staticmethod
     def is_active_interface(itf) -> bool:
         """Return whether an interface is active or not for the OSPF daemon"""
-        return L3Router.is_l3router_intf(otherIntf(itf))
+        if itf.broadcast_domain is None:
+            return False
+        return any(L3Router.is_l3router_intf(i) for i in itf.broadcast_domain
+                   if i != itf)
 
 
 class OSPFNetwork:

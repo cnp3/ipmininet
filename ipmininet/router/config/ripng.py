@@ -3,7 +3,7 @@ from ipaddress import ip_interface, IPv6Interface
 from typing import List
 
 from ipmininet.link import IPIntf
-from ipmininet.utils import otherIntf, L3Router
+from ipmininet.utils import L3Router
 from .utils import ConfigDict
 from .zebra import QuaggaDaemon, Zebra
 
@@ -79,8 +79,11 @@ class RIPng(QuaggaDaemon):
 
     @staticmethod
     def is_active_interface(itf) -> bool:
-        """Return whether an interface is active or not for the OSPF daemon"""
-        return L3Router.is_l3router_intf(otherIntf(itf))
+        """Return whether an interface is active or not for the RIPng daemon"""
+        if itf.broadcast_domain is None:
+            return False
+        return any(L3Router.is_l3router_intf(i) for i in itf.broadcast_domain
+                   if i != itf)
 
 
 class RIPNetwork:

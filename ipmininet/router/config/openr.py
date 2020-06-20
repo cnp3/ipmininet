@@ -2,7 +2,7 @@
 from ipaddress import ip_interface
 
 from ipmininet.overlay import Overlay
-from ipmininet.utils import otherIntf, L3Router, realIntfList
+from ipmininet.utils import L3Router, realIntfList
 from .utils import ConfigDict
 from .openrd import OpenrDaemon
 
@@ -92,7 +92,10 @@ class Openr(OpenrDaemon):
     @staticmethod
     def is_active_interface(itf):
         """Return whether an interface is active or not for the OpenR daemon"""
-        return L3Router.is_l3router_intf(otherIntf(itf))
+        if itf.broadcast_domain is None:
+            return False
+        return any(L3Router.is_l3router_intf(i) for i in itf.broadcast_domain
+                   if i != itf)
 
 
 class OpenrNetwork:

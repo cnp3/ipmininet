@@ -14,8 +14,11 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
 
+from m2r import MdInclude
+from recommonmark.transform import AutoStructify
+
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
@@ -43,7 +46,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxcontrib.apidoc',
               'sphinx.ext.autosectionlabel',
               'sphinx.ext.doctest',
-              'm2r']
+              'recommonmark']
 
 # Mock calls to external libraries
 autodoc_mock_imports = ["pytest"]
@@ -189,3 +192,19 @@ epub_title = project
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
+
+
+def setup(app):
+    # AutoStructify configuration
+    app.add_config_value('recommonmark_config', {
+        'auto_toc_tree_section': 'Contents',
+        'enable_eval_rst': True,
+    }, True)
+    app.add_transform(AutoStructify)
+
+    # from m2r to make `mdinclude` work
+    app.add_config_value('no_underscore_emphasis', False, 'env')
+    app.add_config_value('m2r_parse_relative_links', False, 'env')
+    app.add_config_value('m2r_anonymous_references', False, 'env')
+    app.add_config_value('m2r_disable_inline_math', False, 'env')
+    app.add_directive('mdinclude', MdInclude)

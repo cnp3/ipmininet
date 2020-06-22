@@ -10,21 +10,17 @@ update-alternatives --config gcc
 
 PY_MAJOR=${PY_MAJOR:-2}
 
-if [ "$PY_MAJOR" -eq 2 ]; then
-    PY_BIN=python2
-    PIP_BIN=pip2
-elif [ "$PY_MAJOR" -eq 3 ]; then
-    PY_BIN=python3
-    PIP_BIN=pip3
-else
-    >&2 echo "PYTHON_VERSION must be set to either 2 or 3."
+if [ "$PY_MAJOR" -ne 2 ] && [ "$PY_MAJOR" -ne 3 ]; then
+    >&2 echo "PY_MAJOR must be set to either 2 or 3."
     exit 1
 fi
 
+PY_BIN="python$PY_MAJOR"
+PIP_BIN="pip$PY_MAJOR"
+
 PY_VERSION="$($PY_BIN --version 2>&1)"
-PY_MA=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\2/g' <<< "$PY_VERSION")
-PY_MI=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<< "$PY_VERSION")
-PY_LIB_PATH="/usr/local/lib/python$PY_MA.$PY_MI/site-packages"
+PY_MINOR=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<< "$PY_VERSION")
+PY_LIB_PATH="/usr/local/lib/python$PY_MAJOR.$PY_MINOR/site-packages"
 echo "PY_LIB_PATH: $PY_LIB_PATH"
 
 export CCACHE_DIR='/ccache' CC="ccache ${CC:-gcc}" CXX="ccache ${CXX:-g++}"

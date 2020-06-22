@@ -14,6 +14,9 @@ DEPS="python3 \
       python3-pip \
       git"
 
+IPMN_REPO="${IPMN_REPO:-https://github.com/cnp3/ipmininet.git}"
+IPMN_BRANCH="${IPMN_BRANCH:-master}"
+
 # Upgrade system and install dependencies
 sudo apt update -yq && sudo apt upgrade -yq
 sudo apt install -yq ${DEPS}
@@ -30,8 +33,9 @@ sudo pip3 install --upgrade pip
 sudo apt remove -yq python3-pip
 
 # Install ipmininet
-git clone https://github.com/cnp3/ipmininet.git
+[ ! -d "ipmininet" ] && git clone ${IPMN_REPO}
 pushd ipmininet
+git checkout -t origin/${IPMN_BRANCH}
 sudo pip3 install .
 sudo python3 -m ipmininet.install -af6
 popd

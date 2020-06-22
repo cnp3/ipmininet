@@ -248,7 +248,7 @@ git checkout 'libnl3_2_25'
 
 ### Build and install thom311/libnl ###
 
-curl -O https://raw.githubusercontent.com/facebook/openr/master/build/fix-route-obj-attr-list.patch
+curl -O https://raw.githubusercontent.com/facebook/openr/rc-20190419-11514/build/fix-route-obj-attr-list.patch
 git apply 'fix-route-obj-attr-list.patch'
 ./autogen.sh
 LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" ./configure 

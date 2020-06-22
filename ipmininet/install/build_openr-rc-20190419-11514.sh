@@ -40,7 +40,7 @@ if [[ ! -d '/usr/local/src'/'libsodium' ]]; then
 	git clone https://github.com/'jedisct1/libsodium'
 fi
 mkdir -p '/usr/local/src'/'libsodium'/'.' && cd '/usr/local/src'/'libsodium'/'.'
-git checkout 'stable'
+git checkout '6bece9c8c45259998f83ce243b1933e76c03f545'
 
 ### Build and install jedisct1/libsodium ###
 
@@ -57,6 +57,7 @@ if [[ ! -d '/usr/local/src'/'fizz' ]]; then
 	git clone https://github.com/'facebookincubator/fizz'
 fi
 mkdir -p '/usr/local/src'/'fizz'/'fizz/build' && cd '/usr/local/src'/'fizz'/'fizz/build'
+git checkout '53e9df90e7876ba207deacbf60703bfbee31c442'
 
 ### Build and install fizz/fizz/build ###
 
@@ -88,6 +89,7 @@ if [[ ! -d '/usr/local/src'/'rsocket-cpp' ]]; then
 	git clone https://github.com/'rsocket/rsocket-cpp'
 fi
 mkdir -p '/usr/local/src'/'rsocket-cpp'/'rsocket' && cd '/usr/local/src'/'rsocket-cpp'/'rsocket'
+git checkout '8584e390e26c1eccae8da4283b42e93f7d4926f0'
 
 ### Build and install rsocket-cpp/rsocket ###
 
@@ -119,7 +121,7 @@ if [[ ! -d '/usr/local/src'/'zstd' ]]; then
 	git clone https://github.com/'facebook/zstd'
 fi
 mkdir -p '/usr/local/src'/'zstd'/'.' && cd '/usr/local/src'/'zstd'/'.'
-git checkout $(git describe --abbrev=0 --tags origin/master)
+git checkout '83b51e9f886be7c2a4d477b6e7bc6db831791d8d'
 
 ### Build and install zstd ###
 
@@ -134,7 +136,7 @@ if [[ ! -d '/usr/local/src'/'mstch' ]]; then
 	git clone https://github.com/'no1msd/mstch'
 fi
 mkdir -p '/usr/local/src'/'mstch'/'build' && cd '/usr/local/src'/'mstch'/'build'
-git checkout $(git describe --abbrev=0 --tags)
+git checkout 'ff459067bd02e80dc399006bb610238223d41c50'
 
 ### Build and install no1msd/mstch ###
 
@@ -171,6 +173,7 @@ if [[ ! -d '/usr/local/src'/'sigar' ]]; then
 	git clone https://github.com/'hyperic/sigar'
 fi
 mkdir -p '/usr/local/src'/'sigar'/'.' && cd '/usr/local/src'/'sigar'/'.'
+git checkout 'ad47dc3b494e9293d1f087aebb099bdba832de5e'
 
 ### Build and install sigar ###
 
@@ -225,6 +228,7 @@ if [[ ! -d '/usr/local/src'/'re2' ]]; then
 	git clone https://github.com/'google/re2'
 fi
 mkdir -p '/usr/local/src'/'re2'/'build' && cd '/usr/local/src'/'re2'/'build'
+git checkout '653f9e2a6a17bcdf8dba2b3f8671aa8880efca29'
 
 ### Build and install google/re2 ###
 
@@ -259,6 +263,7 @@ if [[ ! -d '/usr/local/src'/'openr' ]]; then
 	git clone https://github.com/'facebook/openr'
 fi
 mkdir -p '/usr/local/src'/'openr'/'build' && cd '/usr/local/src'/'openr'/'build'
+git checkout 'rc-20190419-11514'
 
 ### Build and install openr/build ###
 

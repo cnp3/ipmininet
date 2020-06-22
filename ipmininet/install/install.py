@@ -10,7 +10,6 @@ from utils import supported_distributions, identify_distribution, sh
 
 MininetVersion = "2.3.0d6"
 FRRoutingVersion = "7.1"
-OpenrRelease = "rc-20190419-11514"
 
 os.environ["PATH"] = "%s:/sbin:/usr/sbin/:/usr/local/sbin" % os.environ["PATH"]
 
@@ -152,27 +151,16 @@ def install_frrouting(output_dir: str):
         break
 
 
-def install_openr(output_dir: str, openr_release=OpenrRelease,
-                  openr_remote="https://github.com/facebook/openr.git"):
-    dist.install("git")
-    openr_install = os.path.join(output_dir, "openr")
-    openr_build = os.path.join(openr_install, "build")
-    openr_buildscript = os.path.join(openr_build, "build_openr_debian.sh")
-    debian_system_builder = "debian_system_builder/debian_system_builder.py"
-    sh("git clone %s" % openr_remote,
-       cwd=output_dir)
-    sh("git checkout %s" % openr_release,
-       cwd=openr_install)
-    # Generate build script
-    with open(openr_buildscript, "w+") as f:
-        sh("python %s" % debian_system_builder,
-           stdout=f,
-           cwd=openr_build).wait()
-    # Make build script executable
-    os.chmod(openr_buildscript, stat.S_IRWXU)
+def install_openr(output_dir: str):
+    # It's not possible to get a build script with pinned dependencies from the
+    # OpenR github repository. The checked-in build script has the dependencies
+    # pinned manually. Builds and installs OpenR release rc-20190419-11514.
+    # https://github.com/facebook/openr/releases/tag/rc-20190419-11514
+    script_name = "build_openr-rc-20190419-11514.sh"
+    openr_buildscript = os.path.join("ipmininet/ipmininet/install/", script_name)
     # Execute build script
     sh(openr_buildscript,
-       cwd=openr_build,
+       cwd=output_dir,
        shell=True,
        executable="/bin/bash")
 

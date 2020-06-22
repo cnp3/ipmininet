@@ -3,10 +3,27 @@
 set -exo pipefail
 ### Install packages for Debian-based OS ###
 
-apt-get update && apt-get install -yq autoconf-archive bison build-essential cmake curl flex git gperf joe libboost-all-dev libcap-dev libdouble-conversion-dev libevent-dev libgflags-dev libgoogle-glog-dev libkrb5-dev libpcre3-dev libpthread-stubs0-dev libnuma-dev libsasl2-dev libsnappy-dev libsqlite3-dev libssl-dev libtool netcat-openbsd pkg-config sudo unzip wget python3-venv python-setuptools python3-setuptools python-pip ccache
+apt-get update && apt-get install -yq autoconf-archive bison build-essential cmake curl flex git gperf joe libboost-all-dev libcap-dev libdouble-conversion-dev libevent-dev libgflags-dev libgoogle-glog-dev libkrb5-dev libpcre3-dev libpthread-stubs0-dev libnuma-dev libsasl2-dev libsnappy-dev libsqlite3-dev libssl-dev libtool netcat-openbsd pkg-config sudo unzip wget python3-venv python-setuptools python3-setuptools python-pip python3-pip ccache
 apt-get install -yq gcc-'5' g++-'5'
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-'5' 40 --slave /usr/bin/g++ g++ /usr/bin/g++-'5'
 update-alternatives --config gcc
+
+PY_MAJOR=${PY_MAJOR:-2}
+
+if [ "$PY_MAJOR" -eq 2 ]; then
+    PY_BIN=python2
+    PIP_BIN=pip2
+elif [ "$PY_MAJOR" -eq 3 ]; then
+    PY_BIN=python3
+    PIP_BIN=pip3
+else
+    >&2 echo "PYTHON_VERSION must be set to either 2 or 3."
+    exit 1
+fi
+
+PY_VERSION=$($PY_BIN --version | sed -e 's/\(Python \)\([[:digit:]]\.[[:digit:]]\)\(.*\)/\2/g')
+PY_LIB_PATH="/usr/local/lib/python${PY_VERSION}/site-packages"
+echo "PY_LIB_PATH: $PY_LIB_PATH"
 
 export CCACHE_DIR='/ccache' CC="ccache ${CC:-gcc}" CXX="ccache ${CXX:-g++}"
 ### Diagnostics ###
@@ -164,7 +181,7 @@ sudo ldconfig
 ### Install thrift python modules ###
 
 mkdir -p '/usr/local/src'/'fbthrift/thrift/lib/py' && cd '/usr/local/src'/'fbthrift/thrift/lib/py'
-sudo python setup.py install
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py install
 
 ### Check out hyperic/sigar, workdir . ###
 
@@ -212,14 +229,14 @@ git checkout '8fba3b727c8194031351cefee71bd36ba3486645'
 ### Build and install fbzmq/fbzmq/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-PYTHONPATH="$PYTHONPATH:"'/usr/local'/lib/python2.7/site-packages make -j '4'
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make -j '4'
 sudo make install
 sudo ldconfig
 
 ### Install fbzmq python modules ###
 
 mkdir -p '/usr/local/src'/'fbzmq/fbzmq/py' && cd '/usr/local/src'/'fbzmq/fbzmq/py'
-sudo python setup.py install
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py install
 
 ### Check out google/re2, workdir build ###
 
@@ -268,16 +285,16 @@ git checkout 'rc-20190419-11514'
 ### Build and install openr/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' -D'ADD_ROOT_TESTS'='OFF' '..'
-PYTHONPATH="$PYTHONPATH:"'/usr/local'/lib/python2.7/site-packages make -j '4'
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make -j '4'
 sudo make install
 sudo ldconfig
 
 ### Install OpenR python modules ###
 
 mkdir -p '/usr/local/src'/'openr/openr/py' && cd '/usr/local/src'/'openr/openr/py'
-sudo pip install cffi future pathlib 'networkx==2.2'
-sudo python setup.py build
-sudo python setup.py install
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PIP_BIN install cffi future pathlib 'networkx==2.2'
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py build
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py install
 
 ### Run openr tests ###
 

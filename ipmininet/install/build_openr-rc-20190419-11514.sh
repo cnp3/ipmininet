@@ -21,8 +21,10 @@ else
     exit 1
 fi
 
-PY_VERSION=$($PY_BIN --version | sed -e 's/\(Python \)\([[:digit:]]\.[[:digit:]]\)\(.*\)/\2/g')
-PY_LIB_PATH="/usr/local/lib/python${PY_VERSION}/site-packages"
+PY_VERSION="$($PY_BIN --version 2>&1)"
+PY_MA=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\2/g' <<< "$PY_VERSION")
+PY_MI=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<< "$PY_VERSION")
+PY_LIB_PATH="/usr/local/lib/python$PY_MA.$PY_MI/site-packages"
 echo "PY_LIB_PATH: $PY_LIB_PATH"
 
 export CCACHE_DIR='/ccache' CC="ccache ${CC:-gcc}" CXX="ccache ${CXX:-g++}"

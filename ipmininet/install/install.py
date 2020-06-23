@@ -151,15 +151,17 @@ def install_frrouting(output_dir: str):
         break
 
 
-def install_openr(output_dir: str):
+def install_openr(output_dir: str, py_major="3"):
     # It's not possible to get a build script with pinned dependencies from the
     # OpenR github repository. The checked-in build script has the dependencies
     # pinned manually. Builds and installs OpenR release rc-20190419-11514.
     # https://github.com/facebook/openr/releases/tag/rc-20190419-11514
     script_name = "build_openr-rc-20190419-11514.sh"
-    openr_buildscript = os.path.join("ipmininet/ipmininet/install/", script_name)
+    openr_buildscript = os.path.join("ipmininet/ipmininet/install/",
+                                     script_name)
     # Execute build script
     sh(openr_buildscript,
+       env=dict(os.environ, PY_MAJOR=str(py_major)),
        cwd=output_dir,
        shell=True,
        executable="/bin/bash")

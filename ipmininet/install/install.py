@@ -151,7 +151,7 @@ def install_frrouting(output_dir: str):
         break
 
 
-def install_openr(output_dir: str, py_major="3"):
+def install_openr(output_dir: str, may_fail=False):
     # It's not possible to get a build script with pinned dependencies from the
     # OpenR github repository. The checked-in build script has the dependencies
     # pinned manually. Builds and installs OpenR release rc-20190419-11514.
@@ -160,11 +160,14 @@ def install_openr(output_dir: str, py_major="3"):
     openr_buildscript = os.path.join("ipmininet/ipmininet/install/",
                                      script_name)
     # Execute build script
-    sh(openr_buildscript,
-       env=dict(os.environ, PY_MAJOR=str(py_major)),
-       cwd=output_dir,
-       shell=True,
-       executable="/bin/bash")
+    p = sh(openr_buildscript,
+           cwd=output_dir,
+           shell=True,
+           executable="/bin/bash",
+           may_fail=may_fail)
+    # We should end here only if may_fail is True
+    if p.returncode != 0:
+        print("WARNING: Ignoring failed OpenR installation.", file=sys.stderr)
 
 
 def update_grub():

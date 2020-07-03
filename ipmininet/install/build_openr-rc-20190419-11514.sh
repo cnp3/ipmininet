@@ -8,19 +8,9 @@ apt-get install -yq gcc-'5' g++-'5'
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-'5' 40 --slave /usr/bin/g++ g++ /usr/bin/g++-'5'
 update-alternatives --config gcc
 
-PY_MAJOR=${PY_MAJOR:-2}
-
-if [ "$PY_MAJOR" -ne 2 ] && [ "$PY_MAJOR" -ne 3 ]; then
-    >&2 echo "PY_MAJOR must be set to either 2 or 3."
-    exit 1
-fi
-
-PY_BIN="python$PY_MAJOR"
-PIP_BIN="pip$PY_MAJOR"
-
-PY_VERSION="$($PY_BIN --version 2>&1)"
+PY_VERSION="$(python3 --version 2>&1)"
 PY_MINOR=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<< "$PY_VERSION")
-PY_LIB_PATH="/usr/local/lib/python$PY_MAJOR.$PY_MINOR/site-packages"
+PY_LIB_PATH="/usr/local/lib/python3.$PY_MINOR/site-packages"
 echo "PY_LIB_PATH: $PY_LIB_PATH"
 
 export CCACHE_DIR='/ccache' CC="ccache ${CC:-gcc}" CXX="ccache ${CXX:-g++}"
@@ -179,7 +169,7 @@ sudo ldconfig
 ### Install thrift python modules ###
 
 mkdir -p '/usr/local/src'/'fbthrift/thrift/lib/py' && cd '/usr/local/src'/'fbthrift/thrift/lib/py'
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py install
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo python3 setup.py install
 
 ### Check out hyperic/sigar, workdir . ###
 
@@ -234,7 +224,7 @@ sudo ldconfig
 ### Install fbzmq python modules ###
 
 mkdir -p '/usr/local/src'/'fbzmq/fbzmq/py' && cd '/usr/local/src'/'fbzmq/fbzmq/py'
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py install
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo python3 setup.py install
 
 ### Check out google/re2, workdir build ###
 
@@ -290,9 +280,9 @@ sudo ldconfig
 ### Install OpenR python modules ###
 
 mkdir -p '/usr/local/src'/'openr/openr/py' && cd '/usr/local/src'/'openr/openr/py'
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PIP_BIN install cffi future pathlib 'networkx==2.2'
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py build
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo $PY_BIN setup.py install
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo pip3 install cffi future pathlib 'networkx==2.2'
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo python3 setup.py build
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" sudo python3 setup.py install
 
 ### Run openr tests ###
 

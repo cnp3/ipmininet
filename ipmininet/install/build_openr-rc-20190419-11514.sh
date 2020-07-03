@@ -29,6 +29,8 @@ PY_MINOR=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<<
 PY_LIB_PATH="/usr/local/lib/python3.$PY_MINOR/site-packages"
 echo "PY_LIB_PATH: $PY_LIB_PATH"
 
+export MAKEFLAGS="$MAKEFLAGS -j $(nproc)"
+
 export CCACHE_DIR='/ccache' CC="ccache ${CC:-gcc}" CXX="ccache ${CXX:-g++}"
 ### Diagnostics ###
 
@@ -50,7 +52,7 @@ git checkout $FOLLY_REV
 ### Build and install facebook/folly ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -67,7 +69,7 @@ git checkout $SODIUM_REV
 
 ./autogen.sh
 LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" ./configure 
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -83,7 +85,7 @@ git checkout $FIZZ_REV
 ### Build and install fizz/fizz/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -99,7 +101,7 @@ git checkout $GTEST_REV
 ### Build and install google/googletest ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_GTEST'='ON' -D'BUILD_SHARED_LIBS'='OFF' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -115,7 +117,7 @@ git checkout $RSOCKET_REV
 ### Build and install rsocket-cpp/rsocket ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -131,7 +133,7 @@ git checkout $WANGLE_REV
 ### Build and install wangle/wangle/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' -D'BUILD_TESTS'='OFF' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -146,7 +148,7 @@ git checkout $ZSTD_REV
 
 ### Build and install zstd ###
 
-make -j '4' VERBOSE=1 'PREFIX'='/usr/local'
+make VERBOSE=1 'PREFIX'='/usr/local'
 sudo make install VERBOSE=1 'PREFIX'='/usr/local'
 sudo ldconfig
 
@@ -162,7 +164,7 @@ git checkout $MSTCH_REV
 ### Build and install no1msd/mstch ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -178,7 +180,7 @@ git checkout $FBTHRIFT_REV
 ### Build and install fbthrift/thrift ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -200,7 +202,7 @@ git checkout $SIGAR_REV
 
 ./autogen.sh
 LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" ./configure 'CFLAGS'='-fgnu89-inline'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -217,7 +219,7 @@ git checkout $ZMQ_REV
 
 ./autogen.sh
 LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" ./configure 
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -233,7 +235,7 @@ git checkout $FBZMQ_REV
 ### Build and install fbzmq/fbzmq/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make -j '4'
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make
 sudo make install
 sudo ldconfig
 
@@ -254,7 +256,7 @@ git checkout $RE2_REV
 ### Build and install google/re2 ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -273,7 +275,7 @@ curl -O https://raw.githubusercontent.com/facebook/openr/$OPENR_REV/build/fix-ro
 git apply 'fix-route-obj-attr-list.patch'
 ./autogen.sh
 LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" ./configure 
-make -j '4' VERBOSE=1 
+make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
 
@@ -289,7 +291,7 @@ git checkout $OPENR_REV
 ### Build and install openr/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' -D'ADD_ROOT_TESTS'='OFF' '..'
-PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make -j '4'
+PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make
 sudo make install
 sudo ldconfig
 

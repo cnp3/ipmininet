@@ -8,6 +8,22 @@ apt-get install -yq gcc-'5' g++-'5'
 update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-'5' 40 --slave /usr/bin/g++ g++ /usr/bin/g++-'5'
 update-alternatives --config gcc
 
+FOLLY_REV="3ceffd7d145be3c85a2aae39f99eb86ea730bdcc"
+SODIUM_REV="6bece9c8c45259998f83ce243b1933e76c03f545"
+FIZZ_REV="53e9df90e7876ba207deacbf60703bfbee31c442"
+GTEST_REV="release-1.8.1"
+RSOCKET_REV="8584e390e26c1eccae8da4283b42e93f7d4926f0"
+WANGLE_REV="f2f8e1996739df1fc8ab1e003a1bc6472bd5b9bd"
+ZSTD_REV="83b51e9f886be7c2a4d477b6e7bc6db831791d8d"
+MSTCH_REV="ff459067bd02e80dc399006bb610238223d41c50"
+FBTHRIFT_REV="2e3a85eb29e0cc3bad910093656bc2196f9e96ae"
+SIGAR_REV="ad47dc3b494e9293d1f087aebb099bdba832de5e"
+ZMQ_REV="v4.2.5"
+FBZMQ_REV="8fba3b727c8194031351cefee71bd36ba3486645"
+RE2_REV="653f9e2a6a17bcdf8dba2b3f8671aa8880efca29"
+LIBNL_REV="libnl3_2_25"
+OPENR_REV="rc-20190419-11514"
+
 PY_VERSION="$(python3 --version 2>&1)"
 PY_MINOR=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<< "$PY_VERSION")
 PY_LIB_PATH="/usr/local/lib/python3.$PY_MINOR/site-packages"
@@ -29,7 +45,7 @@ if [[ ! -d '/usr/local/src'/'folly' ]]; then
 	git clone https://github.com/'facebook/folly'
 fi
 mkdir -p '/usr/local/src'/'folly'/'_build' && cd '/usr/local/src'/'folly'/'_build'
-git checkout '3ceffd7d145be3c85a2aae39f99eb86ea730bdcc'
+git checkout $FOLLY_REV
 
 ### Build and install facebook/folly ###
 
@@ -45,7 +61,7 @@ if [[ ! -d '/usr/local/src'/'libsodium' ]]; then
 	git clone https://github.com/'jedisct1/libsodium'
 fi
 mkdir -p '/usr/local/src'/'libsodium'/'.' && cd '/usr/local/src'/'libsodium'/'.'
-git checkout '6bece9c8c45259998f83ce243b1933e76c03f545'
+git checkout $SODIUM_REV
 
 ### Build and install jedisct1/libsodium ###
 
@@ -62,7 +78,7 @@ if [[ ! -d '/usr/local/src'/'fizz' ]]; then
 	git clone https://github.com/'facebookincubator/fizz'
 fi
 mkdir -p '/usr/local/src'/'fizz'/'fizz/build' && cd '/usr/local/src'/'fizz'/'fizz/build'
-git checkout '53e9df90e7876ba207deacbf60703bfbee31c442'
+git checkout $FIZZ_REV
 
 ### Build and install fizz/fizz/build ###
 
@@ -78,7 +94,7 @@ if [[ ! -d '/usr/local/src'/'googletest' ]]; then
 	git clone https://github.com/'google/googletest'
 fi
 mkdir -p '/usr/local/src'/'googletest'/'build' && cd '/usr/local/src'/'googletest'/'build'
-git checkout 'release-1.8.1'
+git checkout $GTEST_REV
 
 ### Build and install google/googletest ###
 
@@ -94,7 +110,7 @@ if [[ ! -d '/usr/local/src'/'rsocket-cpp' ]]; then
 	git clone https://github.com/'rsocket/rsocket-cpp'
 fi
 mkdir -p '/usr/local/src'/'rsocket-cpp'/'rsocket' && cd '/usr/local/src'/'rsocket-cpp'/'rsocket'
-git checkout '8584e390e26c1eccae8da4283b42e93f7d4926f0'
+git checkout $RSOCKET_REV
 
 ### Build and install rsocket-cpp/rsocket ###
 
@@ -110,7 +126,7 @@ if [[ ! -d '/usr/local/src'/'wangle' ]]; then
 	git clone https://github.com/'facebook/wangle'
 fi
 mkdir -p '/usr/local/src'/'wangle'/'wangle/build' && cd '/usr/local/src'/'wangle'/'wangle/build'
-git checkout 'f2f8e1996739df1fc8ab1e003a1bc6472bd5b9bd'
+git checkout $WANGLE_REV
 
 ### Build and install wangle/wangle/build ###
 
@@ -126,7 +142,7 @@ if [[ ! -d '/usr/local/src'/'zstd' ]]; then
 	git clone https://github.com/'facebook/zstd'
 fi
 mkdir -p '/usr/local/src'/'zstd'/'.' && cd '/usr/local/src'/'zstd'/'.'
-git checkout '83b51e9f886be7c2a4d477b6e7bc6db831791d8d'
+git checkout $ZSTD_REV
 
 ### Build and install zstd ###
 
@@ -141,7 +157,7 @@ if [[ ! -d '/usr/local/src'/'mstch' ]]; then
 	git clone https://github.com/'no1msd/mstch'
 fi
 mkdir -p '/usr/local/src'/'mstch'/'build' && cd '/usr/local/src'/'mstch'/'build'
-git checkout 'ff459067bd02e80dc399006bb610238223d41c50'
+git checkout $MSTCH_REV
 
 ### Build and install no1msd/mstch ###
 
@@ -157,7 +173,7 @@ if [[ ! -d '/usr/local/src'/'fbthrift' ]]; then
 	git clone https://github.com/'facebook/fbthrift'
 fi
 mkdir -p '/usr/local/src'/'fbthrift'/'thrift' && cd '/usr/local/src'/'fbthrift'/'thrift'
-git checkout '2e3a85eb29e0cc3bad910093656bc2196f9e96ae'
+git checkout $FBTHRIFT_REV
 
 ### Build and install fbthrift/thrift ###
 
@@ -178,7 +194,7 @@ if [[ ! -d '/usr/local/src'/'sigar' ]]; then
 	git clone https://github.com/'hyperic/sigar'
 fi
 mkdir -p '/usr/local/src'/'sigar'/'.' && cd '/usr/local/src'/'sigar'/'.'
-git checkout 'ad47dc3b494e9293d1f087aebb099bdba832de5e'
+git checkout $SIGAR_REV
 
 ### Build and install sigar ###
 
@@ -195,7 +211,7 @@ if [[ ! -d '/usr/local/src'/'libzmq' ]]; then
 	git clone https://github.com/'zeromq/libzmq'
 fi
 mkdir -p '/usr/local/src'/'libzmq'/'.' && cd '/usr/local/src'/'libzmq'/'.'
-git checkout 'v4.2.5'
+git checkout $ZMQ_REV
 
 ### Build and install zeromq/libzmq ###
 
@@ -212,7 +228,7 @@ if [[ ! -d '/usr/local/src'/'fbzmq' ]]; then
 	git clone https://github.com/'facebook/fbzmq'
 fi
 mkdir -p '/usr/local/src'/'fbzmq'/'fbzmq/build' && cd '/usr/local/src'/'fbzmq'/'fbzmq/build'
-git checkout '8fba3b727c8194031351cefee71bd36ba3486645'
+git checkout $FBZMQ_REV
 
 ### Build and install fbzmq/fbzmq/build ###
 
@@ -233,7 +249,7 @@ if [[ ! -d '/usr/local/src'/'re2' ]]; then
 	git clone https://github.com/'google/re2'
 fi
 mkdir -p '/usr/local/src'/'re2'/'build' && cd '/usr/local/src'/'re2'/'build'
-git checkout '653f9e2a6a17bcdf8dba2b3f8671aa8880efca29'
+git checkout $RE2_REV
 
 ### Build and install google/re2 ###
 
@@ -249,11 +265,11 @@ if [[ ! -d '/usr/local/src'/'libnl' ]]; then
 	git clone https://github.com/'thom311/libnl'
 fi
 mkdir -p '/usr/local/src'/'libnl'/'.' && cd '/usr/local/src'/'libnl'/'.'
-git checkout 'libnl3_2_25'
+git checkout $LIBNL_REV
 
 ### Build and install thom311/libnl ###
 
-curl -O https://raw.githubusercontent.com/facebook/openr/rc-20190419-11514/build/fix-route-obj-attr-list.patch
+curl -O https://raw.githubusercontent.com/facebook/openr/$OPENR_REV/build/fix-route-obj-attr-list.patch
 git apply 'fix-route-obj-attr-list.patch'
 ./autogen.sh
 LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" ./configure 
@@ -268,7 +284,7 @@ if [[ ! -d '/usr/local/src'/'openr' ]]; then
 	git clone https://github.com/'facebook/openr'
 fi
 mkdir -p '/usr/local/src'/'openr'/'build' && cd '/usr/local/src'/'openr'/'build'
-git checkout 'rc-20190419-11514'
+git checkout $OPENR_REV
 
 ### Build and install openr/build ###
 

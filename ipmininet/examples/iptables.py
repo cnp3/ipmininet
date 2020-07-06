@@ -3,18 +3,22 @@ custom ip(6)table rules, aka ACLs, to control traffic destined to them
 (hence why only INPUT rules are specified).
 
 Only ICMP traffic will be allowed between the routers over
-IPv4, whereas IPv6 traffic can only be made of TCP traffic (regularly
-established, hence the use of CONNTRACK) or ICMP6 ND/NA."""
+IPv4 as well as non-privileged TCP ports, whereas IPv6 traffic can only be
+made of TCP traffic (regularly established, hence the use of CONNTRACK) or
+ICMP6 ND/NA."""
 from ipmininet.iptopo import IPTopo
-from ipmininet.router.config import IPTables, IP6Tables, RouterConfig
-from ipmininet.router.config.iptables import Rule
+from ipmininet.router.config import IPTables, IP6Tables, RouterConfig, Rule, \
+    InputFilter, NOT, Deny, Allow
 
 
 class IPTablesTopo(IPTopo):
     """This is a simple 2-hosts topology with custom IPTable rules."""
     def build(self, *args, **kw):
-        ip_rules = [Rule('-A INPUT -p icmp -j ACCEPT'),
-                    Rule('-A INPUT -j DROP')]
+        ip_rules = [InputFilter(default="DROP", rules=[
+                        Deny(proto='tcp', port='80:1024'),
+                        Allow(proto='tcp', port=NOT(1480)),
+                        Allow(proto='icmp'),
+                    ])]
         ip6_rules = [
             Rule('-A INPUT -p icmpv6 -m icmpv6',
                  '--icmpv6-type neighbour-solicitation -j ACCEPT'),

@@ -202,7 +202,7 @@ _args_ : n/a
 This network spawns two routers, which have custom ACLs set such that their
 inbound traffic (the INPUT chains in ip(6)tables):
 
-  - Can only be ICMP traffic over IPv4
+  - Can only be ICMP traffic over IPv4 as well as non-privileged TCP ports
   - Can only be (properly established) TCP over IPv6
 
 You can test this by trying to ping(6) both routers, use nc to (try to)

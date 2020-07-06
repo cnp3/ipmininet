@@ -9,7 +9,9 @@ from .bgp import BGP, AS, iBGPFullMesh, bgp_peering, bgp_fullmesh, \
     ebgp_session, set_rr, AccessList, CommunityList, AF_INET, AF_INET6, \
     SHARE, CLIENT_PROVIDER
 from .radvd import RADVD, AdvPrefix, AdvRDNSS, AdvConnectedPrefix
-from .iptables import IPTables, IP6Tables
+from .iptables import IPTables, IP6Tables, Rule, Chain, ChainRule, NOT, \
+    PortClause, InterfaceClause, AddressClause, Filter, InputFilter, \
+    OutputFilter, TransitFilter, Allow, Deny
 from .sshd import SSHd
 from .pimd import PIMD
 from .ripng import RIPng
@@ -23,4 +25,6 @@ __all__ = ['BasicRouterConfig', 'NodeConfig', 'Zebra', 'OSPF', 'OSPF6',
            'IP6Tables', 'SSHd', 'RADVD', 'AdvPrefix', 'AdvConnectedPrefix',
            'AdvRDNSS', 'PIMD', 'RIPng', 'STATIC', 'StaticRoute',
            'OpenrDaemon', 'Openr', 'OpenrDomain', 'AF_INET', 'AF_INET6',
-           'BorderRouterConfig']
+           'BorderRouterConfig', 'Rule', 'Chain', 'ChainRule', 'NOT',
+           'PortClause', 'InterfaceClause', 'AddressClause', 'Filter',
+           'InputFilter', 'OutputFilter', 'TransitFilter', 'Allow', 'Deny']

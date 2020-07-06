@@ -32,6 +32,18 @@ def test_iptables_example():
                                            timeout=.5)
         assert ret != 0, "TCP over port 80 should be blocked over IPv4"
 
+        ret, _, _ = check_tcp_connectivity(net["r1"], net["r2"],
+                                           server_port=1480,
+                                           server_itf=net["r2"].intf("r2-eth0"),
+                                           timeout=.5)
+        assert ret != 0, "TCP over port 1480 should be blocked over IPv4"
+
+        ret, _, _ = check_tcp_connectivity(net["r1"], net["r2"],
+                                           server_port=2000,
+                                           server_itf=net["r2"].intf("r2-eth0"),
+                                           timeout=.5)
+        assert ret == 0, "TCP over port 2000 should not be blocked over IPv4"
+
         ret, out, err = \
             check_tcp_connectivity(net["r1"], net["r2"], v6=True,
                                    server_port=80,

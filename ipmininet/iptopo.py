@@ -89,6 +89,14 @@ class IPTopo(Topo):
                                            self.linkInfo(node1, node2, key))
         return link_description
 
+    def addLinks(self, *links, **opts):
+        """Add several links in one go.
+
+        :param links: link description tuples
+        :param opts: link otions (optional)"""
+        for descr in links:
+            self.addLink(*descr, **opts)
+
     def addDaemon(self, node: str, daemon: Union[Daemon, Type[Daemon]],
                   default_cfg_class: Type[NodeConfig] = BasicRouterConfig,
                   cfg_daemon_list="daemons", **daemon_params):

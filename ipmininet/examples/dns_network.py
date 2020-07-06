@@ -27,9 +27,7 @@ class DNSNetwork(IPTopo):
         r1 = self.addRouter('r1')
         r2 = self.addRouter('r2')
         r3 = self.addRouter('r3')
-        self.addLink(r1, r2)
-        self.addLink(r1, r3)
-        self.addLink(r3, r2)
+        self.addLinks((r1, r2), (r1, r3), (r3, r2))
 
         # Add hosts
 

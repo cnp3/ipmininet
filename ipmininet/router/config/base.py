@@ -445,3 +445,27 @@ class BasicRouterConfig(RouterConfig):
             d.append(OSPF6)
         d.extend(additional_daemons)
         super().__init__(node, daemons=d, *args, **kwargs)
+
+
+class BorderRouterConfig(BasicRouterConfig):
+    """A router config that will run both OSPF and BGP, and redistribute all
+    connected router into BGP."""
+
+    def __init__(self, node: 'Router',
+                 daemons: Iterable[DaemonOption] = (),
+                 additional_daemons: Iterable[DaemonOption] = (),
+                 *args, **kwargs):
+        """A simple router made of at least an OSPF daemon
+
+        :param additional_daemons: Other daemons that should be used"""
+        from .bgp import BGP, AF_INET, AF_INET6
+
+        af = []
+        if node.use_v4:
+            af.append(AF_INET(redistribute=('connected',))
+        if node.use_v6:
+            af.append(AF_INET6(redistribute=('connected',))
+        if af:
+            d = list(daemons)
+            d.append((BGP, {'address_families': af}))
+        super().__init__(node, daemons=d, *args, **kwargs)

@@ -455,7 +455,7 @@ class BorderRouterConfig(BasicRouterConfig):
                  daemons: Iterable[DaemonOption] = (),
                  additional_daemons: Iterable[DaemonOption] = (),
                  *args, **kwargs):
-        """A simple router made of at least an OSPF daemon
+        """A simple router made of at least an OSPF daemon and a BGP daemon
 
         :param additional_daemons: Other daemons that should be used"""
         from .bgp import BGP, AF_INET, AF_INET6

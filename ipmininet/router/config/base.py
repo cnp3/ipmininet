@@ -462,9 +462,9 @@ class BorderRouterConfig(BasicRouterConfig):
 
         af = []
         if node.use_v4:
-            af.append(AF_INET(redistribute=('connected',))
+            af.append(AF_INET(redistribute=('connected', 'ospf')))
         if node.use_v6:
-            af.append(AF_INET6(redistribute=('connected',))
+            af.append(AF_INET6(redistribute=('connected', 'ospf6')))
         if af:
             d = list(daemons)
             d.append((BGP, {'address_families': af}))

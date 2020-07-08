@@ -64,6 +64,13 @@ class IPTopo(Topo):
         return RouterDescription(self.addNode(str(name), isRouter=True,
                                               **kwargs), self)
 
+    def addRouters(self, *routers, **opts) -> List['RouterDescription']:
+        """Add several routers in one go.
+
+        :param routers: router names
+        :param opts: router options (optional)"""
+        return [self.addRouter(name, **opts) for name in routers]
+
     def addLink(self, node1: str, node2: str, port1=None, port2=None,
                 key=None, **opts) -> 'LinkDescription':
         """:param node1: first node to link

@@ -157,7 +157,7 @@ def install_openr(output_dir: str, may_fail=False):
     # pinned manually. Builds and installs OpenR release rc-20190419-11514.
     # https://github.com/facebook/openr/releases/tag/rc-20190419-11514
     script_name = "build_openr-rc-20190419-11514.sh"
-    openr_buildscript = os.path.join("ipmininet/ipmininet/install/",
+    openr_buildscript = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                      script_name)
     # Execute build script
     p = sh(openr_buildscript,

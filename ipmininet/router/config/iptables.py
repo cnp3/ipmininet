@@ -30,9 +30,10 @@ class IPTables(Daemon):
 
     def set_defaults(self, defaults):
         """
-        :param rules: The (ordered) list of iptables rules that should be
-                      executed. If a rule is an iterable of strings,
-                      these will be joined using a space."""
+        :param rules: The (ordered) list of iptables Rules that should be
+                      executed or the list of Chain objects each containing
+                      rules. If a rule is an iterable of strings, these will
+                      be joined using a space."""
         defaults.rules = []
         super().set_defaults(defaults)
 
@@ -183,6 +184,9 @@ class ChainRule:
 
 class NOT:
     def __init__(self, clause):
+        """ Negates the match clause
+        :param clause: The value of the match clause to negate
+        """
         self.clause = clause
 
 

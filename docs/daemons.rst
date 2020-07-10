@@ -147,21 +147,112 @@ IPTables
 --------
 
 This is currently mainly a proxy class to generate a list of static rules to pass to iptables.
-As such, see `man iptables` and `man iptables-extensions`
-to see the various table names, commands, pre-existing chains, ...
 
 It takes one parameter:
 
 .. automethod:: ipmininet.router.config.iptables.IPTables.set_defaults
     :noindex:
 
+These rules can be Rule objects with raw iptables command
+As such, see `man iptables` and `man iptables-extensions`
+to see the various table names, commands, pre-existing chains, ...
+
+.. autoclass:: ipmininet.router.config.iptables.Rule
+    :noindex:
+
+In this example, only ICMP traffic will be allowed between the routers over
+IPv4 as well as non-privileged TCP ports:
+
+.. testcode:: iptables
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.router.config import IPTables, Rule
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+            r1 = self.addRouter('r1')
+            r2 = self.addRouter('r2')
+            self.addLink(r1, r2)
+
+            ip_rules = [Rule("-P INPUT DROP"),
+                        Rule("-A INPUT -p tcp -m multiport --ports 80:1024 -j "
+                             "DROP"),
+                        Rule("-A INPUT -p tcp -m multiport ! --ports 1480 -j "
+                             "ACCEPT"),
+                        Rule("-A INPUT -p icmp -j ACCEPT")]
+            r1.addDaemon(IPTables, rules=ip_rules)
+            r2.addDaemon(IPTables, rules=ip_rules)
+
+            super().build(*args, **kwargs)
+
+You can use other classes for better abstraction.
+You can use the Chain class or one of its subclasses:
+
+.. autoclass:: ipmininet.router.config.iptables.Chain
+    :noindex:
+
+.. autoclass:: ipmininet.router.config.iptables.Filter
+    :noindex:
+
+.. autoclass:: ipmininet.router.config.iptables.InputFilter
+    :noindex:
+
+.. autoclass:: ipmininet.router.config.iptables.OutputFilter
+    :noindex:
+
+.. autoclass:: ipmininet.router.config.iptables.TransitFilter
+    :noindex:
+
+Each rule in the Chain instance is a ChainRule that you can use directly or
+use one of its subclasses:
+
+.. autoclass:: ipmininet.router.config.iptables.ChainRule
+    :noindex:
+
+.. autoclass:: ipmininet.router.config.iptables.Allow
+    :noindex:
+
+.. autoclass:: ipmininet.router.config.iptables.Deny
+    :noindex:
+
+Each input value used for matching in ChainRule constructor can be negated
+with the NOT class:
+
+.. autoclass:: ipmininet.router.config.iptables.NOT
+    :noindex:
+
+This example implements the same properties as the previous one with the API.
+
+.. testcode:: iptables2
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.router.config import IPTables, InputFilter, NOT, \
+        Deny, Allow
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+            r1 = self.addRouter('r1')
+            r2 = self.addRouter('r2')
+            self.addLink(r1, r2)
+
+            ip_rules = [InputFilter(default="DROP", rules=[
+                            Deny(proto='tcp', port='80:1024'),
+                            Allow(proto='tcp', port=NOT(1480)),
+                            Allow(proto='icmp'),
+                        ])]
+            r1.addDaemon(IPTables, rules=ip_rules)
+            r2.addDaemon(IPTables, rules=ip_rules)
+
+            super().build(*args, **kwargs)
 
 IP6Tables
 ---------
 
 This class is the IPv6 equivalent to IPTables.
 
-It also takes one parameter:
+It also takes the same parameter (see previous section for details):
 
 .. automethod:: ipmininet.router.config.iptables.IP6Tables.set_defaults
     :noindex:

@@ -29,7 +29,8 @@ PY_MINOR=$(sed -e 's/\(Python \)\([[:digit:]]\)\.\([[:digit:]]\)\(.*\)/\3/g' <<<
 PY_LIB_PATH="/usr/local/lib/python3.$PY_MINOR/site-packages"
 echo "PY_LIB_PATH: $PY_LIB_PATH"
 
-export MAKEFLAGS="$MAKEFLAGS -j $(nproc)"
+NPROC=$(nproc 2> /dev/null || echo 1)
+export MAKEFLAGS="$MAKEFLAGS -j $NPROC"
 
 export CCACHE_DIR='/ccache' CC="ccache ${CC:-gcc}" CXX="ccache ${CXX:-g++}"
 ### Diagnostics ###
@@ -117,6 +118,7 @@ git checkout $RSOCKET_REV
 ### Build and install rsocket-cpp/rsocket ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' '..'
+make gmock
 make VERBOSE=1
 sudo make install VERBOSE=1 
 sudo ldconfig
@@ -291,6 +293,7 @@ git checkout $OPENR_REV
 ### Build and install openr/build ###
 
 CXXFLAGS="$CXXFLAGS -fPIC" CFLAGS="$CFLAGS -fPIC" cmake -D'BUILD_SHARED_LIBS'='ON' -D'ADD_ROOT_TESTS'='OFF' '..'
+make Decision-cpp2-obj Dual-cpp2-obj HealthChecker-cpp2-obj KvStore-cpp2-obj LinkMonitor-cpp2-obj
 PYTHONPATH="$PYTHONPATH:$PY_LIB_PATH" make
 sudo make install
 sudo ldconfig

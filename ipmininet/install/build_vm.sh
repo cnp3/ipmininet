@@ -27,7 +27,7 @@ sudo sed -i -e 's/^\(127\.0\.1\.1\).*/\1\tmininet-vm/' /etc/hosts
 
 # Install mininet
 pushd $HOME
-source <(curl -sL ${MN_INSTALL_SCRIPT_REMOTE})
+source <(curl -sL ${MN_INSTALL_SCRIPT_REMOTE}) ${MN_VERSION}
 
 # Update pip install
 sudo pip3 install --upgrade pip

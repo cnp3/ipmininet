@@ -1,12 +1,13 @@
 """This module defines topology class that supports adding L3 routers"""
 import functools
-from typing import Union, Type, Dict, List, Optional
+import itertools
+from typing import Union, Type, Dict, List, Optional, Tuple, Any
 
 from mininet.topo import Topo
 from mininet.log import lg
 
 from ipmininet.overlay import Overlay, Subnet
-from ipmininet.utils import get_set
+from ipmininet.utils import get_set, is_container
 from ipmininet.router.config import BasicRouterConfig, OSPFArea, AS,\
     iBGPFullMesh, OpenrDomain
 from ipmininet.router.config.base import Daemon, RouterConfig, NodeConfig
@@ -64,12 +65,31 @@ class IPTopo(Topo):
         return RouterDescription(self.addNode(str(name), isRouter=True,
                                               **kwargs), self)
 
-    def addRouters(self, *routers, **opts) -> List['RouterDescription']:
+    def addRouters(self, *routers: Union[str, Tuple[str, Dict[str, Any]]],
+                   **common_opts) -> List['RouterDescription']:
         """Add several routers in one go.
 
-        :param routers: router names
-        :param opts: router options (optional)"""
-        return [self.addRouter(name, **opts) for name in routers]
+        :param routers: router names or tuples (each containing the router name
+            and options only applying to this router)
+        :param common_opts: common router options (optional)"""
+        new_routers = []
+        for router_info in routers:
+            # Accept either router names or tuple containing both a router name
+            # and the specific options of the router
+            n, opt = router_info if is_container(router_info) \
+                else (router_info, {})
+            # Merge router options by giving precedence to specific ones
+            router_opts = {k: v
+                           for k, v in itertools.chain(common_opts.items(),
+                                                       opt.items())}
+            try:
+                new_routers.append(self.addRouter(n, **router_opts))
+            except Exception as e:
+                lg.error("Cannot create router '{}' with options '{}'"
+                         .format(n, router_opts))
+                raise e
+
+        return new_routers
 
     def addLink(self, node1: str, node2: str, port1=None, port2=None,
                 key=None, **opts) -> 'LinkDescription':
@@ -96,12 +116,29 @@ class IPTopo(Topo):
                                            self.linkInfo(node1, node2, key))
         return link_description
 
-    def addLinks(self, *links, **opts) -> List['LinkDescription']:
+    def addLinks(self, *links: Union[Tuple[str, str],
+                                     Tuple[str, str, Dict[str, Any]]],
+                 **common_opts) -> List['LinkDescription']:
         """Add several links in one go.
 
-        :param links: link description tuples
-        :param opts: link options (optional)"""
-        return [self.addLink(*descr, **opts) for descr in links]
+        :param links: link description tuples, either only both node names
+            or nodes names with link-specific options
+        :param common_opts: common link options (optional)"""
+
+        new_links = []
+        for u, v, *opt in links:
+            # Merge link options by giving precedence to specific ones
+            opt = opt[0] if opt else {}
+            link_opts = {k: v for k, v in itertools.chain(common_opts.items(),
+                                                          opt.items())}
+            try:
+                new_links.append(self.addLink(u, v, **link_opts))
+            except Exception as e:
+                lg.error("Cannot create link between '{}' and '{}'"
+                         " with options '{}'".format(u, v, link_opts))
+                raise e
+
+        return new_links
 
     def addDaemon(self, node: str, daemon: Union[Daemon, Type[Daemon]],
                   default_cfg_class: Type[NodeConfig] = BasicRouterConfig,

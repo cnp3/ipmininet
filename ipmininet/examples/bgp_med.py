@@ -50,16 +50,11 @@ class BGPTopoMed(IPTopo):
         # Add Links
         self.addLink(as1r1, as1r6)
         self.addLink(as1r1, as1r3, igp_metric=2)
-        self.addLink(as1r3, as1r2)
-        self.addLink(as1r3, as1r6)
+        self.addLinks((as1r3, as1r2), (as1r3, as1r6))
         self.addLink(as1r2, as1r4, igp_metric=4)
-        self.addLink(as1r4, as1r5)
-        self.addLink(as1r5, as1r6)
-        self.addLink(as4r1, as1r6)
-        self.addLink(as4r2, as1r5)
-        self.addLink(as4r1, switch)
-        self.addLink(as4r2, switch)
-        self.addLink(switch, as4h1)
+        self.addLinks((as1r4, as1r5), (as1r5, as1r6), (as4r1, as1r6),
+                      (as4r2, as1r5), (as4r1, switch), (as4r2, switch),
+                      (switch, as4h1))
         self.addSubnet((as4r1, as4r2, as4h1), subnets=('dead:beef::/32',))
 
         al = AccessList(name='all', entries=('any',))

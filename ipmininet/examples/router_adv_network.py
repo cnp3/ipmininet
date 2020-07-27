@@ -20,7 +20,8 @@ class RouterAdvNet(IPTopo):
         server.  Note that the DNS service is not actually started and thus the
         host won't get a DNS reply.
         """
-        r = self.addRouter_v6('r')
+        r = self.addRouter('r', config=RouterConfig, use_v4=False,
+                           use_v6=True)
         r.addDaemon(RADVD)
         h = self.addHost('h')
         dns = self.addHost('dns')
@@ -33,7 +34,3 @@ class RouterAdvNet(IPTopo):
         lrdns[dns].addParams(ip=("2001:89ab::d/64", "2001:cdef::d/64"))
 
         super().build(*args, **kwargs)
-
-    def addRouter_v6(self, name, **kwargs):
-        return self.addRouter(name, config=RouterConfig, use_v4=False,
-                              use_v6=True, **kwargs)

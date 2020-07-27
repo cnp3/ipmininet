@@ -38,8 +38,8 @@ Management Network (OOB)|       |              |        |          |            
         host number attached to that router, and Y the router name.
         """
         # Build backbone
-        r1, r2 = self.addRouter_v4('r1'), self.addRouter_v4('r2')
-        r3 = self.addRouter_v4('r3')
+        r1, r2, r3 = self.addRouters('r1', 'r2', 'r3', use_v4=True,
+                                     use_v6=False)
         self.addLink(r1, r2)
         self.addLink(r1, r3, igp_metric=5)
         self.addLink(r3, r2)
@@ -49,7 +49,7 @@ Management Network (OOB)|       |              |        |          |            
                              params2={'v4_width': 5})
 
         # Area 1.1.1.1 is delimited by an OSPFArea overlay
-        r4, r5 = self.addRouter_v4('r4'), self.addRouter_v4('r5')
+        r4, r5 = self.addRouters('r4', 'r5', use_v4=True, use_v6=False)
         self.addLink(r2, r5)
         self.addLink(r2, r4)
         self.addLink(r4, r5, igp_metric=10)
@@ -59,7 +59,7 @@ Management Network (OOB)|       |              |        |          |            
         self.addOSPFArea(routers=(r4, r5), area='1.1.1.1')
 
         # Area 2.2.2.2 is delimited by the igp_area parameter of addLink()
-        r6, r7 = self.addRouter_v4('r6'), self.addRouter_v4('r7')
+        r6, r7 = self.addRouters('r6', 'r7', use_v4=True, use_v6=False)
         self.addLink(r3, r6, igp_area='2.2.2.2')
         self.addLink(r3, r7, igp_area='2.2.2.2', igp_metric=5)
         self.addLink(r6, r7, igp_area='2.2.2.2')
@@ -74,6 +74,3 @@ Management Network (OOB)|       |              |        |          |            
             self.addLink(s1, r, igp_passive=True)
 
         super().build(*args, **kwargs)
-
-    def addRouter_v4(self, name):
-        return self.addRouter(name, use_v4=True, use_v6=False)

@@ -19,8 +19,7 @@ class SpanningTreeCost(IPTopo):
         s2 = self.addSwitch("s2", stp=True, prio=2)
         s3 = self.addSwitch("s3", stp=True, prio=3)
 
-        self.addLink(s1, s2)
-        self.addLink(s2, s3)
+        self.addLinks((s1, s2), (s2, s3))
         self.addLink(s3, s1, stp_cost=10)
 
         for s in self.switches():

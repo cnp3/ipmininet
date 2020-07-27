@@ -21,21 +21,16 @@ class RIPngNetwork(IPTopo):
         | h4  +-----+ r4  +-----+ r5  +-----+ h5  |
         +-----+     +-----+     +-----+     +-----+
         """
-        r1 = self.addRouter_v6('r1')
-        r2 = self.addRouter_v6('r2')
-        r3 = self.addRouter_v6('r3')
-        r4 = self.addRouter_v6('r4')
-        r5 = self.addRouter_v6('r5')
+        r1, r2, r3, r4, r5 = self.addRouters('r1', 'r2', 'r3', 'r4', 'r5',
+                                             use_v4=False, use_v6=True,
+                                             config=RouterConfig)
 
         h1 = self.addHost('h1')
         h3 = self.addHost('h3')
         h4 = self.addHost('h4')
         h5 = self.addHost('h5')
 
-        self.addLink(h1, r1)
-        self.addLink(h3, r3)
-        self.addLink(h4, r4)
-        self.addLink(h5, r5)
+        self.addLinks((h1, r1), (h3, r3), (h4, r4), (h5, r5))
 
         lr1r2 = self.addLink(r1, r2, igp_metric=2)
         lr1r2[r1].addParams(ip="2042:12::1/64")
@@ -68,7 +63,3 @@ class RIPngNetwork(IPTopo):
         r5.addDaemon(RIPng)
 
         super().build(*args, **kwargs)
-
-    def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True,
-                              config=RouterConfig)

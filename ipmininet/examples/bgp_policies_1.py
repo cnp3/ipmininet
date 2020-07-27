@@ -43,14 +43,9 @@ class BGPPoliciesTopo1(IPTopo):
         as3r1 = self.bgp('as3r1')
         as4r1 = self.bgp('as4r1')
         as5r1 = self.bgp('as5r1')
-        self.addLink(as1r1, as2r1)
-        self.addLink(as2r1, as2r2)
-        self.addLink(as3r1, as2r2)
-        self.addLink(as3r1, as4r1)
-        self.addLink(as5r1, as1r1)
-        self.addLink(as5r1, as2r1)
-        self.addLink(as5r1, as3r1)
-        self.addLink(as5r1, as4r1)
+        self.addLinks((as1r1, as2r1), (as2r1, as2r2), (as3r1, as2r2),
+                      (as3r1, as4r1), (as5r1, as1r1), (as5r1, as2r1),
+                      (as5r1, as3r1), (as5r1, as4r1))
         # Set AS-ownerships
         self.addAS(1, (as1r1,))
         self.addiBGPFullMesh(2, (as2r1, as2r2))

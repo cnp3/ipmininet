@@ -54,11 +54,9 @@ class RIPngNetworkAdjust(IPTopo):
        +-----+                                     +-----+
         """
 
-        r1 = self.addRouter_v6('r1')
-        r2 = self.addRouter_v6('r2')
-        r3 = self.addRouter_v6('r3')
-        r4 = self.addRouter_v6('r4')
-        r5 = self.addRouter_v6('r5')
+        r1, r2, r3, r4, r5 = self.addRouters('r1', 'r2', 'r3', 'r4', 'r5',
+                                             use_v4=False, use_v6=True,
+                                             config=RouterConfig)
         r1.addDaemon(RIPng)
         r2.addDaemon(RIPng)
         r3.addDaemon(RIPng)
@@ -70,10 +68,7 @@ class RIPngNetworkAdjust(IPTopo):
         h4 = self.addHost('h4')
         h5 = self.addHost('h5')
 
-        self.addLink(h1, r1)
-        self.addLink(h3, r3)
-        self.addLink(h4, r4)
-        self.addLink(h5, r5)
+        self.addLinks((h1, r1), (h3, r3), (h4, r4), (h5, r5))
 
         lr1r2 = self.addLink(r1, r2, igp_metric=self.lr1r2_cost)
         lr1r2[r1].addParams(ip="2042:12::1/64")
@@ -103,7 +98,3 @@ class RIPngNetworkAdjust(IPTopo):
         self.addSubnet(nodes=[r5, h5], subnets=["2042:55::/64"])
 
         super().build(*args, **kwargs)
-
-    def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True,
-                              config=RouterConfig)

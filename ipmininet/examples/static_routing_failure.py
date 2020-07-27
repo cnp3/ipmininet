@@ -24,22 +24,16 @@ class StaticRoutingNetFailure(IPTopo):
 
         """
 
-        r1 = self.addRouter_v6('r1')
-        r2 = self.addRouter_v6('r2')
-        r3 = self.addRouter_v6('r3')
-        r4 = self.addRouter_v6('r4')
-        r5 = self.addRouter_v6('r5')
-        r6 = self.addRouter_v6('r6')
+        r1, r2, r3, r4, r5, r6 = \
+            self.addRouters('r1', 'r2', 'r3', 'r4', 'r5', 'r6',
+                            use_v4=False, use_v6=True, config=RouterConfig)
 
         h1 = self.addHost('h1', use_v4=False, use_v6=True)
         h3 = self.addHost('h3', use_v4=False, use_v6=True)
         h4 = self.addHost('h4', use_v4=False, use_v6=True)
         h6 = self.addHost('h6', use_v4=False, use_v6=True)
 
-        self.addLink(h1, r1)
-        self.addLink(h3, r3)
-        self.addLink(h4, r4)
-        self.addLink(h6, r6)
+        self.addLinks((h1, r1), (h3, r3), (h4, r4), (h6, r6))
 
         lr1r2 = self.addLink(r1, r2)
         lr1r2[r1].addParams(ip=("2042:12::1/64",))
@@ -108,7 +102,3 @@ class StaticRoutingNetFailure(IPTopo):
         ])
 
         super().build(*args, **kwargs)
-
-    def addRouter_v6(self, name):
-        return self.addRouter(name, use_v4=False, use_v6=True,
-                              config=RouterConfig)

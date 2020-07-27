@@ -50,11 +50,8 @@ class BGPPoliciesTopo3(IPTopo):
                        address_families=(AF_INET6(networks=(prefix[as4r],)),))
 
         # Add links
-        self.addLink(as1r, as2r)
-        self.addLink(as1r, as3r)
-        self.addLink(as1r, as4r)
-        self.addLink(as2r, as3r)
-        self.addLink(as3r, as4r)
+        self.addLinks((as1r, as2r), (as1r, as3r), (as1r, as4r), (as2r, as3r),
+                      (as3r, as4r))
 
         # Set AS-ownerships
         self.addAS(1, (as1r,))

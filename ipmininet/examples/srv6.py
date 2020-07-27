@@ -44,10 +44,7 @@ class SRv6Topo(IPTopo):
         h6 = self.addHost('h6')
 
         # Links to hosts
-        self.addLink(h1, r1)
-        self.addLink(h3, r3)
-        self.addLink(h4, r4)
-        self.addLink(h6, r6)
+        self.addLinks((h1, r1), (h3, r3), (h4, r4), (h6, r6))
 
         # Links between routers
         self.addLink(r1, r2)
@@ -55,8 +52,7 @@ class SRv6Topo(IPTopo):
         self.addLink(r2, r5, igp_metric=3)
         self.addLink(r2, r3)
         self.addLink(r3, r4, igp_metric=9)
-        self.addLink(r4, r5)
-        self.addLink(r5, r6)
+        self.addLinks((r4, r5), (r5, r6))
 
         super().build(*args, **kwargs)
 

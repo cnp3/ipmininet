@@ -118,15 +118,8 @@ class SpanningTreeAdjust(IPTopo):
         s6 = self.addSwitch("s6", prio=6)
 
         # adding links
-        self.addLink(s1, s2)
-        self.addLink(s1, s2)
-        self.addLink(s1, s3)
-        self.addLink(s1, s5)
-        self.addLink(s3, s4)
-        self.addLink(s3, s5)
-        self.addLink(s3, s6)
-        self.addLink(s4, s5)
-        self.addLink(s5, s6)
+        self.addLinks((s1, s2), (s1, s2), (s1, s3), (s1, s5), (s3, s4),
+                      (s3, s5), (s3, s6), (s4, s5), (s5, s6))
 
         for s in self.switches():
             self.addLink(s, self.addHost('h%s' % s))

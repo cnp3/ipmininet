@@ -30,18 +30,12 @@ class StaticAddressNet(IPTopo):
         h3 = self.addHost('h3')
         h4 = self.addHost('h4')
 
-        self.addLink(h1, r1)
-
-        lr1r2 = self.addLink(r1, r2)
-
-        self.addLink(r1, s1)
-        self.addLink(s1, h2)
-        self.addLink(s1, h4)
+        _, lr1r2, _, _, _, lr2s2, ls2h3 = \
+            self.addLinks((h1, r1), (r1, r2), (r1, s1), (s1, h2), (s1, h4),
+                          (r2, s2), (s2, h3))
 
         # IP addresses can be set with interface parameters
-        lr2s2 = self.addLink(r2, s2)
         lr2s2[r2].addParams(ip=("10.0.3.1/24", "2001:3c::1/64"))
-        ls2h3 = self.addLink(s2, h3)
         ls2h3[h3].addParams(ip=("10.0.3.2/24", "2001:3c::2/64"))
 
         # We can also declare the subnets on each LAN

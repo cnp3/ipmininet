@@ -19,8 +19,7 @@ class TCAdvancedNet(IPTopo):
 
     def build(self, *args, **kwargs):
         h1 = self.addHost("h1")
-        r1 = self.addRouter("r1")
-        r2 = self.addRouter("r2")
+        r1, r2 = self.addRouters("r1", "r2")
         h2 = self.addHost("h2")
 
         self.addLink(h1, r1, bw=100, delay="15ms")

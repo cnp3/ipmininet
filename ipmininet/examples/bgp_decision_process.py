@@ -40,29 +40,22 @@ class BGPDecisionProcess(IPTopo):
          +------------+                                   +--------+
         """
         # Add all routers
-        as1r1 = self.addRouter('as1r1')
+        as1r1, as2r1, as2r2, as2r3, x, y, as3r1 = \
+            self.addRouters('as1r1', 'as2r1', 'as2r2', 'as2r3', 'x', 'y',
+                            'as3r1', config=RouterConfig)
+
         as1r1.addDaemon(BGP, address_families=(
             _bgp.AF_INET(networks=('1.2.3.0/24',)),))
 
-        as2r1 = self.addRouter('as2r1')
         as2r1.addDaemon(BGP, routerid='1.1.1.1')
         as2r1.addDaemon(OSPF)
-
-        as2r2 = self.addRouter('as2r2')
         as2r2.addDaemon(BGP, routerid='1.1.1.2')
         as2r2.addDaemon(OSPF)
-
-        as2r3 = self.addRouter('as2r3')
         as2r3.addDaemon(BGP)
         as2r3.addDaemon(OSPF)
-
-        x = self.addRouter('x')
         x.addDaemon(OSPF)
-
-        y = self.addRouter('y')
         y.addDaemon(OSPF)
 
-        as3r1 = self.addRouter('as3r1')
         as3r1.addDaemon(BGP, address_families=(
             _bgp.AF_INET(networks=('1.2.3.0/24',)),))
 

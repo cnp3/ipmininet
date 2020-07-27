@@ -58,11 +58,8 @@ class BGPPoliciesAdjustTopo(IPTopo):
         """
 
         # Add all routers
-        as1r = self.addRouter('as1r')
-        as2r = self.addRouter('as2r')
-        as3r = self.addRouter('as3r')
-        as4r = self.addRouter('as4r')
-        as5r = self.addRouter('as5r')
+        as1r, as2r, as3r, as4r, as5r = self.addRouters('as1r', 'as2r', 'as3r',
+                                                       'as4r', 'as5r')
 
         routers = self.routers()
         prefix = {routers[i]: '2001:db:%04x::/48' % i
@@ -79,13 +76,8 @@ class BGPPoliciesAdjustTopo(IPTopo):
                        address_families=(AF_INET6(networks=(prefix[as5r],)),))
 
         # Add links
-        self.addLink(as1r, as2r)
-        self.addLink(as1r, as3r)
-        self.addLink(as1r, as4r)
-        self.addLink(as2r, as3r)
-        self.addLink(as2r, as4r)
-        self.addLink(as3r, as5r)
-        self.addLink(as4r, as5r)
+        self.addLinks((as1r, as2r), (as1r, as3r), (as1r, as4r), (as2r, as3r),
+                      (as2r, as4r), (as3r, as5r), (as4r, as5r))
 
         # Set AS-ownerships
         self.addAS(1, (as1r,))

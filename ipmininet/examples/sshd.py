@@ -5,8 +5,7 @@ from ipmininet.router.config import SSHd, RouterConfig
 
 class SSHTopo(IPTopo):
     def build(self, *args, **kw):
-        r1 = self.addRouter('r1', config=RouterConfig)
-        r2 = self.addRouter('r2', config=RouterConfig)
+        r1, r2 = self.addRouters('r1', 'r2', config=RouterConfig)
         self.addLink(r1, r2)
         r1.addDaemon(SSHd)
         r2.addDaemon(SSHd)

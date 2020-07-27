@@ -188,6 +188,44 @@ Feel free to consult the `Mininet documentation`_ as well.
 
 .. _`Mininet documentation`: https://github.com/mininet/mininet/wiki/Introduction-to-Mininet
 
+
+Additional helpers functions
+----------------------------
+
+You can pass parameters to ``addLinks`` and ``addRouters`` helpers.
+These parameters can be common to all links and routers but they can also be
+specific:
+
+.. testcode:: topo creation addLinks addRouters
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.router.config import RouterConfig
+
+    class MyTopology(IPTopo):
+
+        def build(self, *args, **kwargs):
+
+            # The config parameter is set to RouterConfig for every router
+            r1, r2 = self.addRouters("r1", "r2", config=RouterConfig)
+            # The config parameter is set only for "r3"
+            r3, r4, r5 = self.addRouters(("r3", {"config": RouterConfig}),
+                                         "r4", "r5")
+
+            s1 = self.addSwitch("s1")
+            s2 = self.addSwitch("s2")
+
+            h1 = self.addHost("h1")
+            h2 = self.addHost("h2")
+
+            # 'igp_metric' parameter is set to 5 for all the links while
+            # the 'ip' parameter is set only for the link between 'r1' and 'r2'
+            self.addLinks((r1, r2, {'ip': ("2042:12::1/64", "10.12.0.1/24")}),
+                          (s1, r1), (h1, s1), (s2, r2), (h2, s2),
+                          (r2, r3), (r3, r4), (r4, r5), igp_metric=5)
+
+            super().build(*args, **kwargs)
+
+
 .. doctest related functions
 
 
@@ -196,7 +234,7 @@ Feel free to consult the `Mininet documentation`_ as well.
     from ipmininet.clean import cleanup
     cleanup(level='warning')
 
-.. testcode:: topo creation,topo creation addDaemon,topo creation config param,topo creation addDeamon params
+.. testcode:: topo creation,topo creation addDaemon,topo creation config param,topo creation addDeamon params,topo creation addLinks addRouters
     :hide:
 
     try:
@@ -209,7 +247,7 @@ Feel free to consult the `Mininet documentation`_ as well.
         net = IPNet(topo=MyTopology())
         net.start()
 
-.. testcleanup:: topo creation,topo creation addDaemon,topo creation config param,topo creation addDeamon params
+.. testcleanup:: topo creation,topo creation addDaemon,topo creation config param,topo creation addDeamon params,topo creation addLinks addRouters
 
     try:
         net

@@ -70,44 +70,34 @@ The following code shows how to use all these abstractions:
         def build(self, *args, **kwargs):
 
             # AS1 routers
-            as1r1 = self.addRouter("as1r1", config=RouterConfig)
+            as1r1, as1r2, as1r3 = self.addRouters("as1r1", "as1r2", "as1r3",
+                                                  config=RouterConfig)
             as1r1.addDaemon(BGP)
-            as1r2 = self.addRouter("as1r2", config=RouterConfig)
             as1r2.addDaemon(BGP)
-            as1r3 = self.addRouter("as1r3", config=RouterConfig)
             as1r3.addDaemon(BGP)
 
-            self.addLink(as1r1, as1r2)
-            self.addLink(as1r1, as1r3)
-            self.addLink(as1r2, as1r3)
+            self.addLinks((as1r1, as1r2), (as1r1, as1r3), (as1r2, as1r3))
 
             # AS2 routers
-            as2r1 = self.addRouter("as2r1", config=RouterConfig)
+            as2r1, as2r2, as2r3 = self.addRouters("as2r1", "as2r2", "as2r3",
+                                                  config=RouterConfig)
             as2r1.addDaemon(BGP)
-            as2r2 = self.addRouter("as2r2", config=RouterConfig)
             as2r2.addDaemon(BGP)
-            as2r3 = self.addRouter("as2r3", config=RouterConfig)
             as2r3.addDaemon(BGP)
 
-            self.addLink(as2r1, as2r2)
-            self.addLink(as2r1, as2r3)
-            self.addLink(as2r2, as2r3)
+            self.addLinks((as2r1, as2r2), (as2r1, as2r3), (as2r2, as2r3))
 
             # AS3 routers
-            as3r1 = self.addRouter("as3r1", config=RouterConfig)
+            as3r1, as3r2, as3r3 = self.addRouters("as3r1", "as3r2", "as3r3",
+                                                  config=RouterConfig)
             as3r1.addDaemon(BGP)
-            as3r2 = self.addRouter("as3r2", config=RouterConfig)
             as3r2.addDaemon(BGP)
-            as3r3 = self.addRouter("as3r3", config=RouterConfig)
             as3r3.addDaemon(BGP)
 
-            self.addLink(as3r1, as3r2)
-            self.addLink(as3r1, as3r3)
-            self.addLink(as3r2, as3r3)
+            self.addLinks((as3r1, as3r2), (as3r1, as3r3), (as3r2, as3r3))
 
             # Inter-AS links
-            self.addLink(as1r1, as2r1)
-            self.addLink(as2r3, as3r1)
+            self.addLinks((as1r1, as2r1), (as2r3, as3r1))
 
             # Add an access list to 'any'
             # This can be an IP prefix or address instead
@@ -210,8 +200,7 @@ We can pass parameters to links and interfaces when calling ``addLink()``:
         def build(self, *args, **kwargs):
 
             # Add routers (OSPF daemon is added by default with the default config)
-            router1 = self.addRouter("router1")
-            router2 = self.addRouter("router2")
+            router1, router2 = self.addRouters("router1", "router2")
 
             # Add link
             l = self.addLink(router1, router2,
@@ -235,14 +224,10 @@ while the link between r2 and r3 is in area '0.0.0.5':
         def build(self, *args, **kwargs):
 
             # Add routers (OSPF daemon is added by default with the default config)
-            r1 = self.addRouter("r1")
-            r2 = self.addRouter("r2")
-            r3 = self.addRouter("r3")
+            r1, r2, r3 = self.addRouters("r1", "r2", "r3")
 
             # Add links
-            self.addLink(r1, r2)
-            self.addLink(r1, r3)
-            self.addLink(r2, r3)
+            self.addLinks((r1, r2), (r1, r3), (r2, r3))
 
             # Define OSPF areas
             self.addOSPFArea('0.0.0.1', routers=[r1], links=[])
@@ -282,8 +267,7 @@ It uses the following interface parameters:
         def build(self, *args, **kwargs):
 
             # Add routers (OSPF daemon is added by default with the default config)
-            router1 = self.addRouter("router1")
-            router2 = self.addRouter("router2")
+            router1, router2 = self.addRouters("router1", "router2")
 
             # Add link
             l = self.addLink(router1, router2,
@@ -533,14 +517,13 @@ We can pass parameters to links when calling addLink():
     class MyTopology(IPTopo):
 
         def build(self, *args, **kwargs):
-            r1 = self.addRouter("r1", config=RouterConfig)  # We use RouterConfig to prevent OSPF6 to be run
-            r2 = self.addRouter("r2", config=RouterConfig)
+            # We use RouterConfig to prevent OSPF6 to be run
+            r1, r2 = self.addRouters("r1", "r2", config=RouterConfig)
             h1 = self.addHost("h1")
             h2 = self.addHost("h2")
 
             self.addLink(r1, r2, igp_metric=10)  # The IGP metric is set to 10
-            self.addLink(r1, h1)
-            self.addLink(r2, h2)
+            self.addLinks((r1, h1), (r2, h2))
 
             r1.addDaemon(RIPng)
             r2.addDaemon(RIPng)

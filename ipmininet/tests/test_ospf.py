@@ -34,27 +34,26 @@ class MinimalOSPFNet(IPTopo):
         super().__init__(*args, **kwargs)
 
     def build(self, *args, **kwargs):
-        r1 = self.addRouter("r1", config=RouterConfig)
+        r1, r2, r3 = self.addRouters("r1", "r2", "r3", config=RouterConfig)
         r1.addDaemon(OSPF, **self.ospf_params_r1)
-        r2 = self.addRouter("r2", config=RouterConfig)
         r2.addDaemon(OSPF)
-        r3 = self.addRouter("r3", config=RouterConfig)
         r3.addDaemon(OSPF)
-        self.addLink(r1, r2, **self.link_params)
-        self.addLink(r1, r3, params1={"ip": "10.0.4.1/24"},
-                     params2={"ip": "10.0.4.2/24"})
-        self.addLink(r2, r3, params1={"ip": "10.0.5.1/24"},
-                     params2={"ip": "10.0.5.2/24"})
 
         h1 = self.addHost("h1")
-        self.addLink(r1, h1, params1={"ip": "10.0.1.1/24"},
-                     params2={"ip": "10.0.1.2/24"})
         h2 = self.addHost("h2")
-        self.addLink(r2, h2, params1={"ip": "10.0.2.1/24"},
-                     params2={"ip": "10.0.2.2/24"})
         h3 = self.addHost("h3")
-        self.addLink(r3, h3, params1={"ip": "10.0.3.1/24"},
-                     params2={"ip": "10.0.3.2/24"})
+
+        self.addLinks((r1, r2, self.link_params),
+                      (r1, r3, {"params1": {"ip": "10.0.4.1/24"},
+                                "params2": {"ip": "10.0.4.2/24"}}),
+                      (r2, r3, {"params1": {"ip": "10.0.5.1/24"},
+                                "params2": {"ip": "10.0.5.2/24"}}),
+                      (r1, h1, {"params1": {"ip": "10.0.1.1/24"},
+                                "params2": {"ip": "10.0.1.2/24"}}),
+                      (r2, h2, {"params1": {"ip": "10.0.2.1/24"},
+                                "params2": {"ip": "10.0.2.2/24"}}),
+                      (r3, h3, {"params1": {"ip": "10.0.3.1/24"},
+                                "params2": {"ip": "10.0.3.2/24"}}))
         super().build(*args, **kwargs)
 
 

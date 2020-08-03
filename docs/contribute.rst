@@ -2,7 +2,9 @@ Developer Guide
 ===============
 
 This section details some essential points to contribute to the code base.
-Don't hesitate to ask for advice by opening an issue on Github.
+Don't hesitate to ask for advice on the `mailing list
+<https://sympa-2.sipr.ucl.ac.be/sympa/info/ipmininet>`_,
+to report bugs as Github issues and to contribute through Github pull requests.
 
 Setting up the development environment
 --------------------------------------

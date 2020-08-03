@@ -10,6 +10,10 @@ This is a python library, extending Mininet, in order to support emulation of (c
 As such it provides new classes, such as Routers, auto-configures all properties not set by the user,
 such as IP addresses or router configuration files, ...
 
+Don't hesitate to ask for advice on `mailing list
+<https://sympa-2.sipr.ucl.ac.be/sympa/info/ipmininet>`_ or to report bugs as
+Github issues.
+
 .. toctree::
     :maxdepth: 2
 

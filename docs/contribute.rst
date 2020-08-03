@@ -38,6 +38,135 @@ Finally, you can install all the daemons:
 
     $ sudo python -m ipmininet.install -af
 
+Understanding IPMininet workflow
+--------------------------------
+
+The following code creates, starts and stops a network:
+
+.. code-block:: python
+
+    from ipmininet.ipnet import IPNet
+    from ipmininet.cli import IPCLI
+    from ipmininet.iptopo import IPTopo
+
+    class MyTopology(IPTopo):
+        # [...]
+
+    topo = MyTopology()  # Step 1
+    net = IPNet(topo=topo)  # Steps 2 to 5
+    try:
+        net.start() # Steps 6 to 8
+    finally:
+        net.stop()  # Step 9
+
+During the execution of this code, IPMininet goes through the following steps
+(detailed in the following sections):
+
+1. Instantiation of the topology and application of the overlays
+2. Instantiation of all the devices classes
+3. Instantiation of the daemons
+4. Addressing
+5. Call of the post_build method
+6. Finalization and validation of daemon configurations
+7. Start of daemons
+8. Insertion of the default routes
+9. Cleanup of the network
+
+1. Instantiation of the topology and application of the overlays
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The instantiation of the Topology triggers a call to its
+:meth:`~ipmininet.iptopo.IPTopo.build` method. This method is where users
+define the topology: switches, routers, links, hosts,... But at that time,
+every node is actually a node name, not instances of Switches, Routers,
+IPHosts,...
+
+The node and link options are stored in the :class:`~ipmininet.iptopo.IPTopo`
+object and a instance of ``mininet.topo.MultiGraph`` stores the
+interconnections between nodes.
+
+At the end of the build method, overlays are applied
+(:meth:`ipmininet.overlay.Overlay.apply`) and checked for consistency
+(:meth:`ipmininet.overlay.Overlay.check_consistency`).
+
+2. Instantiation of all the devices classes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Each device class (e.g., routers or hosts) is actually instantiated based
+on the graph and the parameters stored in the :class:`~ipmininet.iptopo.IPTopo`
+instance (in :meth:`ipmininet.ipnet.IPNet.buildFromTopo`). From this point, a
+network namespace is created for each device with interfaces linking to the
+other namespaces as defined in the topology.
+It becomes possible to execute commands on a given device.
+
+3. Instantiation of the daemons
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When instantiating each router and each host, their daemons are also
+instantiated and options parsed. However the daemon configurations are not
+built yet.
+
+3. Addressing
+^^^^^^^^^^^^^
+
+After creating all the devices and their interfaces,
+:meth:`~ipmininet.ipnet.IPNet.build` create one
+:class:`~ipmininet.ipnet.BroadcastDomain` by IP broadcast domain. That is,
+two router or host interfaces belong to the same BroadcastDomain if they are
+directly connected or indirectly connected through only switches or hubs.
+
+IPMIninet then allocates the same IP prefix on interfaces in the same IP
+broadcast domain. At the end of this step, every interface has its IPv4
+and/or IPv6 addresses assigned (if auto-allocation was not disabled).
+
+5. Call of the post_build method
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now, all the devices are created and that they have their IP addresses
+assigned. Users may need this information before adding other elements to
+the network like IPv6 Segment Routing rules
+(see :ref:`Using IPv6 Segment Routing`).
+Therefore the method :meth:`~ipmininet.iptopo.IPTopo.post_build` is called.
+
+6. Finalization and validation of the daemon configurations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In each router and each host, their daemon configurations are
+built (through each daemon's
+:meth:`~ipmininet.router.config.base.Daemon.build` method).
+
+Then the built configuration is used to fill in the templates and create the
+actual configuration files of each daemons (in the
+:meth:`~ipmininet.router.config.base.Daemon.render` method).
+
+When all configurations are built, the configuration is checked by running
+the dry run command specified by the
+:meth:`~ipmininet.router.config.base.Daemon.dry_run` property of each deamon.
+If one of the dry runs fails, the network starting is aborted.
+
+7. Start of the daemons
+^^^^^^^^^^^^^^^^^^^^^^^
+
+From this point, all the daemon configuration files are generated and they
+were checked. Thus, the next step is to start each daemon in its respective
+network namespace. The command line used to run the daemon is specified by the
+:meth:`~ipmininet.router.config.base.Daemon.startup_line` property.
+
+8. Insertion of the default routes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For each host, a default route is added to one of the router in the same IP
+broadcast domain. This behavior is disabled if a default route was harcoded
+in the options or if router advertisements are enabled in the IP broadcast
+domain.
+
+9. Cleanup of the network
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This cleans up all the network namespaces defined for the devices as well as
+killing all the daemon processes started. By default, the configuration files
+are removed (except when the ``ipmininet.DEBUG_FLAG`` is set to ``True``).
+
 Running the tests
 -----------------
 

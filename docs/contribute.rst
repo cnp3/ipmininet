@@ -134,3 +134,30 @@ When adding a new daemon to IPMininet, you have to perform the following tasks:
   ``ipmininet/install/__main__.py`` and ``ipmininet/install/install.py``.
 - Document the daemon and its configuration options
   in the sphinx documentation in ``docs/daemons.rst``.
+
+Adding a new overlay
+--------------------
+
+An overlay is a way to change options of multiple nodes or links in a single
+code. For instance, defining an :class:`~ipmininet.router.config.bgp.AS` object
+will add the defined as number in each node declared in the AS.
+
+When adding a new overlay to IPMininet, you have to perform the following tasks:
+
+- Create a new ``Overlay`` subclass in the most appropriate file. For
+  instance, BGP overlays like :class:`~ipmininet.router.config.bgp.AS` are in
+  the BGP daemon file.
+  The following methods are potentially useful to override in this new subclass:
+
+  .. automethod:: ipmininet.overlay.Overlay.apply
+      :noindex:
+  .. automethod:: ipmininet.overlay.Overlay.check_consistency
+      :noindex:
+- Add the new subclass in the dictionary ``OVERLAYS`` of class
+  :class:`~ipmininet.iptopo.IPTopo`. This enables users to use ``self.addX()``
+  in the build method of their topology subclass with ``X`` being the name of
+  your new overlay.
+- Add at least one example for the users (see :ref:`contribute_example`).
+- Implement the tests to prove the correctness of the overlay.
+- Document the overlay and its configuration options in the sphinx
+  documentation.

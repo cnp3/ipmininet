@@ -381,7 +381,7 @@ When adding PIMD to a router with ``router.addDaemon(PIMD, **kargs)``, we can gi
 Named
 -----
 
-When adding PIMD to a host with ``host.addDaemon(Named, **kargs)``, we can give the following parameters:
+When adding Named to a host with ``host.addDaemon(Named, **kargs)``, we can give the following parameters:
 
 .. automethod:: ipmininet.host.config.named.Named.set_defaults
     :noindex:

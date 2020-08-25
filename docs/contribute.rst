@@ -24,7 +24,7 @@ If you have pip above **18.1**, execute:
 
 .. code-block:: bash
 
-    $ sudo pip -e install .
+    $ sudo pip install -e .
 
 If you have an older version of pip, use:
 

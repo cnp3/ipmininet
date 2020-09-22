@@ -37,7 +37,11 @@ sudo apt remove -yq python3-pip
 
 [ ! -d "$IPMN_DIR" ] && git clone ${IPMN_REPO} ${IPMN_DIR}
 pushd ${IPMN_DIR}
-git checkout -B ${IPMN_BRANCH} -t origin/${IPMN_BRANCH}
+git checkout -B ${IPMN_BRANCH} -t origin/${IPMN_BRANCH} || >&2 cat <<-EOF
+	WARN: Command 'git checkout -B ${IPMN_BRANCH} -t origin/${IPMN_BRANCH}' failed.
+	Please check the ipmininet repository.
+EOF
+
 sudo pip3 install .
 sudo python3 -m ipmininet.install -af6
 popd

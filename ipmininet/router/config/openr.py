@@ -49,7 +49,10 @@ class Openr(OpenrDaemon):
 
     def build(self):
         cfg = super().build()
+        self.options.redistribute_ifaces = \
+            ','.join([intf.name for intf in self._node.intfList()])
         cfg.update(self.options)
+        cfg.redistribute_ifaces = \
         self._create_log_dir()
         interfaces = realIntfList(self._node)
         cfg.interfaces = self._build_interfaces(interfaces)

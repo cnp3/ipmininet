@@ -84,8 +84,8 @@ class Openr(OpenrDaemon):
         routers in mininet. For a full list of parameters see
         OpenrDaemon:_defaults in openrd.py"""
         defaults.node_name = self._node.name
-        defaults.ifname_prefix = "r"
-        defaults.iface_regex_include = "r.*"
+        defaults.ifname_prefix = '{}-eth'.format(self._node.name)
+        defaults.iface_regex_include = '{}-eth.*'.format(self._node.name)
         defaults.log_dir = "/var/log"
         super().set_defaults(defaults)
 

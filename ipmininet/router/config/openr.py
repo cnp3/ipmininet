@@ -86,7 +86,7 @@ class Openr(OpenrDaemon):
         for itf in interfaces:
             ipv6_addresses += itf.addresses[6]
         ipv6_addresses = filter(lambda x: not x.is_link_local, ipv6_addresses)
-        return ",".join(map(lambda x: x.with_prefixlen, ipv6_addresses))
+        return ','.join(map(lambda x: x.with_prefixlen, ipv6_addresses))
 
     def set_defaults(self, defaults):
         """Updates some options of the OpenR daemon to run a network of

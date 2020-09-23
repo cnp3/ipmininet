@@ -1,4 +1,6 @@
 """Base classes to configure an OpenR daemon"""
+import os
+
 from ipaddress import ip_interface
 
 from ipmininet.overlay import Overlay
@@ -48,11 +50,15 @@ class Openr(OpenrDaemon):
     def build(self):
         cfg = super().build()
         cfg.update(self.options)
+        self._create_log_dir()
         interfaces = realIntfList(self._node)
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         cfg.prefixes = self._build_prefixes(interfaces)
         return cfg
+
+    def _create_log_dir(self):
+        os.makedirs(self.options.log_dir, exist_ok=True)
 
     @staticmethod
     def _build_networks(interfaces):

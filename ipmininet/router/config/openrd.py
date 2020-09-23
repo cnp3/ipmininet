@@ -167,7 +167,7 @@ class OpenrDaemon(RouterDaemon):
         :param redistribute_ifaces: Comma separated list of interface names
             whose '/32' (for v4) and '/128' (for v6) should be announced. OpenR
             will monitor address add/remove activity on this interface and
-            announce it to rest of the network. Default: "lo1".
+            announce it to rest of the network. Default: "lo".
         :param seed_prefix: In order to elect a prefix for the node a super
             prefix to elect from is required. This is only applicable when
             'ENABLE_PREFIX_ALLOC' is set to true. Default: "".

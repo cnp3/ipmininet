@@ -54,7 +54,7 @@ ${getConfig("node_name", "")} \
 ${getConfig("override_loopback_addr", False)} \
 ${getConfig("prefix_manager_cmd_port", 60011)} \
 ${getConfig("prefixes", "")} \
-${getConfig("redistribute_ifaces", "lo1")} \
+${getConfig("redistribute_ifaces", "lo")} \
 ${getConfig("seed_prefix", "")} \
 ${getConfig("set_leaf_node", False)} \
 ${getConfig("set_loopback_address", False)} \

@@ -95,6 +95,7 @@ class Openr(OpenrDaemon):
         defaults.log_dir = '/tmp/log/{}'.format(self._node.name)
         defaults.config_store_filepath = \
             '/tmp/{}_aq_persistent_config_store.bin'.format(self._node.name)
+        defaults.enable_v4 = True
         super().set_defaults(defaults)
 
     @staticmethod

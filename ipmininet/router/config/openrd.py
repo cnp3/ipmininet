@@ -235,7 +235,7 @@ class OpenrDaemon(RouterDaemon):
         directly. The default options from the shell script are implemented in
         the openr.mako template and passed to the daemon as argument."""
         cfg = ConfigDict()
-        cfg[self.NAME] = self.build()
+        cfg[self.NAME] = self.options
         return self.template_lookup.get_template(self.template_filenames[0])\
                                    .render(node=cfg)
 

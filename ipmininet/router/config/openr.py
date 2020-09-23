@@ -48,7 +48,6 @@ class Openr(OpenrDaemon):
     def build(self):
         cfg = super().build()
         cfg.update(self.options)
-        cfg.node_name = self._node.name
         interfaces = realIntfList(self._node)
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
@@ -84,6 +83,7 @@ class Openr(OpenrDaemon):
         """Updates some options of the OpenR daemon to run a network of
         routers in mininet. For a full list of parameters see
         OpenrDaemon:_defaults in openrd.py"""
+        defaults.node_name = self._node.name
         defaults.ifname_prefix = "r"
         defaults.iface_regex_include = "r.*"
         defaults.log_dir = "/var/log"

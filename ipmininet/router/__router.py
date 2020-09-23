@@ -11,6 +11,7 @@ from ipmininet.utils import L3Router, realIntfList, otherIntf
 from ipmininet.link import IPIntf
 from .config import BasicRouterConfig, NodeConfig, RouterConfig
 
+
 import mininet.clean
 from mininet.node import Node, Host
 from mininet.log import lg
@@ -126,7 +127,11 @@ class IPNode(Node):
             self._old_sysctl[opt] = self._set_sysctl(opt, val)
         # Fire up all daemons
         for d in self.nconfig.daemons:
-            self._processes.popen(shlex.split(d.startup_line))
+            if (hasattr(d,'logfile')):
+                with open(d.logfile,"w") as err:
+                    self._processes.popen(shlex.split(d.startup_line),stderr=err)
+            else:
+                self._processes.popen(shlex.split(d.startup_line))
             # Busy-wait if the daemon needs some time before being started
             while not d.has_started():
                 time.sleep(.001)

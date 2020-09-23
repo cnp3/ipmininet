@@ -17,6 +17,7 @@ from .pimd import PIMD
 from .ripng import RIPng
 from .openrd import OpenrDaemon
 from .openr import Openr, OpenrDomain
+from .pimd_troglobit import Pimd
 
 __all__ = ['BasicRouterConfig', 'NodeConfig', 'Zebra', 'OSPF', 'OSPF6',
            'OSPFArea', 'BGP', 'AS', 'SHARE', 'CLIENT_PROVIDER',
@@ -27,4 +28,4 @@ __all__ = ['BasicRouterConfig', 'NodeConfig', 'Zebra', 'OSPF', 'OSPF6',
            'OpenrDaemon', 'Openr', 'OpenrDomain', 'AF_INET', 'AF_INET6',
            'BorderRouterConfig', 'Rule', 'Chain', 'ChainRule', 'NOT',
            'PortClause', 'InterfaceClause', 'AddressClause', 'Filter',
-           'InputFilter', 'OutputFilter', 'TransitFilter', 'Allow', 'Deny']
+           'InputFilter', 'OutputFilter', 'TransitFilter', 'Allow', 'Deny','Pimd']

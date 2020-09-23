@@ -232,7 +232,7 @@ class OpenrDaemon(RouterDaemon):
         """The OpenR daemon has currently no option to read config from
         configuration file itself. The run_openr.sh script can be used to read
         options from environment files. However, we want to run the daemon
-        directly.  The default options from the shell script are implemented in
+        directly. The default options from the shell script are implemented in
         the openr.mako template and passed to the daemon as argument."""
         cfg = ConfigDict()
         cfg[self.NAME] = self.build()

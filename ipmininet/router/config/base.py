@@ -21,7 +21,8 @@ from mininet.log import lg as log
 
 if TYPE_CHECKING:
     from ipmininet.router import IPNode, Router
-    from ipmininet.iptopo import IPTopo, NodeDescription
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.node_description import NodeDescription
 DaemonOption = Union['Daemon', Type['Daemon'],
                      Tuple[Union['Daemon', Type['Daemon']], Dict]]
 

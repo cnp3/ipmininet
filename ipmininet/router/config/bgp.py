@@ -13,7 +13,8 @@ from .zebra import QuaggaDaemon, Zebra, RouteMap, AccessList, \
     RouteMapMatchCond, CommunityList, RouteMapSetAction, PERMIT, DENY
 
 if TYPE_CHECKING:
-    from ipmininet.iptopo import IPTopo, RouterDescription
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.node_description import RouterDescription
     from ipmininet.router import Router
 
 

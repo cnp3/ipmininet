@@ -2,7 +2,7 @@ import functools
 from typing import Union, Type, Dict, List, Optional, Tuple, Any
 
 from ipmininet.router.config.base import Daemon, NodeConfig, RouterConfig
-from ipmininet.router.config import BasicRouterConfig
+from ipmininet.router.config import BasicRouterConfig, OpenrDaemon, OpenrConfig
 from ipmininet.host.config import HostConfig
 
 class NodeDescription(str):
@@ -45,6 +45,15 @@ class RouterDescription(NodeDescription):
                   **kwargs):
         super(RouterDescription, self)\
             .addDaemon(daemon, default_cfg_class=default_cfg_class, **kwargs)
+
+
+class OpenrRouterDescription(RouterDescription):
+    def addDaemon(self, daemon: Union[OpenrDaemon, Type[OpenrDaemon]],
+                  default_cfg_class: Type[OpenrConfig] = OpenrConfig,
+                  **kwargs):
+        super().addDaemon(daemon,
+                          default_cfg_class=default_cfg_class,
+                          **kwargs)
 
 
 class HostDescription(NodeDescription):

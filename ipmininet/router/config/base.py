@@ -20,7 +20,7 @@ import mako.exceptions
 from mininet.log import lg as log
 
 if TYPE_CHECKING:
-    from ipmininet.router import IPNode, Router
+    from ipmininet.router import IPNode, Router, OpenrRouter
     from ipmininet.iptopo import IPTopo
     from ipmininet.node_description import NodeDescription
 DaemonOption = Union['Daemon', Type['Daemon'],
@@ -469,4 +469,21 @@ class BorderRouterConfig(BasicRouterConfig):
         if af:
             d = list(daemons)
             d.append((BGP, {'address_families': af}))
+        super().__init__(node, daemons=d, *args, **kwargs)
+
+
+class OpenrConfig(RouterConfig):
+    """A basic router that will run an OpenR daemon"""
+    def __init__(self, node: 'OpenrRouter',
+                 daemons: Iterable[DaemonOption] = (),
+                 additional_daemons: Iterable[DaemonOption] = (),
+                 *args, **kwargs):
+        """A simple router made of at least an OpenR daemon
+
+        :param additional_daemons: Other daemons that should be used"""
+        # Importing here to avoid circular import
+        from .openr import Openr
+        d = list(daemons)
+        d.append(Openr)
+        d.extend(additional_daemons)
         super().__init__(node, daemons=d, *args, **kwargs)

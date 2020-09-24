@@ -95,9 +95,7 @@ class Openr(OpenrDaemon):
         defaults.node_name = self._node.name
         defaults.ifname_prefix = '{}-eth'.format(self._node.name)
         defaults.iface_regex_include = '{}-eth.*'.format(self._node.name)
-        defaults.log_dir = '/tmp/log/{}'.format(self._node.name)
-        defaults.config_store_filepath = \
-            '/tmp/{}_aq_persistent_config_store.bin'.format(self._node.name)
+        defaults.log_dir = '/var/tmp/log/{}'.format(self._node.name)
         defaults.enable_v4 = True
         super().set_defaults(defaults)
 

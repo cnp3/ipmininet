@@ -9,7 +9,7 @@ from typing import Type, Optional, Tuple, Union, Dict, List, Sequence, Set
 from ipmininet import DEBUG_FLAG
 from ipmininet.utils import L3Router, realIntfList, otherIntf
 from ipmininet.link import IPIntf
-from .config import BasicRouterConfig, NodeConfig, RouterConfig
+from .config import BasicRouterConfig, NodeConfig, RouterConfig, OpenrConfig
 
 import mininet.clean
 from mininet.node import Node, Host
@@ -207,3 +207,21 @@ class Router(IPNode, L3Router):
     @property
     def asn(self) -> int:
         return self.get('asn')
+
+
+class OpenrRouter(Router):
+    """OpenR router with private '/tmp' dir to handle unix sockets created by
+       the OpenR daemon"""
+
+    def __init__(self, name,
+                 config: Type[OpenrConfig],
+                 lo_addresses: Sequence[Union[str, IPv4Interface,
+                                              IPv6Interface]] = (),
+                 privateDirs=['/tmp'],
+                 *args, **kwargs):
+        super().__init__(name,
+                         config=config,
+                         lo_addresses=lo_addresses,
+                         password=None,
+                         privateDirs=privateDirs,
+                         *args, **kwargs)

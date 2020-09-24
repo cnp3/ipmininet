@@ -280,9 +280,9 @@ _topo name_ : simple_openr_network
 _args_ : n/a
 
 This network represents a small OpenR network connecting three routers in a Bus
-topology. Each router has hosts attached. The `/tmp` folders are private to
-isolate the unix sockets used by OpenR. The private `/var/log` directories
-isolate logs.
+topology. Each router has hosts attached. OpenR routers use private `/tmp`
+folders to isolate the ZMQ sockets used by the daemon. The OpenR logs are by
+default available in the host machine at `/var/tmp/log/<NODE_NAME>`.
 
 Use
 [breeze](https://github.com/facebook/openr/blob/master/openr/docs/Breeze.md) to

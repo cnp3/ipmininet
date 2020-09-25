@@ -3,6 +3,7 @@ import os
 
 from ipaddress import ip_interface
 
+from mininet.log import lg as log
 from ipmininet.overlay import Overlay
 from ipmininet.utils import L3Router, realIntfList
 from .utils import ConfigDict
@@ -53,15 +54,24 @@ class Openr(OpenrDaemon):
             ','.join([intf.name for intf in self._node.intfList()])
         cfg.update(self.options)
         cfg.redistribute_ifaces = \
-        self._create_log_dir()
+        self._mklogdirs()
         interfaces = realIntfList(self._node)
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         cfg.prefixes = self._build_prefixes(interfaces)
         return cfg
 
-    def _create_log_dir(self):
-        os.makedirs(self.options.log_dir, exist_ok=True)
+    def _mklogdirs(self):
+        try:
+            log.info('Openr: Creating log_dir for node '
+                     '{}\n'.format(self._node.name))
+            os.makedirs(self.options.log_dir)
+            log.info('Openr: Created missing directories in log_dir path '
+                     '{}\n'.format(self.options.log_dir))
+        except FileExistsError as e:
+            log.warn('Openr: Path for log_dir already exists. Using log_dir '
+                     '{}\n'.format(self.options.log_dir))
+        return self.options.log_dir
 
     @staticmethod
     def _build_networks(interfaces):

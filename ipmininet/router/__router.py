@@ -110,6 +110,8 @@ class IPNode(Node):
         # Check them
         err_code = False
         for d in self.nconfig.daemons:
+            if d.logdir:
+                self._mklogdirs(d.logdir)
             out, err, code = self._processes.pexec(shlex.split(d.dry_run))
             err_code = err_code or code
             if code:
@@ -153,6 +155,23 @@ class IPNode(Node):
         if v != val:
             self._processes.call('sysctl', '-w', '%s=%s' % (key, val))
         return v
+
+    def _mklogdirs(self, logdir) -> Tuple[str, str, int]:
+        """Creates directories for the given logdir.
+
+           :param logdir: The log directory path to create
+           :return: (stdout, stderr, return_code)
+        """
+        lg.info('{}: Creating logdir {}.\n'.format(self.name, logdir))
+        cmd = 'mkdir -p {}'.format(logdir)
+        stdout, stderr, return_code =  self._processes.pexec(shlex.split(cmd))
+        if not return_code:
+            lg.info('{}: Logdir {} successfully created.\n'.format(self.name,
+                                                                    logdir))
+        else:
+            lg.warn('{}: Could not create logdir {}. Stderr: \n'
+                     '{}\n'.format(self.name, logdir, stderr))
+        return (stdout, stderr, return_code)
 
     def get(self, key, val=None):
         """Check for a given key in the node parameters"""

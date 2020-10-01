@@ -291,6 +291,13 @@ class Daemon(metaclass=abc.ABCMeta):
         """Get the options ConfigDict for this daemon"""
         return self._options
 
+    @property
+    def logdir(self) -> str:
+        if 'logfile' in self._options:
+            return os.path.dirname(self._options['logfile'])
+        else:
+            return None
+
     def build(self) -> ConfigDict:
         """Build the configuration tree for this daemon
 

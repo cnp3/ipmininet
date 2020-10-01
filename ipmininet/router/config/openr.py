@@ -1,6 +1,4 @@
 """Base classes to configure an OpenR daemon"""
-import os
-
 from ipaddress import ip_interface
 
 from mininet.log import lg as log
@@ -48,30 +46,24 @@ class Openr(OpenrDaemon):
     def __init__(self, node, *args, **kwargs):
         super().__init__(node=node, *args, **kwargs)
 
+    @property
+    def logdir(self) -> str:
+        if 'log_dir' in self._options:
+            return self._options['log_dir']
+        else:
+            return None
+
     def build(self):
         cfg = super().build()
         self.options.redistribute_ifaces = \
             ','.join([intf.name for intf in self._node.intfList()])
         cfg.update(self.options)
         cfg.redistribute_ifaces = \
-        self._mklogdirs()
         interfaces = realIntfList(self._node)
         cfg.interfaces = self._build_interfaces(interfaces)
         cfg.networks = self._build_networks(interfaces)
         cfg.prefixes = self._build_prefixes(interfaces)
         return cfg
-
-    def _mklogdirs(self):
-        try:
-            log.info('Openr: Creating log_dir for node '
-                     '{}\n'.format(self._node.name))
-            os.makedirs(self.options.log_dir)
-            log.info('Openr: Created missing directories in log_dir path '
-                     '{}\n'.format(self.options.log_dir))
-        except FileExistsError as e:
-            log.warn('Openr: Path for log_dir already exists. Using log_dir '
-                     '{}\n'.format(self.options.log_dir))
-        return self.options.log_dir
 
     @staticmethod
     def _build_networks(interfaces):

@@ -162,14 +162,14 @@ class IPNode(Node):
            :param logdir: The log directory path to create
            :return: (stdout, stderr, return_code)
         """
-        lg.info('{}: Creating logdir {}.\n'.format(self.name, logdir))
+        lg.debug('{}: Creating logdir {}.\n'.format(self.name, logdir))
         cmd = 'mkdir -p {}'.format(logdir)
         stdout, stderr, return_code =  self._processes.pexec(shlex.split(cmd))
         if not return_code:
-            lg.info('{}: Logdir {} successfully created.\n'.format(self.name,
+            lg.debug('{}: Logdir {} successfully created.\n'.format(self.name,
                                                                     logdir))
         else:
-            lg.warn('{}: Could not create logdir {}. Stderr: \n'
+            lg.error('{}: Could not create logdir {}. Stderr: \n'
                      '{}\n'.format(self.name, logdir, stderr))
         return (stdout, stderr, return_code)
 

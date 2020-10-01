@@ -76,6 +76,7 @@ class IPNode(Node):
                  process_manager: Type[ProcessHelper] = ProcessHelper,
                  use_v4=True,
                  use_v6=True,
+                 create_logdirs=True,
                  *args, **kwargs):
         """Most of the heavy lifting for this node should happen in the
         associated config object.
@@ -92,6 +93,7 @@ class IPNode(Node):
         self.use_v6 = use_v6
         self.cwd = cwd
         self._old_sysctl = {}  # type: Dict[str, Union[str, int]]
+        self.create_logdirs = create_logdirs
         if isinstance(config, tuple):
             try:
                 self.nconfig = config[0](self, **config[1])
@@ -110,7 +112,7 @@ class IPNode(Node):
         # Check them
         err_code = False
         for d in self.nconfig.daemons:
-            if d.logdir:
+            if self.create_logdirs and d.logdir:
                 self._mklogdirs(d.logdir)
             out, err, code = self._processes.pexec(shlex.split(d.dry_run))
             err_code = err_code or code

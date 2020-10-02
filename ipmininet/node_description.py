@@ -48,9 +48,9 @@ class RouterDescription(NodeDescription):
 
 
 class OpenrRouterDescription(RouterDescription):
-    def addDaemon(self, daemon: Union[OpenrDaemon, Type[OpenrDaemon]],
-                  default_cfg_class: Type[OpenrConfig] = OpenrConfig,
-                  **kwargs):
+    def addOpenrDaemon(self, daemon: Union[OpenrDaemon, Type[OpenrDaemon]],
+                       default_cfg_class: Type[OpenrConfig] = OpenrConfig,
+                       **kwargs):
         super().addDaemon(daemon,
                           default_cfg_class=default_cfg_class,
                           **kwargs)

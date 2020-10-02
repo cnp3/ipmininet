@@ -6,7 +6,6 @@ from ipmininet.router.config import BasicRouterConfig, OpenrDaemon, OpenrConfig
 from ipmininet.host.config import HostConfig
 
 class NodeDescription(str):
-
     def __new__(cls, value, *args, **kwargs):
         return super().__new__(cls, value)
 
@@ -57,7 +56,6 @@ class OpenrRouterDescription(RouterDescription):
 
 
 class HostDescription(NodeDescription):
-
     def addDaemon(self, daemon: Union[Daemon, Type[Daemon]],
                   default_cfg_class: Type[HostConfig] = HostConfig, **kwargs):
         super(HostDescription, self)\
@@ -66,7 +64,6 @@ class HostDescription(NodeDescription):
 
 @functools.total_ordering
 class LinkDescription:
-
     def __init__(self, topo: 'IPTopo', src: str, dst: str, key, link_attrs: Dict):
         self.src = src
         self.dst = dst
@@ -110,7 +107,6 @@ class LinkDescription:
 
 
 class IntfDescription(NodeDescription):
-
     def __init__(self, o: str, topo: 'IPTopo', link: LinkDescription,
                  intf_attrs: Dict):
         self.link = link

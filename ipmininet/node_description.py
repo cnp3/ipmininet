@@ -51,9 +51,9 @@ class OpenrRouterDescription(RouterDescription):
                        default_cfg_class: Type[OpenrRouterConfig] = \
                            OpenrRouterConfig,
                        **kwargs):
-        super().addDaemon(daemon,
-                          default_cfg_class=default_cfg_class,
-                          **kwargs)
+        self.addDaemon(daemon,
+                       default_cfg_class=default_cfg_class,
+                       **kwargs)
 
 
 class HostDescription(NodeDescription):

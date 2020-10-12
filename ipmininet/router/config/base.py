@@ -479,7 +479,7 @@ class BorderRouterConfig(BasicRouterConfig):
         super().__init__(node, daemons=d, *args, **kwargs)
 
 
-class OpenrConfig(RouterConfig):
+class OpenrRouterConfig(RouterConfig):
     """A basic router that will run an OpenR daemon"""
     def __init__(self, node: 'OpenrRouter',
                  daemons: Iterable[DaemonOption] = (),

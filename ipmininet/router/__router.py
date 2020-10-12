@@ -9,7 +9,7 @@ from typing import Type, Optional, Tuple, Union, Dict, List, Sequence, Set
 from ipmininet import DEBUG_FLAG
 from ipmininet.utils import L3Router, realIntfList, otherIntf
 from ipmininet.link import IPIntf
-from .config import BasicRouterConfig, NodeConfig, RouterConfig, OpenrConfig
+from .config import BasicRouterConfig, NodeConfig, RouterConfig, OpenrRouterConfig
 
 import mininet.clean
 from mininet.node import Node, Host
@@ -235,7 +235,7 @@ class OpenrRouter(Router):
        the OpenR daemon"""
 
     def __init__(self, name,
-                 config: Type[OpenrConfig],
+                 config: Type[OpenrRouterConfig],
                  lo_addresses: Sequence[Union[str, IPv4Interface,
                                               IPv6Interface]] = (),
                  privateDirs=['/tmp'],

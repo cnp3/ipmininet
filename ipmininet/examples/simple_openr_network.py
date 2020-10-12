@@ -3,7 +3,7 @@
 from ipmininet.iptopo import IPTopo
 from ipmininet.router import OpenrRouter
 from ipmininet.node_description import OpenrRouterDescription
-from ipmininet.router.config import OpenrConfig
+from ipmininet.router.config import OpenrRouterConfig
 
 HOSTS_PER_ROUTER = 2
 
@@ -24,7 +24,7 @@ class SimpleOpenrNet(IPTopo):
             self.addRouters('r1', 'r2', 'r3',
                             cls=OpenrRouter,
                             routerDescription=OpenrRouterDescription,
-                            config=OpenrConfig)
+                            config=OpenrRouterConfig)
         self.addLinks((r1, r2), (r1, r3))
         for r in (r1, r2, r3):
             for i in range(HOSTS_PER_ROUTER):

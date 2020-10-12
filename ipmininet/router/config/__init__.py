@@ -1,7 +1,7 @@
 """This module holds the configuration generators for daemons
 that can be used in a router."""
 from .base import BorderRouterConfig, BasicRouterConfig, RouterConfig, \
-    OpenrConfig, NodeConfig
+    OpenrRouterConfig, NodeConfig
 from .zebra import Zebra
 from .staticd import STATIC, StaticRoute
 from .ospf import OSPF, OSPFArea
@@ -25,7 +25,8 @@ __all__ = ['BasicRouterConfig', 'NodeConfig', 'Zebra', 'OSPF', 'OSPF6',
            'ebgp_session', 'CommunityList', 'set_rr', 'AccessList', 'IPTables',
            'IP6Tables', 'SSHd', 'RADVD', 'AdvPrefix', 'AdvConnectedPrefix',
            'AdvRDNSS', 'PIMD', 'RIPng', 'STATIC', 'StaticRoute',
-           'OpenrDaemon', 'Openr', 'OpenrConfig', 'OpenrDomain', 'AF_INET',
-           'AF_INET6', 'BorderRouterConfig', 'Rule', 'Chain', 'ChainRule',
-           'NOT', 'PortClause', 'InterfaceClause', 'AddressClause', 'Filter',
-           'InputFilter', 'OutputFilter', 'TransitFilter', 'Allow', 'Deny']
+           'OpenrDaemon', 'Openr', 'OpenrRouterConfig', 'OpenrDomain',
+           'AF_INET', 'AF_INET6', 'BorderRouterConfig', 'Rule', 'Chain',
+           'ChainRule', 'NOT', 'PortClause', 'InterfaceClause',
+           'AddressClause', 'Filter', 'InputFilter', 'OutputFilter',
+           'TransitFilter', 'Allow', 'Deny']

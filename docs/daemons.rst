@@ -251,11 +251,46 @@ It also takes the same parameter (see previous section for details):
 OpenR
 -----
 
-The OpenR daemon can be tuned by adding keyword arguments to ``router.addDaemon(OpenR, **kargs)``.
-Here is a list of the parameters:
+The OpenR daemon can be tuned by adding keyword arguments to
+``router.addDaemon(Openr, **kargs)``.  Here is a list of the parameters:
 
 .. automethod:: ipmininet.router.config.openrd.OpenrDaemon._defaults
     :noindex:
+
+At the moment IPMininet supports OpenR release `rc-20190419-11514
+<https://github.com/facebook/openr/releases/tag/rc-20190419-11514>`_. This
+release can be build from the script
+``install/build_openr-rc-20190419-11514.sh``.
+
+As of ``rc-20190419-11514`` the OpenR daemon creates `ZeroMQ
+<https://zeromq.org>`_ sockets in ``/tmp``. Therefore, it is advisable for
+networks with several OpenR daemons to isolate the ``/tmp`` folder within Linux
+namespaces. ``OpenrRouter`` utilizes Mininet's ``privateDirs`` option to
+provide this isolation. We can pass the ``cls`` option to ``addRouter`` to
+select custom router classes:
+
+.. testcode:: OpenR
+
+    from ipmininet.iptopo import IPTopo
+    from ipmininet.router import OpenrRouter
+    from ipmininet.node_description import OpenrRouterDescription
+
+
+    class SimpleOpenrNet(IPTopo):
+
+        def build(self, *args, **kwargs):
+            r1 = self.addRouter('r1',
+                                cls=OpenrRouter,
+                                routerDescription=OpenrRouterDescription)
+            r1.addOpenrDaemon()
+
+            r2 = self.addRouter('r2',
+                                cls=OpenrRouter,
+                                routerDescription=OpenrRouterDescription)
+            r2.addOpenrDaemon()
+            self.addLink(r1, r2)
+
+            super().build(*args, **kwargs)
 
 
 OSPF

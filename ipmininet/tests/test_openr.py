@@ -55,8 +55,8 @@ def test_logdir_creation():
         default_log_dir = '/var/tmp/log'
 
         for i in range(1, 4):
-            assert os.path.isdir(f'{default_log_dir}/r{i}')
-        assert not os.path.isdir(f'{default_log_dir}/r4')
+            assert os.path.isdir('{}/r{}'.format(default_log_dir, i))
+        assert not os.path.isdir('{}/r4'.format(default_log_dir))
         assert os.path.isdir(topo.r4_log_dir)
 
         net.stop()
@@ -79,14 +79,16 @@ def test_tmp_isolation():
             assert os.path.isfile(host_file_name)
             assert host_file_base_name in host_tmp_dir_content
             for i in range(1, 5):
-                node_tmp_dir_content = net[f'r{i}'].cmd(f'ls {tmp_dir}') \
-                                                   .split()
+                node_tmp_dir_content = net['r{}'.format(i)] \
+                                       .cmd('ls {}'.format(tmp_dir)) \
+                                       .split()
                 assert not host_file_base_name in node_tmp_dir_content
 
         node_file_base_name = str(uuid.uuid1())
-        node_file_name = f'{tmp_dir}/{node_file_base_name}'
-        net['r1'].cmd(f'touch {node_file_name}')
-        node_tmp_dir_content = net['r1'].cmd(f'ls {tmp_dir}').split()
+        node_file_name = '{}/{}'.format(tmp_dir,
+                                        node_file_base_name)
+        net['r1'].cmd('touch {}'.format(node_file_name))
+        node_tmp_dir_content = net['r1'].cmd('ls {}'.format(tmp_dir)).split()
         host_tmp_dir_content = os.listdir(tmp_dir)
 
         assert node_file_base_name in node_tmp_dir_content

@@ -295,8 +295,7 @@ class Daemon(metaclass=abc.ABCMeta):
     def logdir(self) -> str:
         if 'logfile' in self._options:
             return os.path.dirname(self._options['logfile'])
-        else:
-            return None
+        return None
 
     def build(self) -> ConfigDict:
         """Build the configuration tree for this daemon
@@ -490,7 +489,7 @@ class OpenrRouterConfig(RouterConfig):
         :param additional_daemons: Other daemons that should be used"""
         # Importing here to avoid circular import
         from .openr import Openr
-        d = list(daemons)
-        d.append(Openr)
-        d.extend(additional_daemons)
-        super().__init__(node, daemons=d, *args, **kwargs)
+        daemon_list = list(daemons)
+        daemon_list.append(Openr)
+        daemon_list.extend(additional_daemons)
+        super().__init__(node, daemons=daemon_list, *args, **kwargs)

@@ -1,15 +1,14 @@
 """This module defines topology class that supports adding L3 routers"""
 import itertools
-from typing import Union, Type, Dict, List, Optional, Tuple, Any
+from typing import Union, Type, Dict, List, Tuple, Any
 
 from mininet.topo import Topo
 from mininet.log import lg
 
 from ipmininet.overlay import Overlay, Subnet
 from ipmininet.utils import get_set, is_container
-from ipmininet.node_description import NodeDescription, RouterDescription,\
-    HostDescription, LinkDescription
-from ipmininet.router import Router
+from ipmininet.node_description import RouterDescription, HostDescription,\
+    LinkDescription
 from ipmininet.router.config import BasicRouterConfig, OSPFArea, AS,\
     iBGPFullMesh, OpenrDomain
 from ipmininet.router.config.base import Daemon, NodeConfig

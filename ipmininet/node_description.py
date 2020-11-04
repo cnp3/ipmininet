@@ -1,10 +1,11 @@
 import functools
-from typing import Union, Type, Dict, List, Optional, Tuple, Any
+from typing import Union, Type, Dict, Optional
 
 from ipmininet.router.config.base import Daemon, NodeConfig, RouterConfig
 from ipmininet.router.config import BasicRouterConfig, OpenrDaemon, Openr, \
     OpenrRouterConfig
 from ipmininet.host.config import HostConfig
+
 
 class NodeDescription(str):
     def __new__(cls, value, *args, **kwargs):
@@ -12,6 +13,7 @@ class NodeDescription(str):
 
     def __init__(self, o, topo: Optional['IPTopo'] = None):
         self.topo = topo
+        self.node = o
         super().__init__()
 
     def addDaemon(self, daemon: Union[Daemon, Type[Daemon]],
@@ -43,14 +45,15 @@ class RouterDescription(NodeDescription):
     def addDaemon(self, daemon: Union[Daemon, Type[Daemon]],
                   default_cfg_class: Type[RouterConfig] = BasicRouterConfig,
                   **kwargs):
-        super(RouterDescription, self)\
-            .addDaemon(daemon, default_cfg_class=default_cfg_class, **kwargs)
+        super().addDaemon(daemon,
+                          default_cfg_class=default_cfg_class,
+                          **kwargs)
 
 
 class OpenrRouterDescription(RouterDescription):
     def addOpenrDaemon(self,
                        daemon: Union[OpenrDaemon, Type[OpenrDaemon]] = Openr,
-                       default_cfg_class: Type[OpenrRouterConfig] = \
+                       default_cfg_class: Type[OpenrRouterConfig] =
                            OpenrRouterConfig,
                        **kwargs):
         self.addDaemon(daemon,
@@ -61,13 +64,19 @@ class OpenrRouterDescription(RouterDescription):
 class HostDescription(NodeDescription):
     def addDaemon(self, daemon: Union[Daemon, Type[Daemon]],
                   default_cfg_class: Type[HostConfig] = HostConfig, **kwargs):
-        super(HostDescription, self)\
-            .addDaemon(daemon, default_cfg_class=default_cfg_class, **kwargs)
+        super().addDaemon(daemon,
+                          default_cfg_class=default_cfg_class,
+                          **kwargs)
 
 
 @functools.total_ordering
 class LinkDescription:
-    def __init__(self, topo: 'IPTopo', src: str, dst: str, key, link_attrs: Dict):
+    def __init__(self,
+                 topo: 'IPTopo',
+                 src: str,
+                 dst: str,
+                 key,
+                 link_attrs: Dict):
         self.src = src
         self.dst = dst
         self.key = key
@@ -113,7 +122,6 @@ class IntfDescription(NodeDescription):
     def __init__(self, o: str, topo: 'IPTopo', link: LinkDescription,
                  intf_attrs: Dict):
         self.link = link
-        self.node = o
         self.intf_attrs = intf_attrs
         super().__init__(o, topo)
 

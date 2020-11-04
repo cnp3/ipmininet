@@ -20,15 +20,16 @@ class SimpleOpenrNet(IPTopo):
     """
 
     def build(self, *args, **kwargs):
-        r1, r2, r3 = \
-            self.addRouters('r1', 'r2', 'r3',
+        # pylint: disable=unbalanced-tuple-unpacking
+        r_1, r_2, r_3 = \
+            self.addRouters('r_1', 'r_2', 'r_3',
                             cls=OpenrRouter,
                             routerDescription=OpenrRouterDescription,
                             config=OpenrRouterConfig)
-        self.addLinks((r1, r2), (r1, r3))
-        for r in (r1, r2, r3):
+        self.addLinks((r_1, r_2), (r_1, r_3))
+        for router in (r_1, r_2, r_3):
             for i in range(HOSTS_PER_ROUTER):
-                self.addLink(r, self.addHost('h%s%s' % (i, r)),
+                self.addLink(router, self.addHost('h%s%s' % (i, router)),
                              params2={'v4_width': 5})
 
         super().build(*args, **kwargs)

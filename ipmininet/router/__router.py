@@ -1,15 +1,15 @@
 """This modules defines a L3 router class,
    with a modular config system."""
-import subprocess
 import sys
 import time
 from ipaddress import IPv4Interface, IPv6Interface
-from typing import Type, Optional, Tuple, Union, Dict, List, Sequence, Set
+from typing import Type, Optional, Tuple, Union, Dict, List, Sequence
 
 from ipmininet import DEBUG_FLAG
 from ipmininet.utils import L3Router, realIntfList, otherIntf
 from ipmininet.link import IPIntf
-from .config import BasicRouterConfig, NodeConfig, RouterConfig, OpenrRouterConfig
+from .config import BasicRouterConfig, NodeConfig, RouterConfig, \
+    OpenrRouterConfig
 
 import mininet.clean
 from mininet.node import Node, Host
@@ -166,7 +166,7 @@ class IPNode(Node):
         """
         lg.debug('{}: Creating logdir {}.\n'.format(self.name, logdir))
         cmd = 'mkdir -p {}'.format(logdir)
-        stdout, stderr, return_code =  self._processes.pexec(shlex.split(cmd))
+        stdout, stderr, return_code = self._processes.pexec(shlex.split(cmd))
         if not return_code:
             lg.debug('{}: Logdir {} successfully created.\n'.format(self.name,
                                                                     logdir))
@@ -234,12 +234,14 @@ class OpenrRouter(Router):
     """OpenR router with private '/tmp' dir to handle unix sockets created by
        the OpenR daemon"""
 
-    def __init__(self, name,
+    def __init__(self, name, *args,
                  config: Type[OpenrRouterConfig],
-                 lo_addresses: Sequence[Union[str, IPv4Interface,
-                                              IPv6Interface]] = (),
+                 lo_addresses: Optional[Sequence[
+                     Union[str, IPv4Interface, IPv6Interface]]] = None,
                  privateDirs=['/tmp'],
-                 *args, **kwargs):
+                 **kwargs):
+        if not lo_addresses:
+            lo_addresses = ()
         super().__init__(name,
                          config=config,
                          lo_addresses=lo_addresses,

@@ -51,11 +51,12 @@ class RouterDescription(NodeDescription):
 
 
 class OpenrRouterDescription(RouterDescription):
-    def addOpenrDaemon(self,
-                       daemon: Union[OpenrDaemon, Type[OpenrDaemon]] = Openr,
-                       default_cfg_class: Type[OpenrRouterConfig] =
-                           OpenrRouterConfig,
-                       **kwargs):
+    def addOpenrDaemon(
+            self,
+            daemon: Union[OpenrDaemon, Type[OpenrDaemon]] = Openr,
+            default_cfg_class: Type[OpenrRouterConfig] = OpenrRouterConfig,
+            **kwargs
+    ):
         self.addDaemon(daemon,
                        default_cfg_class=default_cfg_class,
                        **kwargs)

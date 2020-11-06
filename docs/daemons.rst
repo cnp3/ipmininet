@@ -276,7 +276,7 @@ select custom router classes:
     from ipmininet.node_description import OpenrRouterDescription
 
 
-    class SimpleOpenrNet(IPTopo):
+    class MyTopology(IPTopo):
 
         def build(self, *args, **kwargs):
             r1 = self.addRouter('r1',

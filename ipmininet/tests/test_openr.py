@@ -2,8 +2,6 @@ import os
 import tempfile
 import uuid
 
-import pytest
-
 from ipmininet.clean import cleanup
 from ipmininet.ipnet import IPNet
 from ipmininet.iptopo import IPTopo

@@ -104,7 +104,7 @@ The following code shows how to use all these abstractions:
             all_al = AccessList('all', ('any',))
 
             # Add a community list to as2r1
-            loc_pref = CommunityList('loc-pref', '2:80')
+            loc_pref = CommunityList('loc-pref', community='2:80')
 
             # as2r1 set the local pref of all the route coming from as1r1 and matching the community list community to 80
             as2r1.get_config(BGP).set_local_pref(80, from_peer=as1r1, matching=(loc_pref,))

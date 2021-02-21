@@ -15,11 +15,10 @@ VERSION = '0.9'
 
 modname = distname = 'ipmininet'
 
-MININET_VERSION = "2.3.0d6"
+MININET_VERSION = "2.3.0"
 install_requires = [
     'setuptools',
-    'mako>=1.0,<1.1',
-    'ipaddress>=1.0.22',
+    'mako>=1.1,<1.2'
 ]
 dependency_links = []
 
@@ -93,9 +92,10 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: System :: Networking",
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9'
         ],
     keywords='networking OSPF IP BGP quagga mininet',
     license='GPLv2',

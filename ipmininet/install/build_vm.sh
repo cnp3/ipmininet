@@ -8,7 +8,7 @@ set -e
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 
-MN_VERSION="2.3.0d6"
+MN_VERSION="2.3.0"
 MN_INSTALL_SCRIPT_REMOTE="https://raw.githubusercontent.com/mininet/mininet/${MN_VERSION}/util/vm/install-mininet-vm.sh"
 DEPS="python3 \
       python3-pip \

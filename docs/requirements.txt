@@ -1,7 +1,5 @@
-mako>=1.0,<1.1
-ipaddress>=1.0.22
-future>=0.17.1
-mininet @ git+https://github.com/mininet/mininet@2.3.0d6
+mako>=1.1,<1.2
+mininet @ git+https://github.com/mininet/mininet@2.3.0
 sphinx_rtd_theme
 sphinxcontrib-apidoc
 sphinxcontrib-napoleon

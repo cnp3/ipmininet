@@ -7,8 +7,9 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from utils import supported_distributions, identify_distribution, sh
 
-MininetVersion = "2.3.0d6"
-FRRoutingVersion = "7.1"
+MininetVersion = "2.3.0"
+FRRoutingVersion = "7.5"
+LibyangVersion = "v1.0.215"
 ExaBGPVersion = "4.2.11"
 
 os.environ["PATH"] = "%s:/sbin:/usr/sbin/:/usr/local/sbin" % os.environ["PATH"]
@@ -74,32 +75,17 @@ def install_mininet(output_dir: str, pip_install=True):
 
 
 def install_libyang(output_dir: str):
-
-    packages = []
-
+    dist.install("git", "cmake")
     if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
-        dist.install("libpcre16-3", "libpcre3-dev", "libpcre32-3",
-                     "libpcrecpp0v5")
-        cmd = "dpkg -i"
-        libyang_url = "https://ci1.netdef.org/artifact/LIBYANG-YANGRELEASE" \
-                      "/shared/build-10/Debian-AMD64-Packages"
-        packages.extend(["libyang0.16_0.16.105-1_amd64.deb",
-                         "libyang-dev_0.16.105-1_amd64.deb"])
+        dist.install("libpcre3-dev")
     elif dist.NAME == "Fedora":
         dist.install("pcre-devel")
-        cmd = "rpm -ivh"
-        libyang_url = "https://ci1.netdef.org/artifact/LIBYANG-YANGRELEASE" \
-                      "/shared/build-10/Fedora-29-x86_64-Packages/"
-        packages.extend(["libyang-0.16.111-0.x86_64.rpm",
-                         "libyang-devel-0.16.111-0.x86_64.rpm"])
-    else:
-        return
 
-    for package in packages:
-        sh("wget %s/%s" % (libyang_url, package),
-           "%s %s" % (cmd, package),
-           "rm %s" % package,
-           cwd=output_dir)
+    sh("git clone https://github.com/CESNET/libyang.git", cwd=output_dir)
+    cloned_repo = os.path.join(output_dir, "libyang")
+    sh("git checkout %s" % LibyangVersion, "mkdir build", cwd=cloned_repo)
+    sh("cmake -DENABLE_LYD_PRIV=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr -D CMAKE_BUILD_TYPE:String=\"Release\" ..",
+       "make", "make install", cwd=os.path.join(cloned_repo, "build"))
 
 
 def link_to_standard_dir(base_dir: str, standard_dir: str):
@@ -120,11 +106,11 @@ def install_frrouting(output_dir: str):
     if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
         dist.install("libreadline-dev", "libc-ares-dev", "libjson-c-dev",
                      "perl", "python3-dev", "libpam0g-dev", "libsystemd-dev",
-                     "libsnmp-dev", "pkg-config")
+                     "libsnmp-dev", "pkg-config", "libcap-dev")
     elif dist.NAME == "Fedora":
         dist.install("readline-devel", "c-ares-devel", "json-c-devel",
                      "perl-core", "python3-devel", "pam-devel", "systemd-devel",
-                     "net-snmp-devel", "pkgconfig")
+                     "net-snmp-devel", "pkgconfig", "libcap-devel")
 
     install_libyang(output_dir)
 

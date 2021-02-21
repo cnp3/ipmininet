@@ -12,7 +12,10 @@ debug bgp ${section}
 router bgp ${node.bgpd.asn}
     bgp router-id ${node.bgpd.routerid}
     bgp bestpath compare-routerid
+    ! To prevent BGP4 of sending only IPv4 routes
     no bgp default ipv4-unicast
+    ! (see https://docs.frrouting.org/en/latest/bgp.html#require-policy-on-ebgp)
+    no bgp ebgp-requires-policy
 % for n in node.bgpd.neighbors:
     no auto-summary
     neighbor ${n.peer} remote-as ${n.asn}
@@ -24,7 +27,7 @@ router bgp ${node.bgpd.asn}
     <%block name="neighbor"/>
 % endfor
 % for af in node.bgpd.address_families:
-    address-family ${af.name}
+    address-family ${af.name} unicast
     % for rm in node.bgpd.route_maps:
         % if rm.family == af.name:
         neighbor ${rm.neighbor.peer} route-map ${rm.name} ${rm.direction}

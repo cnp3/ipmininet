@@ -63,8 +63,6 @@ class QuaggaDaemon(RouterDaemon):
 class Zebra(QuaggaDaemon):
     NAME = 'zebra'
     PRIO = 0
-    # We want zebra to preserve existing routes in the kernel RT (e.g. those
-    # set via ip route)
     STARTUP_LINE_EXTRA = ''
     KILL_PATTERNS = (NAME,)
 

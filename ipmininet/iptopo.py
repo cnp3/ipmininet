@@ -107,16 +107,7 @@ class IPTopo(Topo):
            :param key: a key to identify the link (optional)
            :param opts: link options (optional)
            :return: link info key"""
-
-        # XXX When PR https://github.com/mininet/mininet/pull/895
-        # is accepted, we can replace this code by a call to the
-        # super() method
-        if not opts and self.lopts:
-            opts = self.lopts
-        port1, port2 = self.addPort(node1, node2, port1, port2)
-        opts = dict(opts)
-        opts.update(node1=node1, node2=node2, port1=port1, port2=port2)
-        key = self.g.add_edge(node1, node2, key, opts)
+        key = super().addLink(node1=node1, node2=node2, port1=port1, port2=port2, key=key, **opts)
 
         # Create an abstraction to allow additional calls
         link_description = LinkDescription(self, node1, node2, key,

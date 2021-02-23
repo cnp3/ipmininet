@@ -1,8 +1,4 @@
 """An enhanced CLI providing IP-related commands"""
-import sys
-from cmd import Cmd
-from select import poll
-
 from mininet.cli import CLI
 from mininet.log import lg
 
@@ -10,31 +6,6 @@ from ipmininet.utils import address_pair
 
 
 class IPCLI(CLI):
-
-    # XXX When PR https://github.com/mininet/mininet/pull/897
-    # is accepted, we can remove this constructor
-    def __init__(self, mininet, stdin=sys.stdin, script=None):
-        """Start and run interactive or batch mode CLI
-           mininet: Mininet network object
-           stdin: standard input for CLI
-           script: script to run in batch mode"""
-        self.mn = mininet
-        # Local variable bindings for py command
-        self.locals = {'net': mininet}
-        # Attempt to handle input
-        self.stdin = stdin
-        self.inPoller = poll()
-        self.inPoller.register(stdin)
-        self.inputFile = script
-        Cmd.__init__(self, stdin=self.stdin)
-        lg.info('*** Starting CLI:\n')
-
-        if self.inputFile:
-            self.do_source(self.inputFile)
-            return
-
-        self.initReadline()
-        self.run()
 
     def do_route(self, line: str = ""):
         """route destination: Print all the routes towards that destination

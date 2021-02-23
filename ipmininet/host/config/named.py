@@ -45,7 +45,7 @@ class Named(HostDaemon):
     @property
     def startup_line(self):
         # This runs the daemon outside of AppArmor's restrictions
-        return '{apparmor}{name} -c {cfg} -f -u root -p {port}' \
+        return '{apparmor}{name} -c {cfg} -f -u root -t / -p {port}' \
             .format(apparmor="aa-exec -p unconfined " if self.apparmor else "",
                     name=self.NAME,
                     cfg=self.cfg_filename,

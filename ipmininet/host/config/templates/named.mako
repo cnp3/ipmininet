@@ -25,3 +25,7 @@ zone "${zone.name}" {
     file "${filename}";
 };
 % endfor
+
+options {
+    dnssec-validation no;
+};

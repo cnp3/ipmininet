@@ -164,8 +164,8 @@ def check_as_path(as_path_rib: str, as_path_us: ExaList):
         'as1': {'ipv4': '8.8.8.1/24', 'ipv6': '2001:4860:4860::1/64'},
         'as2': {'ipv4': '8.8.8.2/24', 'ipv6': '2001:4860:4860::2/64'}}), 'as2'),  # custom IP addr, random routes
     (ExaBGPTopoInjectPrefixes(routes=exa_routes, addr={
-        'as1': {'ipv4': '8.8.8.1/24', 'ipv6': '2001:4860:4860::1/64'},
-        'as2': {'ipv4': '8.8.8.2/24', 'ipv6': '2001:4860:4860::2/64'}}), 'as2'),  # custom IP addr, custom routes
+        'as1': {'ipv4': '9.8.8.1/24', 'ipv6': '2001:4860:4860::1/64'},
+        'as2': {'ipv4': '9.8.8.2/24', 'ipv6': '2001:4860:4860::2/64'}}), 'as2'),  # custom IP addr, custom routes
 ])
 def test_example_exabgp(topo_test, frr_bgp_node):
     rib_scripts = prepare_rib_lookup_script(get_rib)

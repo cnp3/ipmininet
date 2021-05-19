@@ -250,7 +250,9 @@ class Router(IPNode, L3Router):
 
         # This interface already exists in the node,
         # so no need to move it
-        lo = IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None)
+        node_params_for_lo = ["igp_area"]
+        params = {k: v for k, v in kwargs.items() if k in node_params_for_lo}
+        lo = IPIntf('lo', node=self, port=-1, moveIntfFn=lambda x, y: None, **params)
         lo.ip = lo_addresses
 
     @property

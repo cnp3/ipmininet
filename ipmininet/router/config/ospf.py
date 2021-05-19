@@ -28,6 +28,8 @@ class OSPFArea(Overlay):
     @area.setter
     def area(self, x: str):
         self.links_properties['igp_area'] = x
+        # Also set node property so we can use it for the loopback interface
+        self.nodes_properties['igp_area'] = x
 
     def apply(self, topo):
         # Add all links for the routers

@@ -64,7 +64,8 @@ class NodeConfig:
         host_file_mount = os.path.join(self._node.cwd, 'hosts_%(name)s')
         self.build_host_file(host_file_mount % self._node.__dict__)
         self.add_private_fs_path([('/etc/resolv.conf', resolv_file_mount),
-                                  ('/etc/hosts', host_file_mount)])
+                                  ('/etc/hosts', host_file_mount),
+                                  '/var/run/frr'])
 
         self._cfg.clear()
         self._cfg.name = self._node.name

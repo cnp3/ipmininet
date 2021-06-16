@@ -22,9 +22,11 @@ class MinimalOSPFNet(IPTopo):
                  |
                 h3
     """
-    def __init__(self, ospf_params_r1, link_params, *args, **kwargs):
-        """:param ospf_params_r1: Parameters to set on the OSPF daemon of r1
+    def __init__(self, node_params_r1, ospf_params_r1, link_params, *args, **kwargs):
+        """:param node_params_r1: Parameters to set on the r1 router
+        :param ospf_params_r1: Parameters to set on the OSPF daemon of r1
         :param link_params: Parameters to set on the link between r1 and r2"""
+        self.node_params_r1 = node_params_r1
         self.ospf_params_r1 = ospf_params_r1
         self.link_params = link_params
         self.link_params.setdefault("params1", {})\
@@ -34,7 +36,8 @@ class MinimalOSPFNet(IPTopo):
         super().__init__(*args, **kwargs)
 
     def build(self, *args, **kwargs):
-        r1, r2, r3 = self.addRouters("r1", "r2", "r3", config=RouterConfig)
+        r1 = self.addRouter("r1", config=RouterConfig, **self.node_params_r1)
+        r2, r3 = self.addRouters("r2", "r3", config=RouterConfig)
         r1.addDaemon(OSPF, **self.ospf_params_r1)
         r2.addDaemon(OSPF)
         r3.addDaemon(OSPF)
@@ -88,42 +91,54 @@ detour_paths = [
 
 
 @require_root
-@pytest.mark.parametrize("ospf_params,link_params,exp_cfg,exp_paths", [
+@pytest.mark.parametrize("node_params,ospf_params,link_params,exp_cfg,exp_paths", [
     ({},
+     {},
      {},
      ["  network 10.0.0.1/24 area 0.0.0.0",
       "interface r1-eth0"],
      unit_igp_cost_paths),
-    ({"debug": ["lsa"]},
+    ({},
+     {"debug": ["lsa"]},
      {},
      ["debug ospf lsa"],
      unit_igp_cost_paths),
     ({},
+     {},
      {"igp_metric": 5},
      ["  ip ospf cost 5"],
      detour_paths),
     ({},
+     {},
      {"igp_area": "1.1.1.1"},
-     ["  network 10.0.0.1/24 area 1.1.1.1"],
+     ["  network 10.0.0.1/24 area 1.1.1.1", "  network 127.0.0.1/8 area 0.0.0.0"],
      detour_paths),
+    ({"igp_area": "1.1.1.1"},
+     {},
+     {},
+     ["  network 127.0.0.1/8 area 1.1.1.1", "  network 10.0.0.1/24 area 0.0.0.0"],
+     unit_igp_cost_paths),
     ({},
+     {},
      {"params1": {"ospf_priority": 1}},
      ["  ip ospf priority 1"],
      unit_igp_cost_paths),
     ({},
+     {},
      {"params1": {"ospf_dead_int": "minimal hello-multiplier 2"}},
      ["  ip ospf dead-interval minimal hello-multiplier 2"],
      unit_igp_cost_paths),
-    ({"redistribute": [OSPFRedistributedRoute("connected", 1, 15),
+    ({},
+     {"redistribute": [OSPFRedistributedRoute("connected", 1, 15),
                        OSPFRedistributedRoute("static", 2, 50)]},
      {},
      ["  redistribute connected metric-type 1 metric 15",
       "  redistribute static metric-type 2 metric 50"],
      unit_igp_cost_paths),
 ])
-def test_ospf_daemon_params(ospf_params, link_params, exp_cfg, exp_paths):
+def test_ospf_daemon_params(node_params, ospf_params, link_params, exp_cfg, exp_paths):
     try:
-        net = IPNet(topo=MinimalOSPFNet(ospf_params, link_params),
+        net = IPNet(topo=MinimalOSPFNet(node_params, ospf_params, link_params),
                     allocate_IPs=False)
         net.start()
 

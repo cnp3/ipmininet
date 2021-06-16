@@ -21,15 +21,17 @@ class MinimalOSPFv3Net(IPTopo):
                  |
                 h3
     """
-    def __init__(self, ospf6_params_r1, link_params, *args, **kwargs):
-        """:param ospf6_params_r1: Parameters to set on the OSPF6 daemon of r1
+    def __init__(self, node_params_r1, ospf6_params_r1, link_params, *args, **kwargs):
+        """:param node_params_r1: Parameters to set on the r1 router
+        :param ospf6_params_r1: Parameters to set on the OSPF6 daemon of r1
         :param link_params: Parameters to set on the link between r1 and r2"""
+        self.node_params_r1 = node_params_r1
         self.ospf6_params_r1 = ospf6_params_r1
         self.link_params = link_params
         super().__init__(*args, **kwargs)
 
     def build(self, *args, **kwargs):
-        r1 = self.addRouter("r1", config=RouterConfig)
+        r1 = self.addRouter("r1", config=RouterConfig, **self.node_params_r1)
         r1.addDaemon(OSPF6, **self.ospf6_params_r1)
         r2 = self.addRouter("r2", config=RouterConfig)
         r2.addDaemon(OSPF6)
@@ -79,37 +81,53 @@ high_igp_cost_paths = [
 
 
 @require_root
-@pytest.mark.parametrize("ospf6_params,link_params,exp_cfg,exp_paths", [
+@pytest.mark.parametrize("node_params,ospf6_params,link_params,exp_cfg,exp_paths", [
     ({},
+     {},
      {},
      ["  interface r1-eth0 area 0.0.0.0"],
      unit_igp_cost_paths),
-    ({"debug": ["flooding"]},
+    ({},
+     {"debug": ["flooding"]},
      {},
      ["debug ospf6 flooding"],
      unit_igp_cost_paths),
     ({},
+     {},
      {"igp_metric": 5},
      ["  ipv6 ospf6 cost 5"],
      high_igp_cost_paths),
     ({},
+     {},
+     {"igp_area": "1.1.1.1"},
+     ["  interface r1-eth0 area 1.1.1.1", "  interface lo area 0.0.0.0"],
+     high_igp_cost_paths),
+    ({"igp_area": "1.1.1.1"},
+     {},
+     {},
+     ["  interface lo area 1.1.1.1", "  interface r1-eth0 area 0.0.0.0"],
+     unit_igp_cost_paths),
+    ({},
+     {},
      {"params1": {"ospf6_priority": 1}},
      ["  ipv6 ospf6 priority 1"],
      unit_igp_cost_paths),
     ({},
+     {},
      {"params1": {"ospf_dead_int": "minimal hello-multiplier 2"}},
      ["  ipv6 ospf6 dead-interval %d" % OSPF6.DEAD_INT],
      unit_igp_cost_paths),
-    ({"redistribute": [OSPF6RedistributedRoute("connected"),
+    ({},
+     {"redistribute": [OSPF6RedistributedRoute("connected"),
                        OSPF6RedistributedRoute("static")]},
      {},
      ["  redistribute connected",
       "  redistribute static"],
      unit_igp_cost_paths),
 ])
-def test_ospf6_daemon_params(ospf6_params, link_params, exp_cfg, exp_paths):
+def test_ospf6_daemon_params(node_params, ospf6_params, link_params, exp_cfg, exp_paths):
     try:
-        net = IPNet(topo=MinimalOSPFv3Net(ospf6_params, link_params))
+        net = IPNet(topo=MinimalOSPFv3Net(node_params, ospf6_params, link_params))
         net.start()
 
         # Check generated configuration

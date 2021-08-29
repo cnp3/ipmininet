@@ -33,6 +33,10 @@ class IPIntf(_m.TCIntf):
         self.backup_addresses = {4: [], 6: []}
         self.restore_cmds = []
 
+        # Start the captures on this interface
+        for capture in self.get("captures", []):
+            capture.start(intf=self)
+
     @property
     def igp_area(self) -> str:
         """Return the igp area associated to this interface"""

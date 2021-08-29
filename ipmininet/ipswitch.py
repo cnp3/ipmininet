@@ -11,12 +11,14 @@ class IPSwitch(LinuxBridge):
        the hubs"""
 
     def __init__(self, name: str, stp=True, hub=False,
-                 prio: Optional[int] = None, **kwargs):
+                 prio: Optional[int] = None, cwd='/tmp', **kwargs):
         """:param name: the name of the node
            :param stp: whether to use spanning tree protocol
            :param hub: whether this switch behaves as a hub (this disable stp)
-           :param prio: optional explicit bridge priority for STP"""
+           :param prio: optional explicit bridge priority for STP
+           :param cwd: The base directory for temporary files such as configs"""
         self.hub = hub
+        self.cwd = cwd
         stp = stp and not hub
         LinuxBridge.__init__(self, name, stp=stp, prio=prio, **kwargs)
 
@@ -39,4 +41,19 @@ class IPSwitch(LinuxBridge):
                 self.cmd('brctl setpathcost'
                          ' %s %s %d' % (self.name, i.name,
                                         i.params.get('stp_cost', 1)))
+        # Start the captures on this switch
+        for capture in self.params.get("captures", []):
+            capture.start(node=self)
+        for intf in self.intfList():
+            for capture in intf.params.get("captures", []):
+                capture.start(intf=intf)
         self.cmd('ifconfig', self, 'up')
+
+    def stop(self, deleteIntfs=True):
+        # Stop the captures on this switch
+        for capture in self.params.get("captures", []):
+            capture.stop(node=self)
+        for intf in self.intfList():
+            for capture in intf.params.get("captures", []):
+                capture.stop(intf=intf)
+        super().stop(deleteIntfs=deleteIntfs)

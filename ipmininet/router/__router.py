@@ -118,6 +118,9 @@ class IPNode(Node):
     def start(self):
         """Start the node: Configure the daemons, set the relevant sysctls,
         and fire up all needed processes"""
+        # Start the captures on this node
+        for capture in self.get("captures", []):
+            capture.start(node=self)
         # Build the config
         self.nconfig.build()
         # Check them
@@ -170,6 +173,12 @@ class IPNode(Node):
             self.nconfig.cleanup()
         for opt, val in self._old_sysctl.items():
             self._set_sysctl(opt, val)
+        # Stop the captures on this node
+        for capture in self.get("captures", []):
+            capture.stop(node=self)
+        for intf in self.intfList():
+            for capture in intf.get("captures", []):
+                capture.stop(intf=intf)
         super().terminate()
 
     def _set_sysctl(self, key: str, val: Union[str, int]):

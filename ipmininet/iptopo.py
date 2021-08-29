@@ -5,7 +5,7 @@ from typing import Union, Type, Dict, List, Tuple, Any
 from mininet.topo import Topo
 from mininet.log import lg
 
-from ipmininet.overlay import Overlay, Subnet
+from ipmininet.overlay import Overlay, Subnet, NetworkCapture
 from ipmininet.utils import get_set, is_container
 from ipmininet.node_description import RouterDescription, HostDescription,\
     LinkDescription
@@ -21,7 +21,7 @@ class IPTopo(Topo):
 
     OVERLAYS = {cls.__name__: cls
                 for cls in (AS, iBGPFullMesh, OpenrDomain, OSPFArea,
-                            Subnet, DNSZone)}
+                            Subnet, DNSZone, NetworkCapture)}
 
     def __init__(self, *args, **kwargs):
         self.overlays = []

@@ -1,5 +1,10 @@
+import os
+import shlex
+import signal
+import subprocess
 from collections import defaultdict
 from builtins import str
+from subprocess import Popen
 from typing import List, Sequence, Tuple, Optional, Dict, TYPE_CHECKING, Any, \
     Mapping
 
@@ -8,6 +13,9 @@ from mininet.log import lg
 
 if TYPE_CHECKING:
     from ipmininet.iptopo import IPTopo
+    from ipmininet.link import IPIntf
+    from ipmininet.node_description import IntfDescription, NodeDescription
+    from ipmininet.router import IPNode
 
 
 class Overlay:
@@ -224,3 +232,59 @@ class Subnet(Overlay):
     def __str__(self):
         return "<SubnetOverlay nodes=%s subnets=%s>" % (self.nodes,
                                                         self.subnets)
+
+
+class NetworkCapture(Overlay):
+    """This overlays capture traffic on multiple interfaces before starting the daemons and stores the result"""
+
+    def __init__(self, nodes: List['NodeDescription'] = (), interfaces: List['IntfDescription'] = (),
+                 base_filename: str = "capture", extra_arguments: str = ""):
+        """
+        :param nodes: The routers and hosts that needs to capture traffic on every of their interfaces
+        :param interfaces: The interfaces on which traffic should be captured
+        :param base_filename: The base name of the network capture. One file by router or interface will be created
+            of the form "{base_filename}_{router/interface}.pcapng" in the working directory of the node on which
+            each capture is made.
+        :param extra_arguments: The string encoding any additional argument for the tcpdump call
+        """
+
+        self.base_filename = base_filename
+        self.interfaces = list(set(interfaces))
+        self.extra_arguments = extra_arguments
+        self.ongoing_captures = {}
+        super().__init__(nodes=list(set(nodes)))
+
+    def apply(self, topo: 'IPTopo'):
+        for n in self.nodes:
+            topo.nodeInfo(n).setdefault("captures", []).append(self)
+        for itf in self.interfaces:
+            itf.intf_attrs.setdefault("captures", []).append(self)
+
+    def check_consistency(self, topo: 'IPTopo') -> bool:
+        return len(self.nodes) != 0 or len(self.interfaces) != 0
+
+    def start(self, node: Optional['IPNode'] = None, intf: Optional['IPIntf'] = None) -> Popen:
+        if node is not None:
+            # We need to specify the interfaces explicitly because switches that are loaded on the root namespace
+            # and therefore using '-i any' would listen on all the switches
+            interfaces = [itf.name for itf in node.intfList()]
+            file_path = os.path.join(node.cwd, self.base_filename + '_' + node.name + '.pcapng')
+            cmd = f"tcpdump -Z root -i {' -i '.join(interfaces)} -w {file_path} {self.extra_arguments}"
+            process = node.popen(shlex.split(cmd))
+            self.ongoing_captures[node.name] = process
+            return process
+        elif intf is not None:
+            file_path = os.path.join(intf.node.cwd, self.base_filename + '_' + intf.name + '.pcapng')
+            cmd = f"tcpdump -Z root -i {intf.name} -w {file_path} {self.extra_arguments}"
+            process = intf.node.popen(shlex.split(cmd))
+            self.ongoing_captures[intf.name] = process
+            return process
+        else:
+            raise ValueError("The Network capture need a router or an interface to run")
+
+    def stop(self, node: Optional['IPNode'] = None, intf: Optional['IPIntf'] = None):
+        for anchor in [node, intf]:
+            if anchor is not None:
+                process: subprocess.Popen = self.ongoing_captures.get(anchor.name)
+                process.send_signal(signal.SIGINT)
+                process.wait()

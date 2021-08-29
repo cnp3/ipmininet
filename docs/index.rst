@@ -28,6 +28,7 @@ Github issues.
     srv6
     topologydb
     link_failure
+    network_capture
     contribute
     api/modules
 

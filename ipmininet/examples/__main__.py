@@ -2,6 +2,7 @@
 import argparse
 
 import ipmininet
+from ipmininet.examples.network_capture import NetworkCaptureTopo
 from ipmininet.ipnet import IPNet
 from ipmininet.cli import IPCLI
 
@@ -89,7 +90,8 @@ TOPOS = {'simple_ospf_network': SimpleOSPFNet,
          'tc_network': TCNet,
          'tc_advanced_network': TCAdvancedNet,
          'exabgp_prefix_injector': ExaBGPTopoInjectPrefixes,
-         'failure': FailureTopo}
+         'failure': FailureTopo,
+         'network_capture': NetworkCaptureTopo}
 
 NET_ARGS = {'router_adv_network':  {'use_v4': False,
                                     'use_v6': True,

@@ -43,6 +43,7 @@ The following sections will detail the topologies.
    - [TCNetwork](#tcnetwork)
    - [TCAdvancedNetwork](#tcadvancednetwork)
    - [ExaBGPPrefixInjector](#exabgpprefixinjector)
+   - [NetworkCapture](#networkcapture)
 
 
 ## SimpleOSPFNetwork
@@ -504,3 +505,12 @@ custom BGP routes for both IPv4 and IPv6 unicast families to as2.
 
 When the operation is done, as2 BGP RIB is filled with 3 IPv4 and 3
 IPv6 prefixes with random BGP attributes.
+
+## NetworkCapture
+
+_topo name_ : network_capture
+_args_ : n/a
+
+This topology captures traffic from the network booting.
+This capture the initial messages of the OSPF/OSPFv3 daemons and save the capture
+on /tmp next to the logs.

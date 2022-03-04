@@ -187,7 +187,7 @@ and for real interfaces of all the nodes.
 
             lr2h2 = self.addLink(r2, h2)
             lr2h2[r2].addParams(ip=("2042:2b::2/64", "10.62.0.2/24"))
-            lr2h2[r2].addParams(ip=("2042:2b::b/64", "10.62.0.6/24"))
+            lr2h2[h2].addParams(ip=("2042:2b::b/64", "10.62.0.6/24"))
 
             super().build(*args, **kwargs)
 

@@ -98,10 +98,10 @@ route-map ${rm.name} ${rm.entries[order].match_policy} ${order}
             %endif
         %endfor
         %if rm.entries[order].call_action:
-    call ${rm.call_action}
+    call ${rm.entries[order].call_action}
         %endif
         %if rm.entries[order].exit_policy:
-    on-match ${rm.exit_policy}
+    on-match ${rm.entries[order].exit_policy}
         %endif
 !
     %endfor

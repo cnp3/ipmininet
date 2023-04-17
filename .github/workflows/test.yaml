@@ -1,0 +1,27 @@
+name: Test IPMininet
+on: [ push, pull_request ]
+
+jobs:
+  install_and_run_test:
+    name: Install and test IPMininet
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout the event commit
+        uses: actions/checkout@v2
+      - name: Install IPMininet in dev mode
+        run: |
+          sudo pip install -e .
+          sudo python -m ipmininet.install -a
+      - name: Run tests
+        run: |
+          sudo pip install pytest pytest-cov
+          sudo python -m pytest --cov-config=.coveragerc --cov=ipmininet/ --cov-branch -v --cov-report term --cov-report lcov:lcov.info -v ipmininet
+      - uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          lcov-file: lcov.info
+      - name: Run doc tests
+        run: |
+          cd docs
+          pip install -r requirements.txt
+          printf '' | sudo make doctest
+          cat docs/_build/doctest/output.txt

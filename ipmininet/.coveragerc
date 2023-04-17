@@ -1,0 +1,11 @@
+[run]
+omit =
+    */docs/*
+    */tests/*
+    */util/*
+    */install/*
+    */setup.py
+    */venv/*
+    */templates/*
+    *_mako
+    */.eggs/*

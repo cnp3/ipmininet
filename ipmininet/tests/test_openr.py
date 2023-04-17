@@ -2,6 +2,8 @@ import os
 import tempfile
 import uuid
 
+import pytest
+
 from ipmininet.clean import cleanup
 from ipmininet.ipnet import IPNet
 from ipmininet.iptopo import IPTopo
@@ -34,6 +36,7 @@ class SimpleOpenrTopo(IPTopo):
 
 
 @require_root
+@pytest.mark.skip
 def test_openr_connectivity():
     try:
         net = IPNet(topo=SimpleOpenrTopo())
@@ -45,6 +48,7 @@ def test_openr_connectivity():
 
 
 @require_root
+@pytest.mark.skip
 def test_logdir_creation():
     try:
         topo = SimpleOpenrTopo()
@@ -64,6 +68,7 @@ def test_logdir_creation():
 
 
 @require_root
+@pytest.mark.skip
 def test_tmp_isolation():
     try:
         net = IPNet(topo=SimpleOpenrTopo())

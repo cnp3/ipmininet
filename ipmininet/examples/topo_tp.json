@@ -1,0 +1,56 @@
+{
+    "subnets" : {
+        "as1_lan" :{
+            "address" :"cafe:babe:dead:beaf::/64",
+            "hosts" : {"as1_h1" : "as1_s2"}
+        },
+        "as2_lan" :{
+            "address":"c1a4:4ad:c0ff:ee::/64",
+            "hosts" : {"as2_h2" : ["as2_cl1", "as2_cl2"]}
+        }
+    },
+    "AS" : {
+        "AS1" : {
+            "routers" : {
+                "as1_rr1" : {
+                    "clients" : ["as1_s1"],
+                    "daemons" : {"bgp" : {"networks":["as1_lan"]}}
+                },
+                "as1_rr2" : {
+                    "clients" : ["as1_s2"],
+                    "daemons" : {"bgp" : {"networks":["as1_lan"]}}
+                },
+                "as1_s1" : {},
+                "as1_s2" : {}
+            },
+            "hosts" : {
+                "as1_h1" : {}
+            },
+            "rconfig" : {
+                "daemons" : ["ospf", "bgp"]
+            }
+        },
+        "AS2" : {
+            "routers" : {
+                "as2_cl1" : {},
+                "as2_cl2" : {}
+            },
+            "hosts" : {
+                "as2_h2" : {}
+            },
+            "rconfig" : {
+                "daemons" : {"bgp" : {"redistribute":["connected"]}}
+            }
+        }
+    },
+    "links" : {
+        "as1_rr1" : [
+            ["as1_rr2", {"igp_metric" : 5}],
+            "as2_cl1"
+        ],
+        "as1_rr2" : ["as2_cl2"],
+        "as1_s1" : ["as1_s2", "as1_rr2"],
+        "as1_s2" : ["as1_rr1", "as1_h1"],
+        "as2_h2" : ["as2_cl1", "as2_cl2"]
+    }
+}
